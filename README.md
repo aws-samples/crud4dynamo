@@ -1,4 +1,4 @@
-## A light-weight library built on top of the AWS SDK for easing the access to Amazon DynamoDB.
+## crud4dynamo
 
 
 
