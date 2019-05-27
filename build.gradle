@@ -18,8 +18,6 @@ ext {
             // configure the package name for generated source
             'package' : "com.amazon.${rootProject.name}.ddbparser".toString() // a bug in antlr plugin, need to explicitly call toString
     ]
-    
-    logger.info("antlrConfig ${antlrConfig}")
 }
 
 repositories {
@@ -34,8 +32,10 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:27.0.1-jre'
 
-    // Use JUnit test framework
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.assertj:assertj-core:3.12.2'
+    testCompileOnly 'org.junit.jupiter:junit-jupiter-params:5.4.2'
+    testCompileOnly 'org.junit.jupiter:junit-jupiter-api:5.4.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
 }
 
 generateGrammarSource {
@@ -53,4 +53,8 @@ task showSourceSetPath {
             println "--> SourceSet [${st.name}] with srcDirs ${st.allJava.srcDirs}"
         }
     }
+}
+
+test {
+    useJUnitPlatform()
 }
