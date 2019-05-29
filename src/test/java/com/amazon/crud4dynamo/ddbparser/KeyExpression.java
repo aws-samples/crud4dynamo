@@ -8,12 +8,12 @@ class KeyExpression extends ParsingTestBase {
 
     @Override
     Class<? extends Lexer> getLexerClass() {
-        return KeyExpressionLexer.class;
+        return com.amazon.crud4dynamo.ddbparser.KeyExpressionLexer.class;
     }
 
     @Override
     Class<? extends Parser> getParserClass() {
-        return KeyExpressionParser.class;
+        return com.amazon.crud4dynamo.ddbparser.KeyExpressionParser.class;
     }
 
     @Override

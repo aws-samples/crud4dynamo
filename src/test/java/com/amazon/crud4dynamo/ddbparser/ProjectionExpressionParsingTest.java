@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test;
 public class ProjectionExpressionParsingTest extends ParsingTestBase {
     @Override
     Class<? extends Lexer> getLexerClass() {
-        return ProjectionExpressionLexer.class;
+        return com.amazon.crud4dynamo.ddbparser.ProjectionExpressionLexer.class;
     }
 
     @Override
     Class<? extends Parser> getParserClass() {
-        return ProjectionExpressionParser.class;
+        return com.amazon.crud4dynamo.ddbparser.ProjectionExpressionParser.class;
     }
 
     @Override

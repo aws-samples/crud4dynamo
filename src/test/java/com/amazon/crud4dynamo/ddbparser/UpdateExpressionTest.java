@@ -11,12 +11,12 @@ class UpdateExpressionTest {
 
         @Override
         Class<? extends Lexer> getLexerClass() {
-            return UpdateExpressionLexer.class;
+            return com.amazon.crud4dynamo.ddbparser.UpdateExpressionLexer.class;
         }
 
         @Override
         Class<? extends Parser> getParserClass() {
-            return UpdateExpressionParser.class;
+            return com.amazon.crud4dynamo.ddbparser.UpdateExpressionParser.class;
         }
 
         @Override

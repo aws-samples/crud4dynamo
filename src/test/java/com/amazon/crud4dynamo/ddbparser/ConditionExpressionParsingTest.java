@@ -9,12 +9,12 @@ import org.junit.jupiter.params.provider.ValueSource;
 class ConditionExpressionParsingTest extends ParsingTestBase {
     @Override
     Class<? extends Lexer> getLexerClass() {
-        return ConditionExpressionLexer.class;
+        return com.amazon.crud4dynamo.ddbparser.ConditionExpressionLexer.class;
     }
 
     @Override
     Class<? extends Parser> getParserClass() {
-        return ConditionExpressionParser.class;
+        return com.amazon.crud4dynamo.ddbparser.ConditionExpressionParser.class;
     }
 
     @Override

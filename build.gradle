@@ -23,23 +23,58 @@ ext {
 repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
-    jcenter()
+//    jcenter()
     mavenCentral()
+
+    maven {
+        // name "DynamoDB Local Release Repository - Asia Pacific (Tokyo) Region"
+        url "https://s3-ap-northeast-1.amazonaws.com/dynamodb-local-tokyo/release"
+    }
 }
 
 dependencies {
     antlr "org.antlr:antlr4:4.7.1"
 
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation 'com.google.guava:guava:27.0.1-jre'
+    // api
+    // This is where you should declare dependencies which are transitively exported to consumers, for compile.
 
+    // implementation
+    // This is where you should declare dependencies which are purely internal and not meant to be exposed to consumers.
+    implementation 'com.google.guava:guava:27.0.1-jre'
+    implementation 'com.amazonaws:aws-java-sdk:1.11.560' // TODO: change to dynamodb sdk
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.2'
+
+    // compileOnly
+    // This is where you should declare dependencies which are only required at compile time, but should not leak into runtime
+    // This typically includes dependencies which are shaded when found at runtime
     compileOnly 'org.projectlombok:lombok:1.18.8'
+
+    // runtimeOnly
+    // This is where you should declare dependencies which are only required at runtime, and not at compile time
+
+    // annotationProcessor
     annotationProcessor 'org.projectlombok:lombok:1.18.8'
 
+    // testImplementation
+    // This is where you should declare dependencies which are used to compile tests
     testImplementation 'org.assertj:assertj-core:3.12.2'
+    testImplementation 'org.mockito:mockito-core:2.27.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:2.27.0'
+    testImplementation 'com.amazonaws:DynamoDBLocal:1.11.477'
+
+    // testCompileOnly
+    // This is where you should declare dependencies which are only required at test compile time, but should not leak into the runtime
+    // This typically includes dependencies which are shaded when found at runtime
     testCompileOnly 'org.junit.jupiter:junit-jupiter-params:5.4.2'
     testCompileOnly 'org.junit.jupiter:junit-jupiter-api:5.4.2'
+    testCompileOnly 'org.projectlombok:lombok:1.18.8'
+
+    // testRuntimeOnly
+    // This is where you should declare dependencies which are only required at test runtime, and not at test compile time
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+
+    // testAnnotationProcessor
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.8'
 }
 
 generateGrammarSource {
