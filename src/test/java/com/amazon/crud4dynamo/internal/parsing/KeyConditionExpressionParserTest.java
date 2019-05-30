@@ -1,5 +1,7 @@
 package com.amazon.crud4dynamo.internal.parsing;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.amazon.crud4dynamo.testbase.SingleTableDynamoDbTestBase;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
@@ -14,8 +16,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class KeyConditionExpressionParserTest {
 

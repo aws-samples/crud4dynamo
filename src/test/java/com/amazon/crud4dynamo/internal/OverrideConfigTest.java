@@ -46,7 +46,8 @@ class OverrideConfigTest {
         @BeforeEach
         public void setUp() throws Exception {
             super.setUp();
-            AssertionsForClassTypes.assertThat(identityChainedFactoryConstructor.factory).isInstanceOf(MapperConfigAwareMethodFactory.class);
+            AssertionsForClassTypes.assertThat(identityChainedFactoryConstructor.factory)
+                    .isInstanceOf(MapperConfigAwareMethodFactory.class);
         }
 
         @Override

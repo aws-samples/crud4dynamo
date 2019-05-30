@@ -1,5 +1,9 @@
 package com.amazon.crud4dynamo.internal.factory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import com.amazon.crud4dynamo.crudinterface.CompositeKeyCrud;
 import com.amazon.crud4dynamo.crudinterface.SimpleKeyCrud;
 import com.amazon.crud4dynamo.exception.CrudForDynamoException;
@@ -20,10 +24,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 class BasicCrudMethodFactoryTest {
 

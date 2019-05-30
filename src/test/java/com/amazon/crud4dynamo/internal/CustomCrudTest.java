@@ -1,5 +1,8 @@
 package com.amazon.crud4dynamo.internal;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.amazon.crud4dynamo.CrudForDynamo;
 import com.amazon.crud4dynamo.annotation.Cached;
 import com.amazon.crud4dynamo.annotation.Custom;
@@ -45,9 +48,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class CustomCrudTest extends CompositeKeyTestBase<CustomCrudTest.Model, CustomCrudTest.CustomDao> {
     private static final String GSI = "GSI";

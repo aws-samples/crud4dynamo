@@ -1,5 +1,7 @@
 package com.amazon.crud4dynamo.internal.method.transaction;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.amazon.crud4dynamo.annotation.Param;
 import com.amazon.crud4dynamo.annotation.transaction.Delete;
 import com.amazon.crud4dynamo.extension.Signature;
@@ -16,8 +18,6 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransactionWriteMethodWithDeleteOnlyTest {
     private static final String TABLE_NAME_1 = "TestTable1";

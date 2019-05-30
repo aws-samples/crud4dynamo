@@ -1,14 +1,14 @@
 package com.amazon.crud4dynamo;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.Mockito.mock;
+
 import com.amazon.crud4dynamo.extension.factory.ChainedFactoryConstructor;
 import com.amazon.crud4dynamo.extension.factory.ChainedMethodFactoryConfig;
 import com.amazon.crud4dynamo.extension.factory.FactoryConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.mockito.Mockito.mock;
 
 class ConfigTest {
 

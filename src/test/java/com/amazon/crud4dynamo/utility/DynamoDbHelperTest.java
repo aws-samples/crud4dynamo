@@ -1,9 +1,9 @@
 package com.amazon.crud4dynamo.utility;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.amazon.crud4dynamo.testdata.DummyTable;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class DynamoDbHelperTest {
     @Test

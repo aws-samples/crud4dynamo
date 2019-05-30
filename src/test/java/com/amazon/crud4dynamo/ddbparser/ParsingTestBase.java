@@ -1,13 +1,13 @@
 package com.amazon.crud4dynamo.ddbparser;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public abstract class ParsingTestBase {
     abstract Class<? extends Lexer> getLexerClass();

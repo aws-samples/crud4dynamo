@@ -1,13 +1,13 @@
 package com.amazon.crud4dynamo.internal.parsing;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class AttributeNameMapperTest {
     private final AttributeNameMapper mapper = new AttributeNameMapper();

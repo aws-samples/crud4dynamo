@@ -1,5 +1,10 @@
 package com.amazon.crud4dynamo.internal.factory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.amazon.crud4dynamo.annotation.Cached;
 import com.amazon.crud4dynamo.annotation.Custom;
 import com.amazon.crud4dynamo.extension.Context;
@@ -8,11 +13,6 @@ import com.amazon.crud4dynamo.extension.factory.AbstractMethodFactory;
 import com.amazon.crud4dynamo.extension.method.AbstractMethod;
 import java.lang.reflect.Method;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 class CustomMethodFactoryTest {
     public interface TestInterface {

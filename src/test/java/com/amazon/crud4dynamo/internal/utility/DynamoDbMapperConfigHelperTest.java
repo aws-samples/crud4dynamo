@@ -1,10 +1,10 @@
 package com.amazon.crud4dynamo.internal.utility;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.PaginationLoadingStrategy;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class DynamoDbMapperConfigHelperTest {
 

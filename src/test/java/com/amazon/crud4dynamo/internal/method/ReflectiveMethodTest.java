@@ -1,10 +1,10 @@
 package com.amazon.crud4dynamo.internal.method;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.amazon.crud4dynamo.extension.Signature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ReflectiveMethodTest {
 

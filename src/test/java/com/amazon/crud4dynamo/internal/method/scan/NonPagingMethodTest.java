@@ -1,5 +1,7 @@
 package com.amazon.crud4dynamo.internal.method.scan;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
 import com.amazon.crud4dynamo.annotation.Param;
 import com.amazon.crud4dynamo.annotation.Scan;
 import com.amazon.crud4dynamo.crudinterface.CompositeKeyCrud;
@@ -18,8 +20,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 class NonPagingMethodTest extends SingleTableDynamoDbTestBase<NonPagingMethodTest.Model> {
     @Data

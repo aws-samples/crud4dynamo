@@ -1,5 +1,10 @@
 package com.amazon.crud4dynamo.internal.factory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+
 import com.amazon.crud4dynamo.annotation.transaction.ConditionCheck;
 import com.amazon.crud4dynamo.extension.Context;
 import com.amazon.crud4dynamo.extension.Signature;
@@ -9,11 +14,6 @@ import com.amazon.crud4dynamo.internal.method.transaction.TransactionWriteMethod
 import com.amazon.crud4dynamo.testbase.DynamoDbTestBase;
 import com.amazon.crud4dynamo.testdata.DummyTable;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 class TransactionWriteMethodFactoryTest extends DynamoDbTestBase {
     private interface Dao {

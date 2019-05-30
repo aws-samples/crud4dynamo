@@ -1,14 +1,14 @@
 package com.amazon.crud4dynamo.internal.method;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.amazon.crud4dynamo.exception.CrudForDynamoException;
 import com.amazon.crud4dynamo.extension.Signature;
 import com.google.common.reflect.AbstractInvocationHandler;
 import com.google.common.reflect.Reflection;
 import java.lang.reflect.Method;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DefaultMethodTest {
 

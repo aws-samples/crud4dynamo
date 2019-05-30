@@ -1,5 +1,7 @@
 package com.amazon.crud4dynamo.internal.parsing;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.amazon.crud4dynamo.annotation.Param;
 import com.amazon.crud4dynamo.extension.Argument;
 import com.amazon.crud4dynamo.extension.Signature;
@@ -10,8 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ExpressionAttributesFactoryTest {
     private static final String EXPRESSION_ATTRIBUTE_NAME_1 = "#ExpressionAttributeName1";

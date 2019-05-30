@@ -1,5 +1,7 @@
 package com.amazon.crud4dynamo.internal;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.amazon.crud4dynamo.CrudForDynamo;
 import com.amazon.crud4dynamo.annotation.Param;
 import com.amazon.crud4dynamo.annotation.transaction.ConditionCheck;
@@ -19,8 +21,6 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransactionTest extends DynamoDbTestBase {
     @Data

@@ -1,5 +1,7 @@
 package com.amazon.crud4dynamo.internal.factory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.amazon.crud4dynamo.annotation.Param;
 import com.amazon.crud4dynamo.extension.Argument;
 import com.amazon.crud4dynamo.extension.PageRequest;
@@ -27,8 +29,6 @@ import lombok.NoArgsConstructor;
 import org.assertj.core.data.MapEntry;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ExpressionFactoryHelperTest {
 

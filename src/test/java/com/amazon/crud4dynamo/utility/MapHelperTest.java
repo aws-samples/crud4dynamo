@@ -1,13 +1,13 @@
 package com.amazon.crud4dynamo.utility;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class MapHelperTest {
 

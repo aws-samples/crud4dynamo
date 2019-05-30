@@ -1,5 +1,8 @@
 package com.amazon.crud4dynamo.internal.factory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+
 import com.amazon.crud4dynamo.extension.Context;
 import com.amazon.crud4dynamo.extension.factory.AbstractMethodFactory;
 import com.amazon.crud4dynamo.extension.method.AbstractMethod;
@@ -14,9 +17,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 public class DefaultMethodFactoryTest extends SingleTableDynamoDbTestBase<Model> {
 

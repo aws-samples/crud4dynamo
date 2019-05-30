@@ -17,15 +17,10 @@ class AwsDynamoDbLocalTestUtils {
 
     private static final String BASE_LIBRARY_NAME = "sqlite4java";
 
-    /**
-     * Static helper class.
-     */
-    private AwsDynamoDbLocalTestUtils() {
-    }
+    /** Static helper class. */
+    private AwsDynamoDbLocalTestUtils() {}
 
-    /**
-     * Sets the sqlite4java library path system parameter if it is not set already.
-     */
+    /** Sets the sqlite4java library path system parameter if it is not set already. */
     static void initSqLite() {
         initSqLite(
                 () -> {
@@ -57,12 +52,11 @@ class AwsDynamoDbLocalTestUtils {
      * Calculates the possible Library Names for finding the proper sqlite4j native library and returns the directory with the most specific
      * matching library.
      *
-     * @param osName      The value of <code>"os.name"</code> system property (<code>System.getProperty("os.name")</code>).
+     * @param osName The value of <code>"os.name"</code> system property (<code>System.getProperty("os.name")</code>).
      * @param runtimeName The value of <code>"java.runtime.name"</code> system property (<code>System.getProperty("java.runtime.name")
      *                    </code>).
-     * @param osArch      The value of <code>"os.arch"</code> system property (<code>System.getProperty("os.arch")</code>).
-     * @param osArch      The classpath split into strings by path separator. Value of <code>"java.class.path"</code> system property
-     *                    (<code>
+     * @param osArch The value of <code>"os.arch"</code> system property (<code>System.getProperty("os.arch")</code>).
+     * @param osArch The classpath split into strings by path separator. Value of <code>"java.class.path"</code> system property (<code>
      *                    System.getProperty("os.arch")</code>) split by <code>File.pathSeparator</code>.
      * @return
      */
@@ -88,7 +82,7 @@ class AwsDynamoDbLocalTestUtils {
      * .org/almworks/sqlite4java/src/fa4bb0fe7319a5f1afe008284146ac83e027de60/java/com/almworks/sqlite4java/Internal
      * .java?at=master&fileviewer=file-view-default#Internal.java-160">Internal class</a>.
      *
-     * @param os   Operating System Name used by sqlite4java to get native library.
+     * @param os Operating System Name used by sqlite4java to get native library.
      * @param arch Operating System Architecture used by sqlite4java to get native library.
      * @return Possible Library Names used by sqlite4java to get native library.
      */
@@ -126,7 +120,7 @@ class AwsDynamoDbLocalTestUtils {
      * .java?at=master&fileviewer=file-view-default#Internal.java-204">Internal class</a>.
      *
      * @param osArch The value of <code>"os.arch"</code> system property (<code>System.getProperty("os.arch")</code>).
-     * @param os     Operating System Name used by sqlite4java to get native library.
+     * @param os Operating System Name used by sqlite4java to get native library.
      * @return Operating System Architecture used by sqlite4java to get native library.
      */
     static String getArch(final String os, final String osArch) {
@@ -152,7 +146,7 @@ class AwsDynamoDbLocalTestUtils {
      * .org/almworks/sqlite4java/src/fa4bb0fe7319a5f1afe008284146ac83e027de60/java/com/almworks/sqlite4java/Internal
      * .java?at=master&fileviewer=file-view-default#Internal.java-219">Internal class</a>.*
      *
-     * @param osName      The value of <code>"os.name"</code> system property (<code>System.getProperty("os.name")</code>).
+     * @param osName The value of <code>"os.name"</code> system property (<code>System.getProperty("os.name")</code>).
      * @param runtimeName The value of <code>"java.runtime.name"</code> system property (<code>System.getProperty("java.runtime.name")
      *                    </code>).
      * @return Operating System Name used by sqlite4java to get native library.
@@ -183,7 +177,7 @@ class AwsDynamoDbLocalTestUtils {
     /**
      * Splits classpath string by path separator value.
      *
-     * @param classPath     Value of <code>"java.class.path"</code> system property (<code>System.getProperty("os.arch")</code>).
+     * @param classPath Value of <code>"java.class.path"</code> system property (<code>System.getProperty("os.arch")</code>).
      * @param pathSeparator Value of path separator (<code>File.pathSeparator</code>).
      * @return The list of each classpath elements.
      */
@@ -191,4 +185,3 @@ class AwsDynamoDbLocalTestUtils {
         return Lists.newArrayList(Splitter.on(pathSeparator).split(classPath));
     }
 }
-

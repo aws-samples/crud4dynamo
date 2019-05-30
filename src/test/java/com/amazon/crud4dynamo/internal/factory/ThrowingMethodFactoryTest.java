@@ -1,12 +1,12 @@
 package com.amazon.crud4dynamo.internal.factory;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.amazon.crud4dynamo.exception.CrudForDynamoException;
 import com.amazon.crud4dynamo.extension.Context;
 import com.amazon.crud4dynamo.extension.Signature;
 import java.lang.reflect.Method;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ThrowingMethodFactoryTest {
     @Test

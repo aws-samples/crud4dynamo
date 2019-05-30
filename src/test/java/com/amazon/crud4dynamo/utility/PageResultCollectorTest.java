@@ -1,5 +1,9 @@
 package com.amazon.crud4dynamo.utility;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.amazon.crud4dynamo.extension.PageRequest;
 import com.amazon.crud4dynamo.extension.PageResult;
 import com.google.common.base.Preconditions;
@@ -9,10 +13,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class PageResultCollectorTest {
 
@@ -33,13 +33,10 @@ class PageResultCollectorTest {
 
     private static class PageRequestMocker<T> {
         private static final int DUMMY_MAX_PAGE_SIZE = 100;
-        @Getter
-        private final PageResultCollector.Requester requester;
-        @Getter
-        private PageRequest<T> firstRequest;
+        @Getter private final PageResultCollector.Requester requester;
+        @Getter private PageRequest<T> firstRequest;
         private T lastEvaluatedItem = null;
-        @Getter
-        private final List<T> allItems = new ArrayList<>();
+        @Getter private final List<T> allItems = new ArrayList<>();
 
         private PageRequestMocker() {
             requester = mock(PageResultCollector.Requester.class);

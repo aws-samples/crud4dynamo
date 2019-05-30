@@ -1,5 +1,7 @@
 package com.amazon.crud4dynamo.internal.method;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.amazon.crud4dynamo.annotation.Param;
 import com.amazon.crud4dynamo.annotation.Update;
 import com.amazon.crud4dynamo.extension.Signature;
@@ -18,8 +20,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class UpdateRequestFactoryTest extends SingleTableDynamoDbTestBase<Model> {
     @Data

@@ -1,5 +1,7 @@
 package com.amazon.crud4dynamo.extension;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.amazon.crud4dynamo.annotation.Cached;
 import com.amazon.crud4dynamo.annotation.Query;
 import com.amazon.crud4dynamo.annotation.transaction.ConditionCheck;
@@ -7,8 +9,6 @@ import com.amazon.crud4dynamo.annotation.transaction.ConditionChecks;
 import java.lang.reflect.Method;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class SignatureTest {
 

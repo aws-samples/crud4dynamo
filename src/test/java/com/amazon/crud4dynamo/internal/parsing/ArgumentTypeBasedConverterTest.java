@@ -1,5 +1,8 @@
 package com.amazon.crud4dynamo.internal.parsing;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+
 import com.amazon.crud4dynamo.exception.CrudForDynamoException;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.util.DateUtils;
@@ -16,9 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class ArgumentTypeBasedConverterTest {
     private static final String DUMMY_PATH = "DUMMY_PATH";

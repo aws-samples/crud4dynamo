@@ -1,5 +1,8 @@
 package com.amazon.crud4dynamo.internal.utility;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.amazon.crud4dynamo.annotation.Param;
 import com.amazon.crud4dynamo.extension.Argument;
 import com.amazon.crud4dynamo.extension.Signature;
@@ -15,9 +18,6 @@ import java.util.Map;
 import lombok.Data;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class KeyAttributeConstructorTest {
 

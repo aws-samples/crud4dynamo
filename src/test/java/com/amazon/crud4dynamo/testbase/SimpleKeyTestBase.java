@@ -1,5 +1,9 @@
 package com.amazon.crud4dynamo.testbase;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.amazon.crud4dynamo.crudinterface.SimpleKeyCrud;
 import com.amazon.crud4dynamo.extension.FailedBatch;
 import com.amazon.crud4dynamo.extension.PageRequest;
@@ -14,14 +18,9 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public abstract class SimpleKeyTestBase<M, D extends SimpleKeyCrud> extends SingleTableDynamoDbTestBase<M> {
 
-    @Getter
-    private D dao;
+    @Getter private D dao;
 
     protected abstract D newDao();
 

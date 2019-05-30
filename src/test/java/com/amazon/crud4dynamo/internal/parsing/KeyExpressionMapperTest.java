@@ -1,5 +1,7 @@
 package com.amazon.crud4dynamo.internal.parsing;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.amazon.crud4dynamo.internal.parsing.KeyExpressionMapper.Context;
 import com.amazon.crud4dynamo.internal.parsing.KeyExpressionMapperTest.Model;
 import com.amazon.crud4dynamo.testbase.SingleTableDynamoDbTestBase;
@@ -14,8 +16,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class KeyExpressionMapperTest extends SingleTableDynamoDbTestBase<Model> {
     @Data

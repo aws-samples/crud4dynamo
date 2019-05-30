@@ -1,5 +1,9 @@
 package com.amazon.crud4dynamo.internal.factory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import com.amazon.crud4dynamo.annotation.Param;
 import com.amazon.crud4dynamo.annotation.Put;
 import com.amazon.crud4dynamo.extension.Context;
@@ -15,10 +19,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import java.lang.reflect.Method;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 class PutMethodFactoryTest extends SingleTableDynamoDbTestBase<PutMethodFactoryTest.Model> {
     @Data

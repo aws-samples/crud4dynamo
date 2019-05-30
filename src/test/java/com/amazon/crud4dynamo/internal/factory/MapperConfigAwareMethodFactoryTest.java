@@ -1,5 +1,8 @@
 package com.amazon.crud4dynamo.internal.factory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+
 import com.amazon.crud4dynamo.annotation.MapperConfig;
 import com.amazon.crud4dynamo.extension.Context;
 import com.amazon.crud4dynamo.extension.Signature;
@@ -12,9 +15,6 @@ import java.lang.reflect.Method;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 class MapperConfigAwareMethodFactoryTest {
 

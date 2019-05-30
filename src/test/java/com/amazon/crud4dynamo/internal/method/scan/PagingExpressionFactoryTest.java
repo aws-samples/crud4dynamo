@@ -1,5 +1,10 @@
 package com.amazon.crud4dynamo.internal.method.scan;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.amazon.crud4dynamo.extension.PageRequest;
 import com.amazon.crud4dynamo.internal.method.scan.PagingExpressionFactoryTest.Model;
 import com.amazon.crud4dynamo.testbase.SingleTableDynamoDbTestBase;
@@ -12,11 +17,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class PagingExpressionFactoryTest extends SingleTableDynamoDbTestBase<Model> {
     @Data

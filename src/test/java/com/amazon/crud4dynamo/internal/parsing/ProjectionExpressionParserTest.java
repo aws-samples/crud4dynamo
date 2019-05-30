@@ -1,8 +1,8 @@
 package com.amazon.crud4dynamo.internal.parsing;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 class ProjectionExpressionParserTest {
     private static final AttributeNameMapper EMPTY_NAME_MAPPER = new AttributeNameMapper();

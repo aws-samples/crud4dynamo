@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License").
+ *   You may not use this file except in compliance with the License.
+ *   A copy of the License is located at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   or in the "license" file accompanying this file. This file is distributed
+ *   on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ *   express or implied. See the License for the specific language governing
+ *   permissions and limitations under the License.
+ */
+
 package com.amazon.crud4dynamo.internal.parsing;
 
 import com.amazon.crud4dynamo.ddbparser.ParserFactory;
@@ -18,12 +33,9 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 public class ProjectionExpressionParser implements ExpressionParser {
     private final String projectionExpression;
     private final Optional<com.amazon.crud4dynamo.ddbparser.ProjectionExpressionParser.StartContext> contextRoot;
-    @Getter
-    private final AttributeNameMapper attributeNameMapper = new AttributeNameMapper();
-    @Getter
-    private final AttributeValueMapper attributeValueMapper = new AttributeValueMapper();
-    @Getter
-    private final Set<String> expressionAttributeNames;
+    @Getter private final AttributeNameMapper attributeNameMapper = new AttributeNameMapper();
+    @Getter private final AttributeValueMapper attributeValueMapper = new AttributeValueMapper();
+    @Getter private final Set<String> expressionAttributeNames;
 
     public ProjectionExpressionParser(final String projectionExpression) {
         this.projectionExpression = projectionExpression;

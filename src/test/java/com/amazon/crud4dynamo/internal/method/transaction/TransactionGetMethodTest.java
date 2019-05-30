@@ -1,5 +1,8 @@
 package com.amazon.crud4dynamo.internal.method.transaction;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.amazon.crud4dynamo.annotation.Param;
 import com.amazon.crud4dynamo.annotation.transaction.Get;
 import com.amazon.crud4dynamo.extension.Signature;
@@ -16,9 +19,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TransactionGetMethodTest extends DynamoDbTestBase {
 

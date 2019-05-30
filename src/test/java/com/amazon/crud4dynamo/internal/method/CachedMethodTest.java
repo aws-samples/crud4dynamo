@@ -1,5 +1,11 @@
 package com.amazon.crud4dynamo.internal.method;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.amazon.crud4dynamo.annotation.Cached;
 import com.amazon.crud4dynamo.extension.Signature;
 import com.amazon.crud4dynamo.extension.method.AbstractMethod;
@@ -8,12 +14,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 class CachedMethodTest {
     private static final int EXPIRE_AFTER_WRITE = 2;

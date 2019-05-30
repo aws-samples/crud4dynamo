@@ -1,5 +1,8 @@
 package com.amazon.crud4dynamo.internal.method;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.amazon.crud4dynamo.annotation.Delete;
 import com.amazon.crud4dynamo.annotation.Param;
 import com.amazon.crud4dynamo.extension.Signature;
@@ -18,9 +21,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DeleteRequestFactoryTest extends SingleTableDynamoDbTestBase<DeleteRequestFactoryTest.Model> {
     private static final String TABLE_NAME = "Table";

@@ -1,5 +1,7 @@
 package com.amazon.crud4dynamo.internal.method.scan;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.amazon.crud4dynamo.annotation.Parallel;
 import com.amazon.crud4dynamo.annotation.Param;
 import com.amazon.crud4dynamo.annotation.Scan;
@@ -20,8 +22,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ParallelScanMethodTest extends SingleTableDynamoDbTestBase<Model> {
     @Data

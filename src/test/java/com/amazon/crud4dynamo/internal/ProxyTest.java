@@ -1,12 +1,12 @@
 package com.amazon.crud4dynamo.internal;
 
-import com.amazon.crud4dynamo.extension.method.AbstractMethod;
-import org.junit.jupiter.api.Test;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.amazon.crud4dynamo.extension.method.AbstractMethod;
+import org.junit.jupiter.api.Test;
 
 class ProxyTest {
     private interface Dao {

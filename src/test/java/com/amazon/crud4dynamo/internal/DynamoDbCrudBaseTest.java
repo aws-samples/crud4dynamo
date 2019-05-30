@@ -1,5 +1,7 @@
 package com.amazon.crud4dynamo.internal;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.amazon.crud4dynamo.extension.FailedBatch;
 import com.amazon.crud4dynamo.extension.PageRequest;
 import com.amazon.crud4dynamo.internal.DynamoDbCrudBaseTest.Model;
@@ -18,8 +20,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class DynamoDbCrudBaseTest extends SingleTableDynamoDbTestBase<Model> {
     private static final List<Model> TEST_ITEMS = Arrays.asList(Model.builder().hashKey("A").build(), Model.builder().hashKey("B").build());

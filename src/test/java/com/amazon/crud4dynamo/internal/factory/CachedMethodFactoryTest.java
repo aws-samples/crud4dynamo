@@ -1,5 +1,11 @@
 package com.amazon.crud4dynamo.internal.factory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.amazon.crud4dynamo.annotation.Cached;
 import com.amazon.crud4dynamo.extension.Context;
 import com.amazon.crud4dynamo.extension.Signature;
@@ -9,12 +15,6 @@ import com.amazon.crud4dynamo.internal.method.CachedMethod;
 import java.lang.reflect.Method;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 class CachedMethodFactoryTest {
 
