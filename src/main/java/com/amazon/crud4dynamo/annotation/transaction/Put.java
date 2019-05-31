@@ -27,26 +27,29 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Repeatable(Puts.class)
 public @interface Put {
-    Class<?> tableClass();
+  Class<?> tableClass();
 
-    /**
-     * Specify the expression attribute name of the item.
-     *
-     * <p>For example,
-     *
-     * <p>If <code>itemExpresionAttribute = ":an_item"</code>
-     *
-     * <p>Then in your method definition, you should have a parameter like @Param(":an_item") final ItemType item
-     */
-    String item();
+  /**
+   * Specify the expression attribute name of the item.
+   *
+   * <p>For example,
+   *
+   * <p>If <code>itemExpresionAttribute = ":an_item"</code>
+   *
+   * <p>Then in your method definition, you should have a parameter like @Param(":an_item") final
+   * ItemType item
+   */
+  String item();
 
-    /* https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html */
-    String conditionExpression() default "";
+  /* https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html */
+  String conditionExpression() default "";
 
-    /**
-     * Use ReturnValuesOnConditionCheckFailure to get the item attributes if the ConditionCheck condition fails.
-     *
-     * <p>The valid values are: NONE and ALL_OLD.
-     */
-    ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure() default ReturnValuesOnConditionCheckFailure.NONE;
+  /**
+   * Use ReturnValuesOnConditionCheckFailure to get the item attributes if the ConditionCheck
+   * condition fails.
+   *
+   * <p>The valid values are: NONE and ALL_OLD.
+   */
+  ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure() default
+      ReturnValuesOnConditionCheckFailure.NONE;
 }

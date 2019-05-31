@@ -29,19 +29,19 @@ import java.util.concurrent.TimeUnit;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Cached {
-    /** Disable by default. */
-    int expireAfterAccess() default -1;
+  /** Disable by default. */
+  int expireAfterAccess() default -1;
 
-    /** Disable by default. */
-    int expireAfterWrite() default -1;
+  /** Disable by default. */
+  int expireAfterWrite() default -1;
 
-    TimeUnit expireAfterAccessTimeUnit() default TimeUnit.MILLISECONDS;
+  TimeUnit expireAfterAccessTimeUnit() default TimeUnit.MILLISECONDS;
 
-    TimeUnit expireAfterWriteTimeUnit() default TimeUnit.MILLISECONDS;
+  TimeUnit expireAfterWriteTimeUnit() default TimeUnit.MILLISECONDS;
 
-    int maxSize() default 10;
+  int maxSize() default 10;
 
-    int initialCapacity() default 5;
+  int initialCapacity() default 5;
 
-    int concurrencyLevel() default 4;
+  int concurrencyLevel() default 4;
 }

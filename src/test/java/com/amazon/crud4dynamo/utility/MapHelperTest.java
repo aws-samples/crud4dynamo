@@ -11,36 +11,38 @@ import org.junit.jupiter.api.Test;
 
 class MapHelperTest {
 
-    @Test
-    void toNull_whenEmpty() {
-        final Map<Object, Object> amap = MapHelper.toNullIfEmpty(new HashMap<>());
+  @Test
+  void toNull_whenEmpty() {
+    final Map<Object, Object> amap = MapHelper.toNullIfEmpty(new HashMap<>());
 
-        assertThat(amap).isNull();
-    }
+    assertThat(amap).isNull();
+  }
 
-    @Test
-    void nonEmpty_returnOriginal() {
-        final HashMap<Object, Object> objectObjectHashMap = new HashMap<>();
-        objectObjectHashMap.put("dummyKey", "dummyValue");
+  @Test
+  void nonEmpty_returnOriginal() {
+    final HashMap<Object, Object> objectObjectHashMap = new HashMap<>();
+    objectObjectHashMap.put("dummyKey", "dummyValue");
 
-        final Map<Object, Object> aMap = MapHelper.toNullIfEmpty(objectObjectHashMap);
+    final Map<Object, Object> aMap = MapHelper.toNullIfEmpty(objectObjectHashMap);
 
-        assertThat(aMap).isSameAs(objectObjectHashMap);
-    }
+    assertThat(aMap).isSameAs(objectObjectHashMap);
+  }
 
-    @Test
-    void merge() {
-        final String key = "a";
-        final Map<String, List<Integer>> map = MapHelper.merge(ImmutableMap.of(key, 1), ImmutableMap.of(key, 2));
+  @Test
+  void merge() {
+    final String key = "a";
+    final Map<String, List<Integer>> map =
+        MapHelper.merge(ImmutableMap.of(key, 1), ImmutableMap.of(key, 2));
 
-        assertThat(map.get(key)).hasSameElementsAs(Arrays.asList(1, 2));
-    }
+    assertThat(map.get(key)).hasSameElementsAs(Arrays.asList(1, 2));
+  }
 
-    @Test
-    void mergeWithOverride() {
-        final String key = "a";
-        final Map<String, Integer> map = MapHelper.overrideMerge(ImmutableMap.of(key, 1), ImmutableMap.of(key, 2));
+  @Test
+  void mergeWithOverride() {
+    final String key = "a";
+    final Map<String, Integer> map =
+        MapHelper.overrideMerge(ImmutableMap.of(key, 1), ImmutableMap.of(key, 2));
 
-        assertThat(map.get(key)).isEqualTo(2);
-    }
+    assertThat(map.get(key)).isEqualTo(2);
+  }
 }

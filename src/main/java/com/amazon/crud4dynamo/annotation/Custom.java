@@ -25,5 +25,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Custom {
-    Class<? extends AbstractMethodFactory> factoryClass();
+  Class<? extends AbstractMethodFactory> factoryClass();
 }

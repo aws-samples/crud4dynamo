@@ -29,25 +29,28 @@ import lombok.Value;
 @Builder
 @Value
 public class FailedBatch<M> {
-    @Singular private final List<SubBatch<M>> subBatches;
+  @Singular private final List<SubBatch<M>> subBatches;
 
-    public boolean isEmpty() {
-        return subBatches.isEmpty();
-    }
+  public boolean isEmpty() {
+    return subBatches.isEmpty();
+  }
 
-    public List<M> getFailedItems() {
-        return subBatches.stream().map(SubBatch::getFailedItems).flatMap(List::stream).collect(Collectors.toList());
-    }
+  public List<M> getFailedItems() {
+    return subBatches.stream()
+        .map(SubBatch::getFailedItems)
+        .flatMap(List::stream)
+        .collect(Collectors.toList());
+  }
 
-    /**
-     * This class represent a sub-batch failure of a batch operations.
-     *
-     * @param <M> Model Generic Type Parameter
-     */
-    @Builder
-    @Value
-    public static class SubBatch<M> {
-        private final List<M> failedItems;
-        private final Exception exception;
-    }
+  /**
+   * This class represent a sub-batch failure of a batch operations.
+   *
+   * @param <M> Model Generic Type Parameter
+   */
+  @Builder
+  @Value
+  public static class SubBatch<M> {
+    private final List<M> failedItems;
+    private final Exception exception;
+  }
 }

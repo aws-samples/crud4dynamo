@@ -27,11 +27,11 @@ import java.util.Optional;
  * @param <M> Model Type Generic Parameter
  */
 public interface SimpleKeyCrud<H, M> extends DynamoDbCrud<M> {
-    void deleteBy(final H hashKey) throws CrudForDynamoException;
+  void deleteBy(final H hashKey) throws CrudForDynamoException;
 
-    FailedBatch<H> deleteAllBy(final Iterable<H> hashKeys) throws CrudForDynamoException;
+  FailedBatch<H> deleteAllBy(final Iterable<H> hashKeys) throws CrudForDynamoException;
 
-    Optional<M> findBy(final H hashKey) throws CrudForDynamoException;
+  Optional<M> findBy(final H hashKey) throws CrudForDynamoException;
 
-    Iterator<M> findAllBy(final Iterable<H> hashKeys) throws CrudForDynamoException;
+  Iterator<M> findAllBy(final Iterable<H> hashKeys) throws CrudForDynamoException;
 }

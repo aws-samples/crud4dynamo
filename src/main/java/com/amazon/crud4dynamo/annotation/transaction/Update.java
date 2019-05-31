@@ -27,33 +27,35 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Repeatable(Updates.class)
 public @interface Update {
-    Class<?> tableClass();
+  Class<?> tableClass();
 
-    /**
-     * Key Expression has the following syntax.
-     *
-     * <pre>
-     * keyExpression
-     *   : equalityExpression (',' equalityExpression)?
-     *   ;
-     *
-     * equalityExpression
-     *   : (expressionAttributeName | attributeName) '=' expressionAttributeValue
-     *   ;
-     * </pre>
-     */
-    String keyExpression();
+  /**
+   * Key Expression has the following syntax.
+   *
+   * <pre>
+   * keyExpression
+   *   : equalityExpression (',' equalityExpression)?
+   *   ;
+   *
+   * equalityExpression
+   *   : (expressionAttributeName | attributeName) '=' expressionAttributeValue
+   *   ;
+   * </pre>
+   */
+  String keyExpression();
 
-    /* https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html#DDB-UpdateItem-request-UpdateExpression */
-    String updateExpression();
+  /* https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html#DDB-UpdateItem-request-UpdateExpression */
+  String updateExpression();
 
-    /* https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html */
-    String conditionExpression() default "";
+  /* https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html */
+  String conditionExpression() default "";
 
-    /**
-     * Use ReturnValuesOnConditionCheckFailure to get the item attributes if the ConditionCheck condition fails.
-     *
-     * <p>The valid values are: NONE and ALL_OLD.
-     */
-    ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure() default ReturnValuesOnConditionCheckFailure.NONE;
+  /**
+   * Use ReturnValuesOnConditionCheckFailure to get the item attributes if the ConditionCheck
+   * condition fails.
+   *
+   * <p>The valid values are: NONE and ALL_OLD.
+   */
+  ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure() default
+      ReturnValuesOnConditionCheckFailure.NONE;
 }

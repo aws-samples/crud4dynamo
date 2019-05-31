@@ -27,30 +27,32 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Repeatable(ConditionChecks.class)
 public @interface ConditionCheck {
-    Class<?> tableClass();
+  Class<?> tableClass();
 
-    /**
-     * Key Expression has the following syntax.
-     *
-     * <pre>
-     * keyExpression
-     *   : equalityExpression (',' equalityExpression)?
-     *   ;
-     *
-     * equalityExpression
-     *   : (expressionAttributeName | attributeName) '=' expressionAttributeValue
-     *   ;
-     * </pre>
-     */
-    String keyExpression();
+  /**
+   * Key Expression has the following syntax.
+   *
+   * <pre>
+   * keyExpression
+   *   : equalityExpression (',' equalityExpression)?
+   *   ;
+   *
+   * equalityExpression
+   *   : (expressionAttributeName | attributeName) '=' expressionAttributeValue
+   *   ;
+   * </pre>
+   */
+  String keyExpression();
 
-    /* https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html */
-    String conditionExpression();
+  /* https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html */
+  String conditionExpression();
 
-    /**
-     * Use ReturnValuesOnConditionCheckFailure to get the item attributes if the ConditionCheck condition fails.
-     *
-     * <p>The valid values are: NONE and ALL_OLD.
-     */
-    ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure() default ReturnValuesOnConditionCheckFailure.NONE;
+  /**
+   * Use ReturnValuesOnConditionCheckFailure to get the item attributes if the ConditionCheck
+   * condition fails.
+   *
+   * <p>The valid values are: NONE and ALL_OLD.
+   */
+  ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure() default
+      ReturnValuesOnConditionCheckFailure.NONE;
 }

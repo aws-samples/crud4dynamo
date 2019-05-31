@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class DynamoDbHelper {
-    public static String getTableName(final Class<?> tableType) {
-        return tableType.getAnnotation(DynamoDBTable.class).tableName();
-    }
+  public static String getTableName(final Class<?> tableType) {
+    return tableType.getAnnotation(DynamoDBTable.class).tableName();
+  }
 }

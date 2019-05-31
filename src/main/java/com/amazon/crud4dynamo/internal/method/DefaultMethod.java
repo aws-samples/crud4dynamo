@@ -28,39 +28,44 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultMethod implements AbstractMethod {
 
-    private final Method method;
-    private final Signature signature;
-    private final ConcurrentHashMap<Class<MethodHandle>, MethodHandle> methodHandleMap = new ConcurrentHashMap<>();
+  private final Method method;
+  private final Signature signature;
+  private final ConcurrentHashMap<Class<MethodHandle>, MethodHandle> methodHandleMap =
+      new ConcurrentHashMap<>();
 
-    public DefaultMethod(final Method method, final Signature signature) {
-        this.method = method;
-        this.signature = signature;
-    }
+  public DefaultMethod(final Method method, final Signature signature) {
+    this.method = method;
+    this.signature = signature;
+  }
 
-    @Override
-    public Signature getSignature() {
-        return signature;
-    }
+  @Override
+  public Signature getSignature() {
+    return signature;
+  }
 
-    @Override
-    public Object invoke(final Object... args) throws Throwable {
-        return Optional.ofNullable(methodHandleMap.get(MethodHandle.class))
-                .orElseThrow(() -> new CrudForDynamoException("method handle of " + signature + " is not initialized."))
-                .invokeWithArguments(args);
-    }
+  @Override
+  public Object invoke(final Object... args) throws Throwable {
+    return Optional.ofNullable(methodHandleMap.get(MethodHandle.class))
+        .orElseThrow(
+            () ->
+                new CrudForDynamoException(
+                    "method handle of " + signature + " is not initialized."))
+        .invokeWithArguments(args);
+  }
 
-    @Override
-    public AbstractMethod bind(final Object target) {
-        methodHandleMap.computeIfAbsent(MethodHandle.class, key -> toMethodHandle(method).bindTo(target));
-        return this;
-    }
+  @Override
+  public AbstractMethod bind(final Object target) {
+    methodHandleMap.computeIfAbsent(
+        MethodHandle.class, key -> toMethodHandle(method).bindTo(target));
+    return this;
+  }
 
-    private static MethodHandle toMethodHandle(final Method m) {
-        final Lookup lookup = MethodHandlesHelper.getLookup(m.getDeclaringClass());
-        try {
-            return lookup.unreflectSpecial(m, m.getDeclaringClass());
-        } catch (final IllegalAccessException e) {
-            throw ExceptionHelper.throwAsUnchecked(e);
-        }
+  private static MethodHandle toMethodHandle(final Method m) {
+    final Lookup lookup = MethodHandlesHelper.getLookup(m.getDeclaringClass());
+    try {
+      return lookup.unreflectSpecial(m, m.getDeclaringClass());
+    } catch (final IllegalAccessException e) {
+      throw ExceptionHelper.throwAsUnchecked(e);
     }
+  }
 }

@@ -1,6 +1,6 @@
 ## crud4dynamo
 
-## TODO 
+## TODO
 * Add code format
 * Add checkstyle
 * Add find bug plugin
@@ -9,4 +9,4 @@
 
 ## License
 
-This library is licensed under the Apache 2.0 License. 
+This library is licensed under the Apache 2.0 License.

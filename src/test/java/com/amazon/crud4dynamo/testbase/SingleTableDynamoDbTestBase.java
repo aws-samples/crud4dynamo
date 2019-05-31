@@ -26,96 +26,102 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 public abstract class SingleTableDynamoDbTestBase<T> extends Log4jEnabledTestBase {
-    private static final ProvisionedThroughput PROVISIONED_THROUGHPUT = new ProvisionedThroughput(5L, 5L);
-    private static final Projection PROJECTION_ALL = new Projection().withProjectionType(ProjectionType.ALL);
-    private AmazonDynamoDBLocal embeddedDynamoDb;
-    private AmazonDynamoDB dynamoDbClient;
-    private DynamoDBMapper dynamoDbMapper;
-    private DynamoDBMapperTableModel tableModel;
+  private static final ProvisionedThroughput PROVISIONED_THROUGHPUT =
+      new ProvisionedThroughput(5L, 5L);
+  private static final Projection PROJECTION_ALL =
+      new Projection().withProjectionType(ProjectionType.ALL);
+  private AmazonDynamoDBLocal embeddedDynamoDb;
+  private AmazonDynamoDB dynamoDbClient;
+  private DynamoDBMapper dynamoDbMapper;
+  private DynamoDBMapperTableModel tableModel;
 
-    @BeforeEach
-    public void setUp() throws Exception {
-        AwsDynamoDbLocalTestUtils.initSqLite();
+  @BeforeEach
+  public void setUp() throws Exception {
+    AwsDynamoDbLocalTestUtils.initSqLite();
 
-        embeddedDynamoDb = DynamoDBEmbedded.create();
-        dynamoDbClient = embeddedDynamoDb.amazonDynamoDB();
-        dynamoDbMapper = new DynamoDBMapper(dynamoDbClient);
-        tableModel = dynamoDbMapper.getTableModel(getModelClass());
-        createTable(getModelClass());
-    }
+    embeddedDynamoDb = DynamoDBEmbedded.create();
+    dynamoDbClient = embeddedDynamoDb.amazonDynamoDB();
+    dynamoDbMapper = new DynamoDBMapper(dynamoDbClient);
+    tableModel = dynamoDbMapper.getTableModel(getModelClass());
+    createTable(getModelClass());
+  }
 
-    @AfterEach
-    public void tearDown() throws Exception {
-        embeddedDynamoDb.shutdown();
-    }
+  @AfterEach
+  public void tearDown() throws Exception {
+    embeddedDynamoDb.shutdown();
+  }
 
-    protected abstract Class<T> getModelClass();
+  protected abstract Class<T> getModelClass();
 
-    protected AmazonDynamoDBLocal getDynamoDbLocal() {
-        return embeddedDynamoDb;
-    }
+  protected AmazonDynamoDBLocal getDynamoDbLocal() {
+    return embeddedDynamoDb;
+  }
 
-    protected AmazonDynamoDB getDynamoDbClient() {
-        return dynamoDbClient;
-    }
+  protected AmazonDynamoDB getDynamoDbClient() {
+    return dynamoDbClient;
+  }
 
-    protected DynamoDBMapper getDynamoDbMapper() {
-        return dynamoDbMapper;
-    }
+  protected DynamoDBMapper getDynamoDbMapper() {
+    return dynamoDbMapper;
+  }
 
-    protected DynamoDBMapperTableModel getDynamoDbMapperTableModel() {
-        return tableModel;
-    }
+  protected DynamoDBMapperTableModel getDynamoDbMapperTableModel() {
+    return tableModel;
+  }
 
-    protected void shutdownDb() {
-        embeddedDynamoDb.shutdown();
-    }
+  protected void shutdownDb() {
+    embeddedDynamoDb.shutdown();
+  }
 
-    protected Optional<Item> getItem(final GetItemSpec getItemSpec) {
-        return Optional.ofNullable(new Table(dynamoDbClient, getTableName()).getItem(getItemSpec));
-    }
+  protected Optional<Item> getItem(final GetItemSpec getItemSpec) {
+    return Optional.ofNullable(new Table(dynamoDbClient, getTableName()).getItem(getItemSpec));
+  }
 
-    protected List<T> storeItems(final Stream<T> itemStream) {
-        return itemStream.peek(dynamoDbMapper::save).collect(Collectors.toList());
-    }
+  protected List<T> storeItems(final Stream<T> itemStream) {
+    return itemStream.peek(dynamoDbMapper::save).collect(Collectors.toList());
+  }
 
-    protected List<T> storeItems(final T... items) {
-        return storeItems(Stream.of(items));
-    }
+  protected List<T> storeItems(final T... items) {
+    return storeItems(Stream.of(items));
+  }
 
-    protected List<T> getAllItems() {
-        final PaginatedScanList<T> scan = dynamoDbMapper.scan(getModelClass(), new DynamoDBScanExpression());
-        return Lists.newArrayList(scan.iterator());
-    }
+  protected List<T> getAllItems() {
+    final PaginatedScanList<T> scan =
+        dynamoDbMapper.scan(getModelClass(), new DynamoDBScanExpression());
+    return Lists.newArrayList(scan.iterator());
+  }
 
-    protected Optional<T> getItem(final T item) {
-        return Optional.ofNullable(dynamoDbMapper.load(item));
-    }
+  protected Optional<T> getItem(final T item) {
+    return Optional.ofNullable(dynamoDbMapper.load(item));
+  }
 
-    private String getTableName() {
-        return getModelClass().getAnnotation(DynamoDBTable.class).tableName();
-    }
+  private String getTableName() {
+    return getModelClass().getAnnotation(DynamoDBTable.class).tableName();
+  }
 
-    private void createTable(final Class<?> modelClass) throws Exception {
-        dynamoDbClient.createTable(newCreateTableRequest(modelClass));
-        waitTableToBeActive(modelClass);
-    }
+  private void createTable(final Class<?> modelClass) throws Exception {
+    dynamoDbClient.createTable(newCreateTableRequest(modelClass));
+    waitTableToBeActive(modelClass);
+  }
 
-    private CreateTableRequest newCreateTableRequest(final Class<?> modelClass) {
-        final CreateTableRequest createTableRequest = dynamoDbMapper.generateCreateTableRequest(modelClass);
-        createTableRequest.setProvisionedThroughput(PROVISIONED_THROUGHPUT);
-        Optional.ofNullable(createTableRequest.getGlobalSecondaryIndexes()).ifPresent(gsis -> gsis.forEach(configureGsi()));
-        return createTableRequest;
-    }
+  private CreateTableRequest newCreateTableRequest(final Class<?> modelClass) {
+    final CreateTableRequest createTableRequest =
+        dynamoDbMapper.generateCreateTableRequest(modelClass);
+    createTableRequest.setProvisionedThroughput(PROVISIONED_THROUGHPUT);
+    Optional.ofNullable(createTableRequest.getGlobalSecondaryIndexes())
+        .ifPresent(gsis -> gsis.forEach(configureGsi()));
+    return createTableRequest;
+  }
 
-    private static Consumer<GlobalSecondaryIndex> configureGsi() {
-        return gsi -> {
-            gsi.setProvisionedThroughput(PROVISIONED_THROUGHPUT);
-            gsi.setProjection(PROJECTION_ALL);
-        };
-    }
+  private static Consumer<GlobalSecondaryIndex> configureGsi() {
+    return gsi -> {
+      gsi.setProvisionedThroughput(PROVISIONED_THROUGHPUT);
+      gsi.setProjection(PROJECTION_ALL);
+    };
+  }
 
-    private void waitTableToBeActive(final Class<?> modelClass) throws InterruptedException {
-        new Table(dynamoDbClient, modelClass.getAnnotation(DynamoDBTable.class).tableName()).waitForActive();
-    }
+  private void waitTableToBeActive(final Class<?> modelClass) throws InterruptedException {
+    new Table(dynamoDbClient, modelClass.getAnnotation(DynamoDBTable.class).tableName())
+        .waitForActive();
+  }
 }

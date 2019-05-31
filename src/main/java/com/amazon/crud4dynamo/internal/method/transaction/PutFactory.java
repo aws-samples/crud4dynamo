@@ -28,41 +28,48 @@ import com.google.common.annotations.VisibleForTesting;
 import java.util.List;
 
 public class PutFactory {
-    private final com.amazon.crud4dynamo.annotation.transaction.Put putAnnotation;
-    private final DynamoDBMapperTableModel tableModel;
-    private final ExpressionAttributesFactory expressionAttributesFactory;
+  private final com.amazon.crud4dynamo.annotation.transaction.Put putAnnotation;
+  private final DynamoDBMapperTableModel tableModel;
+  private final ExpressionAttributesFactory expressionAttributesFactory;
 
-    public PutFactory(final com.amazon.crud4dynamo.annotation.transaction.Put putAnnotation, final DynamoDBMapperTableModel tableModel) {
-        this.putAnnotation = putAnnotation;
-        this.tableModel = tableModel;
-        expressionAttributesFactory =
-                new ExpressionAttributesFactory(new ConditionExpressionParser(putAnnotation.conditionExpression(), tableModel));
-    }
+  public PutFactory(
+      final com.amazon.crud4dynamo.annotation.transaction.Put putAnnotation,
+      final DynamoDBMapperTableModel tableModel) {
+    this.putAnnotation = putAnnotation;
+    this.tableModel = tableModel;
+    expressionAttributesFactory =
+        new ExpressionAttributesFactory(
+            new ConditionExpressionParser(putAnnotation.conditionExpression(), tableModel));
+  }
 
-    public Put create(final List<Argument> arguments) {
-        return new Put()
-                .withTableName(DynamoDbHelper.getTableName(putAnnotation.tableClass()))
-                .withItem(tableModel.convert(findPutItemOrThrow(arguments)))
-                .withConditionExpression(ExpressionFactoryHelper.toNullIfBlank(putAnnotation.conditionExpression()))
-                .withExpressionAttributeNames(expressionAttributesFactory.newExpressionAttributeNames(arguments))
-                .withExpressionAttributeValues(expressionAttributesFactory.newExpressionAttributeValues(arguments))
-                .withReturnValuesOnConditionCheckFailure(putAnnotation.returnValuesOnConditionCheckFailure());
-    }
+  public Put create(final List<Argument> arguments) {
+    return new Put()
+        .withTableName(DynamoDbHelper.getTableName(putAnnotation.tableClass()))
+        .withItem(tableModel.convert(findPutItemOrThrow(arguments)))
+        .withConditionExpression(
+            ExpressionFactoryHelper.toNullIfBlank(putAnnotation.conditionExpression()))
+        .withExpressionAttributeNames(
+            expressionAttributesFactory.newExpressionAttributeNames(arguments))
+        .withExpressionAttributeValues(
+            expressionAttributesFactory.newExpressionAttributeValues(arguments))
+        .withReturnValuesOnConditionCheckFailure(
+            putAnnotation.returnValuesOnConditionCheckFailure());
+  }
 
-    private Object findPutItemOrThrow(final List<Argument> arguments) {
-        return arguments
-                .stream()
-                .filter(a -> a.getParameter().getAnnotation(Param.class) != null)
-                .filter(a -> a.getParameter().getAnnotation(Param.class).value().equals(putAnnotation.item()))
-                .findFirst()
-                .map(Argument::getValue)
-                .orElseThrow(() -> new NoPutItemException(putAnnotation));
-    }
+  private Object findPutItemOrThrow(final List<Argument> arguments) {
+    return arguments.stream()
+        .filter(a -> a.getParameter().getAnnotation(Param.class) != null)
+        .filter(
+            a -> a.getParameter().getAnnotation(Param.class).value().equals(putAnnotation.item()))
+        .findFirst()
+        .map(Argument::getValue)
+        .orElseThrow(() -> new NoPutItemException(putAnnotation));
+  }
 
-    @VisibleForTesting
-    static class NoPutItemException extends CrudForDynamoException {
-        private NoPutItemException(final com.amazon.crud4dynamo.annotation.transaction.Put annotation) {
-            super(String.format("Cannot find parameter annotated with @Param(%s)", annotation.item()));
-        }
+  @VisibleForTesting
+  static class NoPutItemException extends CrudForDynamoException {
+    private NoPutItemException(final com.amazon.crud4dynamo.annotation.transaction.Put annotation) {
+      super(String.format("Cannot find parameter annotated with @Param(%s)", annotation.item()));
     }
+  }
 }

@@ -9,19 +9,19 @@ import com.amazon.crud4dynamo.extension.method.AbstractMethod;
 import org.junit.jupiter.api.Test;
 
 class ProxyTest {
-    private interface Dao {
-        void aMethod();
-    }
+  private interface Dao {
+    void aMethod();
+  }
 
-    @Test
-    void createProxy() throws Throwable {
-        final AbstractMethod abstractMethod = mock(AbstractMethod.class);
-        when(abstractMethod.bind(any())).thenReturn(abstractMethod);
-        final Dao dao = new Proxy<>(Dao.class, method -> abstractMethod).create();
+  @Test
+  void createProxy() throws Throwable {
+    final AbstractMethod abstractMethod = mock(AbstractMethod.class);
+    when(abstractMethod.bind(any())).thenReturn(abstractMethod);
+    final Dao dao = new Proxy<>(Dao.class, method -> abstractMethod).create();
 
-        dao.aMethod();
+    dao.aMethod();
 
-        verify(abstractMethod).bind(dao);
-        verify(abstractMethod).invoke();
-    }
+    verify(abstractMethod).bind(dao);
+    verify(abstractMethod).invoke();
+  }
 }

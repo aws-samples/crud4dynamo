@@ -31,19 +31,21 @@ import java.util.List;
 import java.util.Set;
 
 public class TransactionWriteMethodFactory extends ChainedAbstractMethodFactory {
-    private static final Set<Class<? extends Annotation>> TRANSACTION_WRITE_ANNOTATIONS =
-            ImmutableSet.of(ConditionCheck.class, Put.class, Update.class, Delete.class);
+  private static final Set<Class<? extends Annotation>> TRANSACTION_WRITE_ANNOTATIONS =
+      ImmutableSet.of(ConditionCheck.class, Put.class, Update.class, Delete.class);
 
-    public TransactionWriteMethodFactory(final AbstractMethodFactory delegate) {
-        super(delegate);
-    }
+  public TransactionWriteMethodFactory(final AbstractMethodFactory delegate) {
+    super(delegate);
+  }
 
-    @Override
-    public AbstractMethod create(final Context context) {
-        final Signature signature = context.signature();
-        if (TRANSACTION_WRITE_ANNOTATIONS.stream().map(signature::getAnnotationsByType).allMatch(List::isEmpty)) {
-            return super.create(context);
-        }
-        return new TransactionWriteMethod(context.amazonDynamoDb(), context.mapper(), signature);
+  @Override
+  public AbstractMethod create(final Context context) {
+    final Signature signature = context.signature();
+    if (TRANSACTION_WRITE_ANNOTATIONS.stream()
+        .map(signature::getAnnotationsByType)
+        .allMatch(List::isEmpty)) {
+      return super.create(context);
     }
+    return new TransactionWriteMethod(context.amazonDynamoDb(), context.mapper(), signature);
+  }
 }

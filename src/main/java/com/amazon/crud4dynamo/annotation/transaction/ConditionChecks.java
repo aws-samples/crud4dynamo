@@ -23,5 +23,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ConditionChecks {
-    ConditionCheck[] value();
+  ConditionCheck[] value();
 }

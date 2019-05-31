@@ -17,39 +17,43 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class TransactionGetMethodFactoryTest extends DynamoDbTestBase {
-    private interface Dao {
-        void nonTransactionGet();
+  private interface Dao {
+    void nonTransactionGet();
 
-        @Get(tableClass = DummyTable.class, keyExpression = "", projectionExpression = "")
-        List<Object> transactionGet();
-    }
+    @Get(tableClass = DummyTable.class, keyExpression = "", projectionExpression = "")
+    List<Object> transactionGet();
+  }
 
-    @Test
-    void withoutTransactionGetAnnotation_callDelegate() throws Exception {
-        final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
-        final TransactionGetMethodFactory factory = new TransactionGetMethodFactory(delegate);
-        final Context context = getContext("nonTransactionGet");
+  @Test
+  void withoutTransactionGetAnnotation_callDelegate() throws Exception {
+    final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
+    final TransactionGetMethodFactory factory = new TransactionGetMethodFactory(delegate);
+    final Context context = getContext("nonTransactionGet");
 
-        final AbstractMethod method = factory.create(context);
+    final AbstractMethod method = factory.create(context);
 
-        assertThat(method).isNull();
-        verify(delegate).create(context);
-    }
+    assertThat(method).isNull();
+    verify(delegate).create(context);
+  }
 
-    private Context getContext(final String methodName) throws NoSuchMethodException {
-        final Signature signature = Signature.resolve(Dao.class.getMethod(methodName), Dao.class);
-        return Context.builder().mapper(getDbMapper()).amazonDynamoDb(getDbClient()).signature(signature).build();
-    }
+  private Context getContext(final String methodName) throws NoSuchMethodException {
+    final Signature signature = Signature.resolve(Dao.class.getMethod(methodName), Dao.class);
+    return Context.builder()
+        .mapper(getDbMapper())
+        .amazonDynamoDb(getDbClient())
+        .signature(signature)
+        .build();
+  }
 
-    @Test
-    void givenTransactionGetAnnotation_createTransactionMethod() throws Exception {
-        final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
-        final TransactionGetMethodFactory factory = new TransactionGetMethodFactory(delegate);
-        final Context context = getContext("transactionGet");
+  @Test
+  void givenTransactionGetAnnotation_createTransactionMethod() throws Exception {
+    final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
+    final TransactionGetMethodFactory factory = new TransactionGetMethodFactory(delegate);
+    final Context context = getContext("transactionGet");
 
-        final AbstractMethod method = factory.create(context);
+    final AbstractMethod method = factory.create(context);
 
-        assertThat(method).isInstanceOf(TransactionGetMethod.class);
-        verifyZeroInteractions(delegate);
-    }
+    assertThat(method).isInstanceOf(TransactionGetMethod.class);
+    verifyZeroInteractions(delegate);
+  }
 }

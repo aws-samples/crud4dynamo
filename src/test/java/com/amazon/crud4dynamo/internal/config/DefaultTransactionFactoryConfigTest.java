@@ -6,15 +6,15 @@ import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 
 class DefaultTransactionFactoryConfigTest {
-    @Test
-    void order_should_be_unique() {
-        final int numberOfUniqueConfigs =
-                DefaultTransactionFactoryConfig.getConfigs()
-                        .stream()
-                        .map(ChainedMethodFactoryConfig::getOrder)
-                        .collect(Collectors.toSet())
-                        .size();
+  @Test
+  void order_should_be_unique() {
+    final int numberOfUniqueConfigs =
+        DefaultTransactionFactoryConfig.getConfigs().stream()
+            .map(ChainedMethodFactoryConfig::getOrder)
+            .collect(Collectors.toSet())
+            .size();
 
-        AssertionsForClassTypes.assertThat(DefaultTransactionFactoryConfig.getConfigs().size()).isEqualTo(numberOfUniqueConfigs);
-    }
+    AssertionsForClassTypes.assertThat(DefaultTransactionFactoryConfig.getConfigs().size())
+        .isEqualTo(numberOfUniqueConfigs);
+  }
 }

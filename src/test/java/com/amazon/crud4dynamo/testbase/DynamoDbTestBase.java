@@ -9,33 +9,33 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 public class DynamoDbTestBase extends Log4jEnabledTestBase {
-    private AmazonDynamoDBLocal embeddedDynamoDb;
-    private AmazonDynamoDB dynamoDbClient;
-    private DynamoDBMapper dynamoDbMapper;
+  private AmazonDynamoDBLocal embeddedDynamoDb;
+  private AmazonDynamoDB dynamoDbClient;
+  private DynamoDBMapper dynamoDbMapper;
 
-    @BeforeEach
-    public void setUp() throws Exception {
-        AwsDynamoDbLocalTestUtils.initSqLite();
+  @BeforeEach
+  public void setUp() throws Exception {
+    AwsDynamoDbLocalTestUtils.initSqLite();
 
-        embeddedDynamoDb = DynamoDBEmbedded.create();
-        dynamoDbClient = embeddedDynamoDb.amazonDynamoDB();
-        dynamoDbMapper = new DynamoDBMapper(dynamoDbClient);
-    }
+    embeddedDynamoDb = DynamoDBEmbedded.create();
+    dynamoDbClient = embeddedDynamoDb.amazonDynamoDB();
+    dynamoDbMapper = new DynamoDBMapper(dynamoDbClient);
+  }
 
-    @AfterEach
-    public void tearDown() throws Exception {
-        embeddedDynamoDb.shutdown();
-    }
+  @AfterEach
+  public void tearDown() throws Exception {
+    embeddedDynamoDb.shutdown();
+  }
 
-    protected AmazonDynamoDB getDbClient() {
-        return dynamoDbClient;
-    }
+  protected AmazonDynamoDB getDbClient() {
+    return dynamoDbClient;
+  }
 
-    protected DynamoDBMapper getDbMapper() {
-        return dynamoDbMapper;
-    }
+  protected DynamoDBMapper getDbMapper() {
+    return dynamoDbMapper;
+  }
 
-    protected <T> DynamoDBMapperTableModel<T> getTableModel(final Class<T> modelClass) {
-        return getDbMapper().getTableModel(modelClass);
-    }
+  protected <T> DynamoDBMapperTableModel<T> getTableModel(final Class<T> modelClass) {
+    return getDbMapper().getTableModel(modelClass);
+  }
 }

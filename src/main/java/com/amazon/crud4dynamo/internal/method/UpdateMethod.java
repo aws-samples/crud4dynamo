@@ -29,44 +29,44 @@ import lombok.NonNull;
 
 public class UpdateMethod implements AbstractMethod {
 
-    private final Signature signature;
-    private final Class<?> tableType;
-    private final DynamoDBMapper mapper;
-    private final AmazonDynamoDB dynamoDb;
-    private final DynamoDBMapperConfig mapperConfig;
-    private final UpdateRequestFactory updateRequestFactory;
-    private final DynamoDBMapperTableModel<?> tableModel;
+  private final Signature signature;
+  private final Class<?> tableType;
+  private final DynamoDBMapper mapper;
+  private final AmazonDynamoDB dynamoDb;
+  private final DynamoDBMapperConfig mapperConfig;
+  private final UpdateRequestFactory updateRequestFactory;
+  private final DynamoDBMapperTableModel<?> tableModel;
 
-    public UpdateMethod(
-            @NonNull final Signature signature,
-            @NonNull final Class<?> tableType,
-            @NonNull final DynamoDBMapper mapper,
-            @NonNull final AmazonDynamoDB dynamoDb,
-            final DynamoDBMapperConfig mapperConfig) {
-        this.signature = signature;
-        this.tableType = tableType;
-        this.mapper = mapper;
-        this.dynamoDb = dynamoDb;
-        this.mapperConfig = mapperConfig;
-        tableModel = mapper.getTableModel(tableType);
-        updateRequestFactory = new UpdateRequestFactory(signature, tableType, mapper);
-    }
+  public UpdateMethod(
+      @NonNull final Signature signature,
+      @NonNull final Class<?> tableType,
+      @NonNull final DynamoDBMapper mapper,
+      @NonNull final AmazonDynamoDB dynamoDb,
+      final DynamoDBMapperConfig mapperConfig) {
+    this.signature = signature;
+    this.tableType = tableType;
+    this.mapper = mapper;
+    this.dynamoDb = dynamoDb;
+    this.mapperConfig = mapperConfig;
+    tableModel = mapper.getTableModel(tableType);
+    updateRequestFactory = new UpdateRequestFactory(signature, tableType, mapper);
+  }
 
-    @Override
-    public Signature getSignature() {
-        return signature;
-    }
+  @Override
+  public Signature getSignature() {
+    return signature;
+  }
 
-    @Override
-    public Object invoke(final Object... args) throws Throwable {
-        final UpdateItemRequest updateItemRequest = updateRequestFactory.create(args);
-        final UpdateItemResult updateItemResult = dynamoDb.updateItem(updateItemRequest);
-        final Map<String, AttributeValue> attributes = updateItemResult.getAttributes();
-        return attributes == null ? null : tableModel.unconvert(updateItemResult.getAttributes());
-    }
+  @Override
+  public Object invoke(final Object... args) throws Throwable {
+    final UpdateItemRequest updateItemRequest = updateRequestFactory.create(args);
+    final UpdateItemResult updateItemResult = dynamoDb.updateItem(updateItemRequest);
+    final Map<String, AttributeValue> attributes = updateItemResult.getAttributes();
+    return attributes == null ? null : tableModel.unconvert(updateItemResult.getAttributes());
+  }
 
-    @Override
-    public AbstractMethod bind(final Object target) {
-        return this;
-    }
+  @Override
+  public AbstractMethod bind(final Object target) {
+    return this;
+  }
 }

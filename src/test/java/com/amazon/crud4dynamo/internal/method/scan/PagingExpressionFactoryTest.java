@@ -19,40 +19,42 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class PagingExpressionFactoryTest extends SingleTableDynamoDbTestBase<Model> {
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @DynamoDBTable(tableName = "Model")
-    public static class Model {
-        @DynamoDBHashKey(attributeName = "HashKey")
-        private String hashKey;
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
 
-        @DynamoDBRangeKey(attributeName = "RangeKey")
-        private Integer rangeKey;
-    }
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
+  }
 
-    @Override
-    protected Class<Model> getModelClass() {
-        return Model.class;
-    }
+  @Override
+  protected Class<Model> getModelClass() {
+    return Model.class;
+  }
 
-    @Test
-    void create() {
-        final PagingExpressionFactory factory = getFactory();
-        final Model model = Model.builder().hashKey("hashKey").rangeKey(1).build();
-        final int limit = 10;
-        final PageRequest<Model> pageRequest = PageRequest.<Model>builder().exclusiveStartItem(model).limit(limit).build();
+  @Test
+  void create() {
+    final PagingExpressionFactory factory = getFactory();
+    final Model model = Model.builder().hashKey("hashKey").rangeKey(1).build();
+    final int limit = 10;
+    final PageRequest<Model> pageRequest =
+        PageRequest.<Model>builder().exclusiveStartItem(model).limit(limit).build();
 
-        final DynamoDBScanExpression expression = factory.create(pageRequest);
+    final DynamoDBScanExpression expression = factory.create(pageRequest);
 
-        assertThat(expression.getLimit()).isEqualTo(limit);
-        assertThat(expression.getExclusiveStartKey()).isEqualTo(getDynamoDbMapperTableModel().convert(model));
-    }
+    assertThat(expression.getLimit()).isEqualTo(limit);
+    assertThat(expression.getExclusiveStartKey())
+        .isEqualTo(getDynamoDbMapperTableModel().convert(model));
+  }
 
-    private PagingExpressionFactory getFactory() {
-        final ScanExpressionFactory mockFactory = mock(ScanExpressionFactory.class);
-        when(mockFactory.create(any())).thenReturn(new DynamoDBScanExpression());
-        return new PagingExpressionFactory(mockFactory, Model.class, getDynamoDbMapper());
-    }
+  private PagingExpressionFactory getFactory() {
+    final ScanExpressionFactory mockFactory = mock(ScanExpressionFactory.class);
+    when(mockFactory.create(any())).thenReturn(new DynamoDBScanExpression());
+    return new PagingExpressionFactory(mockFactory, Model.class, getDynamoDbMapper());
+  }
 }

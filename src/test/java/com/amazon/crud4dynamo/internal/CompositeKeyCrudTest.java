@@ -15,34 +15,34 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 public class CompositeKeyCrudTest extends CompositeKeyTestBase<Model, CompositeKeyCrud> {
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @DynamoDBTable(tableName = "TestTable")
-    public static class Model {
-        @DynamoDBHashKey(attributeName = "HashKey")
-        private String hashKey;
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "TestTable")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
 
-        @DynamoDBRangeKey(attributeName = "RangeKey")
-        private Integer rangeKey;
-    }
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
+  }
 
-    @Override
-    protected CompositeKeyCrud newDao() {
-        return new CrudForDynamo(getDynamoDbClient()).createComposite(Model.class);
-    }
+  @Override
+  protected CompositeKeyCrud newDao() {
+    return new CrudForDynamo(getDynamoDbClient()).createComposite(Model.class);
+  }
 
-    @Override
-    protected List<Model> getTestData() {
-        return Arrays.asList(
-                Model.builder().hashKey("A").rangeKey(1).build(),
-                Model.builder().hashKey("A").rangeKey(2).build(),
-                Model.builder().hashKey("B").rangeKey(3).build());
-    }
+  @Override
+  protected List<Model> getTestData() {
+    return Arrays.asList(
+        Model.builder().hashKey("A").rangeKey(1).build(),
+        Model.builder().hashKey("A").rangeKey(2).build(),
+        Model.builder().hashKey("B").rangeKey(3).build());
+  }
 
-    @Override
-    protected Class<Model> getModelClass() {
-        return Model.class;
-    }
+  @Override
+  protected Class<Model> getModelClass() {
+    return Model.class;
+  }
 }

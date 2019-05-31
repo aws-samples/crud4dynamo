@@ -23,38 +23,45 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class PageResultCollector<T, R> {
-    private final PageRequest<T> initialRequest;
-    private final Requester<T> requester;
-    private final Function<T, R> resultMapper;
+  private final PageRequest<T> initialRequest;
+  private final Requester<T> requester;
+  private final Function<T, R> resultMapper;
 
-    public PageResultCollector(final PageRequest<T> initialRequest, final Requester<T> requester, final Function<T, R> resultMapper) {
-        this.initialRequest = initialRequest;
-        this.requester = requester;
-        this.resultMapper = resultMapper;
-    }
+  public PageResultCollector(
+      final PageRequest<T> initialRequest,
+      final Requester<T> requester,
+      final Function<T, R> resultMapper) {
+    this.initialRequest = initialRequest;
+    this.requester = requester;
+    this.resultMapper = resultMapper;
+  }
 
-    public static <E> PageResultCollector<E, E> newCollector(final PageRequest<E> initialRequest, final Requester<E> requester) {
-        return new PageResultCollector<>(initialRequest, requester, Function.identity());
-    }
+  public static <E> PageResultCollector<E, E> newCollector(
+      final PageRequest<E> initialRequest, final Requester<E> requester) {
+    return new PageResultCollector<>(initialRequest, requester, Function.identity());
+  }
 
-    public List<R> get() {
-        final List<R> ret = new ArrayList<>();
-        PageRequest<T> request = initialRequest;
-        T lastEvaluatedItem = null;
-        do {
-            final PageResult<T> result = requester.issue(request);
-            ret.addAll(result.getItems().stream().map(resultMapper).collect(Collectors.toList()));
-            lastEvaluatedItem = result.getLastEvaluatedItem();
-            request = rebuildRequest(request, lastEvaluatedItem);
-        } while (lastEvaluatedItem != null);
-        return ret;
-    }
+  public List<R> get() {
+    final List<R> ret = new ArrayList<>();
+    PageRequest<T> request = initialRequest;
+    T lastEvaluatedItem = null;
+    do {
+      final PageResult<T> result = requester.issue(request);
+      ret.addAll(result.getItems().stream().map(resultMapper).collect(Collectors.toList()));
+      lastEvaluatedItem = result.getLastEvaluatedItem();
+      request = rebuildRequest(request, lastEvaluatedItem);
+    } while (lastEvaluatedItem != null);
+    return ret;
+  }
 
-    private PageRequest<T> rebuildRequest(final PageRequest<T> request, final T lastEvaluatedItem) {
-        return PageRequest.<T>builder().limit(request.getLimit()).exclusiveStartItem(lastEvaluatedItem).build();
-    }
+  private PageRequest<T> rebuildRequest(final PageRequest<T> request, final T lastEvaluatedItem) {
+    return PageRequest.<T>builder()
+        .limit(request.getLimit())
+        .exclusiveStartItem(lastEvaluatedItem)
+        .build();
+  }
 
-    public interface Requester<T> {
-        PageResult<T> issue(final PageRequest<T> request);
-    }
+  public interface Requester<T> {
+    PageResult<T> issue(final PageRequest<T> request);
+  }
 }

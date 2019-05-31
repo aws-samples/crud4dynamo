@@ -21,112 +21,116 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class TransactionWriteMethodWithConditionCheckOnlyTest {
-    private static final String TABLE_NAME_1 = "TestTable1";
-    private static final String TABLE_NAME_2 = "TestTable2";
+  private static final String TABLE_NAME_1 = "TestTable1";
+  private static final String TABLE_NAME_2 = "TestTable2";
 
-    @Data
-    @Builder
-    @DynamoDBTable(tableName = TABLE_NAME_1)
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Table1 {
-        private static final String HASH_KEY = "HashKey";
-        private static final String INT_ATTRIBUTE = "IntAttribute";
+  @Data
+  @Builder
+  @DynamoDBTable(tableName = TABLE_NAME_1)
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Table1 {
+    private static final String HASH_KEY = "HashKey";
+    private static final String INT_ATTRIBUTE = "IntAttribute";
 
-        @DynamoDBHashKey(attributeName = HASH_KEY)
-        private String hashKey;
+    @DynamoDBHashKey(attributeName = HASH_KEY)
+    private String hashKey;
 
-        @DynamoDBAttribute(attributeName = INT_ATTRIBUTE)
-        private Integer integerAttribute;
+    @DynamoDBAttribute(attributeName = INT_ATTRIBUTE)
+    private Integer integerAttribute;
+  }
+
+  @Data
+  @Builder
+  @DynamoDBTable(tableName = TABLE_NAME_2)
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Table2 {
+    private static final String HASH_KEY = "HashKey";
+    private static final String INT_ATTRIBUTE = "IntAttribute";
+
+    @DynamoDBHashKey(attributeName = HASH_KEY)
+    private String hashKey;
+
+    @DynamoDBAttribute(attributeName = INT_ATTRIBUTE)
+    private Integer integerAttribute;
+  }
+
+  private interface TestDao {
+    @ConditionCheck(
+        tableClass = Table1.class,
+        conditionExpression = "attribute_exists(#attribute)",
+        keyExpression = "HashKey = :hashKey")
+    void checkOnTable1(
+        @Param(":hashKey") final String hashKey, @Param("#attribute") final String attribute);
+
+    @ConditionCheck(
+        tableClass = Table1.class,
+        conditionExpression = "attribute_exists(#attribute)",
+        keyExpression = "HashKey = :hashKey")
+    @ConditionCheck(
+        tableClass = Table2.class,
+        conditionExpression = "attribute_exists(#attribute)",
+        keyExpression = "HashKey = :hashKey")
+    void checkOnTable_1_and_2(
+        @Param(":hashKey") final String hashKey, @Param("#attribute") final String attribute);
+  }
+
+  @Nested
+  class SingleConditionCheckTest extends DynamoDbTestBase {
+
+    private TransactionWriteMethod transaction;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+      super.setUp();
+      new TableProvisioner(getDbClient()).create(Table1.class);
+      final Method method = TestDao.class.getMethod("checkOnTable1", String.class, String.class);
+      final Signature signature = Signature.resolve(method, TestDao.class);
+      transaction = new TransactionWriteMethod(getDbClient(), getDbMapper(), signature);
     }
 
-    @Data
-    @Builder
-    @DynamoDBTable(tableName = TABLE_NAME_2)
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Table2 {
-        private static final String HASH_KEY = "HashKey";
-        private static final String INT_ATTRIBUTE = "IntAttribute";
+    @Test
+    void attributeNotExist_throwException() {
+      final String aHashKey = "aHashKey";
+      getDbMapper().save(Table1.builder().hashKey(aHashKey).build());
 
-        @DynamoDBHashKey(attributeName = HASH_KEY)
-        private String hashKey;
-
-        @DynamoDBAttribute(attributeName = INT_ATTRIBUTE)
-        private Integer integerAttribute;
+      assertThatThrownBy(() -> transaction.invoke(aHashKey, Table1.INT_ATTRIBUTE))
+          .isInstanceOf(TransactionCanceledException.class);
     }
 
-    private interface TestDao {
-        @ConditionCheck(
-                tableClass = Table1.class,
-                conditionExpression = "attribute_exists(#attribute)",
-                keyExpression = "HashKey = :hashKey")
-        void checkOnTable1(@Param(":hashKey") final String hashKey, @Param("#attribute") final String attribute);
+    @Test
+    void attributeExist_succeeded() throws Throwable {
+      final String aHashKey = "aHashKey";
+      getDbMapper().save(Table1.builder().hashKey(aHashKey).integerAttribute(1).build());
 
-        @ConditionCheck(
-                tableClass = Table1.class,
-                conditionExpression = "attribute_exists(#attribute)",
-                keyExpression = "HashKey = :hashKey")
-        @ConditionCheck(
-                tableClass = Table2.class,
-                conditionExpression = "attribute_exists(#attribute)",
-                keyExpression = "HashKey = :hashKey")
-        void checkOnTable_1_and_2(@Param(":hashKey") final String hashKey, @Param("#attribute") final String attribute);
+      transaction.invoke(aHashKey, Table1.INT_ATTRIBUTE);
+    }
+  }
+
+  @Nested
+  class MultipleConditionCheckTest extends DynamoDbTestBase {
+
+    private TransactionWriteMethod transactionWriteMethod;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+      super.setUp();
+      new TableProvisioner(getDbClient()).create(Table1.class);
+      new TableProvisioner(getDbClient()).create(Table2.class);
+      final Method method =
+          TestDao.class.getMethod("checkOnTable_1_and_2", String.class, String.class);
+      final Signature signature = Signature.resolve(method, TestDao.class);
+      transactionWriteMethod = new TransactionWriteMethod(getDbClient(), getDbMapper(), signature);
     }
 
-    @Nested
-    class SingleConditionCheckTest extends DynamoDbTestBase {
+    @Test
+    void transactionSucceeded() throws Throwable {
+      final String aHashKey = "aHashKey";
+      getDbMapper().save(Table1.builder().hashKey(aHashKey).integerAttribute(1).build());
+      getDbMapper().save(Table2.builder().hashKey(aHashKey).integerAttribute(1).build());
 
-        private TransactionWriteMethod transaction;
-
-        @BeforeEach
-        public void setUp() throws Exception {
-            super.setUp();
-            new TableProvisioner(getDbClient()).create(Table1.class);
-            final Method method = TestDao.class.getMethod("checkOnTable1", String.class, String.class);
-            final Signature signature = Signature.resolve(method, TestDao.class);
-            transaction = new TransactionWriteMethod(getDbClient(), getDbMapper(), signature);
-        }
-
-        @Test
-        void attributeNotExist_throwException() {
-            final String aHashKey = "aHashKey";
-            getDbMapper().save(Table1.builder().hashKey(aHashKey).build());
-
-            assertThatThrownBy(() -> transaction.invoke(aHashKey, Table1.INT_ATTRIBUTE)).isInstanceOf(TransactionCanceledException.class);
-        }
-
-        @Test
-        void attributeExist_succeeded() throws Throwable {
-            final String aHashKey = "aHashKey";
-            getDbMapper().save(Table1.builder().hashKey(aHashKey).integerAttribute(1).build());
-
-            transaction.invoke(aHashKey, Table1.INT_ATTRIBUTE);
-        }
+      transactionWriteMethod.invoke(aHashKey, Table1.INT_ATTRIBUTE);
     }
-
-    @Nested
-    class MultipleConditionCheckTest extends DynamoDbTestBase {
-
-        private TransactionWriteMethod transactionWriteMethod;
-
-        @BeforeEach
-        public void setUp() throws Exception {
-            super.setUp();
-            new TableProvisioner(getDbClient()).create(Table1.class);
-            new TableProvisioner(getDbClient()).create(Table2.class);
-            final Method method = TestDao.class.getMethod("checkOnTable_1_and_2", String.class, String.class);
-            final Signature signature = Signature.resolve(method, TestDao.class);
-            transactionWriteMethod = new TransactionWriteMethod(getDbClient(), getDbMapper(), signature);
-        }
-
-        @Test
-        void transactionSucceeded() throws Throwable {
-            final String aHashKey = "aHashKey";
-            getDbMapper().save(Table1.builder().hashKey(aHashKey).integerAttribute(1).build());
-            getDbMapper().save(Table2.builder().hashKey(aHashKey).integerAttribute(1).build());
-
-            transactionWriteMethod.invoke(aHashKey, Table1.INT_ATTRIBUTE);
-        }
-    }
+  }
 }

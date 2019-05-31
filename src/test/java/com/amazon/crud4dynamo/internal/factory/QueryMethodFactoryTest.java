@@ -18,60 +18,67 @@ import java.lang.reflect.Method;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
 
-public class QueryMethodFactoryTest extends SingleTableDynamoDbTestBase<QueryMethodFactoryTest.TestModel> {
+public class QueryMethodFactoryTest
+    extends SingleTableDynamoDbTestBase<QueryMethodFactoryTest.TestModel> {
 
-    @Data
-    @DynamoDBTable(tableName = "Model")
-    public static class TestModel {
-        @DynamoDBHashKey(attributeName = "HashKey")
-        private String hashKey;
-    }
+  @Data
+  @DynamoDBTable(tableName = "Model")
+  public static class TestModel {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+  }
 
-    public interface TestInterface {
-        void nonQuery();
+  public interface TestInterface {
+    void nonQuery();
 
-        @Query(keyCondition = "HashKey = :hashKey")
-        void query();
+    @Query(keyCondition = "HashKey = :hashKey")
+    void query();
 
-        @Query(keyCondition = "HashKey = :hashKey")
-        PageResult pagingQuery();
-    }
+    @Query(keyCondition = "HashKey = :hashKey")
+    PageResult pagingQuery();
+  }
 
-    @Override
-    protected Class<TestModel> getModelClass() {
-        return TestModel.class;
-    }
+  @Override
+  protected Class<TestModel> getModelClass() {
+    return TestModel.class;
+  }
 
-    @Test
-    void notGivenQueryAnnotation_delegate() throws Exception {
-        final Context context = getContext("nonQuery");
-        final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
+  @Test
+  void notGivenQueryAnnotation_delegate() throws Exception {
+    final Context context = getContext("nonQuery");
+    final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
 
-        new QueryMethodFactory(delegate).create(context);
+    new QueryMethodFactory(delegate).create(context);
 
-        verify(delegate).create(context);
-    }
+    verify(delegate).create(context);
+  }
 
-    private static Signature getSignature(final String nonQuery2) throws NoSuchMethodException {
-        final Method nonQuery = TestInterface.class.getMethod(nonQuery2);
-        return Signature.resolve(nonQuery, TestInterface.class);
-    }
+  private static Signature getSignature(final String nonQuery2) throws NoSuchMethodException {
+    final Method nonQuery = TestInterface.class.getMethod(nonQuery2);
+    return Signature.resolve(nonQuery, TestInterface.class);
+  }
 
-    @Test
-    void nonPagingQuery() throws Exception {
-        final Context context = getContext("query");
+  @Test
+  void nonPagingQuery() throws Exception {
+    final Context context = getContext("query");
 
-        assertThat(new QueryMethodFactory(null).create(context)).isExactlyInstanceOf(NonPagingMethod.class);
-    }
+    assertThat(new QueryMethodFactory(null).create(context))
+        .isExactlyInstanceOf(NonPagingMethod.class);
+  }
 
-    @Test
-    void pagingQuery() throws Exception {
-        final Context context = getContext("pagingQuery");
+  @Test
+  void pagingQuery() throws Exception {
+    final Context context = getContext("pagingQuery");
 
-        assertThat(new QueryMethodFactory(null).create(context)).isExactlyInstanceOf(PagingMethod.class);
-    }
+    assertThat(new QueryMethodFactory(null).create(context))
+        .isExactlyInstanceOf(PagingMethod.class);
+  }
 
-    private Context getContext(final String name) throws NoSuchMethodException {
-        return Context.builder().signature(getSignature(name)).mapper(getDynamoDbMapper()).modelType(getModelClass()).build();
-    }
+  private Context getContext(final String name) throws NoSuchMethodException {
+    return Context.builder()
+        .signature(getSignature(name))
+        .mapper(getDynamoDbMapper())
+        .modelType(getModelClass())
+        .build();
+  }
 }

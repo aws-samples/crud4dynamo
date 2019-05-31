@@ -28,18 +28,21 @@ import java.util.List;
 import java.util.Set;
 
 public class TransactionGetMethodFactory extends ChainedAbstractMethodFactory {
-    private static final Set<Class<? extends Annotation>> TRANSACTION_GET_ANNOTATIONS = ImmutableSet.of(Get.class);
+  private static final Set<Class<? extends Annotation>> TRANSACTION_GET_ANNOTATIONS =
+      ImmutableSet.of(Get.class);
 
-    public TransactionGetMethodFactory(final AbstractMethodFactory delegate) {
-        super(delegate);
-    }
+  public TransactionGetMethodFactory(final AbstractMethodFactory delegate) {
+    super(delegate);
+  }
 
-    @Override
-    public AbstractMethod create(final Context context) {
-        final Signature signature = context.signature();
-        if (TRANSACTION_GET_ANNOTATIONS.stream().map(signature::getAnnotationsByType).allMatch(List::isEmpty)) {
-            return super.create(context);
-        }
-        return new TransactionGetMethod(context.amazonDynamoDb(), context.mapper(), signature);
+  @Override
+  public AbstractMethod create(final Context context) {
+    final Signature signature = context.signature();
+    if (TRANSACTION_GET_ANNOTATIONS.stream()
+        .map(signature::getAnnotationsByType)
+        .allMatch(List::isEmpty)) {
+      return super.create(context);
     }
+    return new TransactionGetMethod(context.amazonDynamoDb(), context.mapper(), signature);
+  }
 }

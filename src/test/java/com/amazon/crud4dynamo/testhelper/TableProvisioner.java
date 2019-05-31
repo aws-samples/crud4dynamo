@@ -13,36 +13,40 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class TableProvisioner {
-    private static final ProvisionedThroughput PROVISIONED_THROUGHPUT = new ProvisionedThroughput(10L, 10L);
-    private static final Projection PROJECTION_ALL = new Projection().withProjectionType(ProjectionType.ALL);
-    private final AmazonDynamoDB dynamoDb;
-    private final DynamoDBMapper dynamoDbMapper;
+  private static final ProvisionedThroughput PROVISIONED_THROUGHPUT =
+      new ProvisionedThroughput(10L, 10L);
+  private static final Projection PROJECTION_ALL =
+      new Projection().withProjectionType(ProjectionType.ALL);
+  private final AmazonDynamoDB dynamoDb;
+  private final DynamoDBMapper dynamoDbMapper;
 
-    public TableProvisioner(final AmazonDynamoDB dynamoDb) {
-        this.dynamoDb = dynamoDb;
-        dynamoDbMapper = new DynamoDBMapper(dynamoDb);
-    }
+  public TableProvisioner(final AmazonDynamoDB dynamoDb) {
+    this.dynamoDb = dynamoDb;
+    dynamoDbMapper = new DynamoDBMapper(dynamoDb);
+  }
 
-    public void create(final Class<?> tableClass) throws Exception {
-        dynamoDb.createTable(newCreateTableRequest(tableClass));
-        waitTableToBeActive(tableClass);
-    }
+  public void create(final Class<?> tableClass) throws Exception {
+    dynamoDb.createTable(newCreateTableRequest(tableClass));
+    waitTableToBeActive(tableClass);
+  }
 
-    private CreateTableRequest newCreateTableRequest(final Class<?> tableClass) {
-        final CreateTableRequest createTableRequest = dynamoDbMapper.generateCreateTableRequest(tableClass);
-        createTableRequest.setProvisionedThroughput(PROVISIONED_THROUGHPUT);
-        Optional.ofNullable(createTableRequest.getGlobalSecondaryIndexes()).ifPresent(gsis -> gsis.forEach(configureGsi()));
-        return createTableRequest;
-    }
+  private CreateTableRequest newCreateTableRequest(final Class<?> tableClass) {
+    final CreateTableRequest createTableRequest =
+        dynamoDbMapper.generateCreateTableRequest(tableClass);
+    createTableRequest.setProvisionedThroughput(PROVISIONED_THROUGHPUT);
+    Optional.ofNullable(createTableRequest.getGlobalSecondaryIndexes())
+        .ifPresent(gsis -> gsis.forEach(configureGsi()));
+    return createTableRequest;
+  }
 
-    private static Consumer<GlobalSecondaryIndex> configureGsi() {
-        return gsi -> {
-            gsi.setProvisionedThroughput(PROVISIONED_THROUGHPUT);
-            gsi.setProjection(PROJECTION_ALL);
-        };
-    }
+  private static Consumer<GlobalSecondaryIndex> configureGsi() {
+    return gsi -> {
+      gsi.setProvisionedThroughput(PROVISIONED_THROUGHPUT);
+      gsi.setProjection(PROJECTION_ALL);
+    };
+  }
 
-    private void waitTableToBeActive(final Class<?> modelClass) throws InterruptedException {
-        new Table(dynamoDb, modelClass.getAnnotation(DynamoDBTable.class).tableName()).waitForActive();
-    }
+  private void waitTableToBeActive(final Class<?> modelClass) throws InterruptedException {
+    new Table(dynamoDb, modelClass.getAnnotation(DynamoDBTable.class).tableName()).waitForActive();
+  }
 }

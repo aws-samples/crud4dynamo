@@ -8,15 +8,17 @@ import org.junit.jupiter.api.Test;
 
 class DynamoDbMapperConfigHelperTest {
 
-    @Test
-    void verifyOverrideConfig() {
-        final DynamoDBMapperConfig baseConfig = DynamoDBMapperConfig.builder().build();
+  @Test
+  void verifyOverrideConfig() {
+    final DynamoDBMapperConfig baseConfig = DynamoDBMapperConfig.builder().build();
 
-        assertThat(baseConfig.getPaginationLoadingStrategy()).isNull();
+    assertThat(baseConfig.getPaginationLoadingStrategy()).isNull();
 
-        final DynamoDBMapperConfig overriddenConfig =
-                DynamoDbMapperConfigHelper.override(baseConfig, PaginationLoadingStrategy.LAZY_LOADING.config());
+    final DynamoDBMapperConfig overriddenConfig =
+        DynamoDbMapperConfigHelper.override(
+            baseConfig, PaginationLoadingStrategy.LAZY_LOADING.config());
 
-        assertThat(overriddenConfig.getPaginationLoadingStrategy()).isEqualTo(PaginationLoadingStrategy.LAZY_LOADING);
-    }
+    assertThat(overriddenConfig.getPaginationLoadingStrategy())
+        .isEqualTo(PaginationLoadingStrategy.LAZY_LOADING);
+  }
 }

@@ -10,6 +10,7 @@ plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
     id 'antlr'
+    id "com.diffplug.gradle.spotless" version "3.23.0"
 }
 
 ext {
@@ -21,11 +22,8 @@ ext {
 }
 
 repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-//    jcenter()
+    jcenter()
     mavenCentral()
-
     maven {
         // name "DynamoDB Local Release Repository - Asia Pacific (Tokyo) Region"
         url "https://s3-ap-northeast-1.amazonaws.com/dynamodb-local-tokyo/release"
@@ -41,7 +39,7 @@ dependencies {
     // implementation
     // This is where you should declare dependencies which are purely internal and not meant to be exposed to consumers.
     implementation 'com.google.guava:guava:27.0.1-jre'
-    implementation 'com.amazonaws:aws-java-sdk:1.11.560' // TODO: change to dynamodb sdk
+    implementation 'com.amazonaws:aws-java-sdk:1.11.560'
     implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.2'
 
     // compileOnly
@@ -82,18 +80,20 @@ generateGrammarSource {
     arguments += ["-visitor", "-long-messages", "-package", antlrConfig['package'], "-lib", antlrConfig['lib']]
 }
 
-// Tasks are useful when leaning
-task showSourceSetPath {
-    group 'Gradle Hack Tasks'
-    description 'Shows path for each source sets'
-    doLast {
-        // also we can use sourceSets['main'] to lookup source set
-        sourceSets.each { st ->
-            println "--> SourceSet [${st.name}] with srcDirs ${st.allJava.srcDirs}"
-        }
-    }
-}
-
 test {
     useJUnitPlatform()
 }
+
+spotless {
+    java {
+        googleJavaFormat('1.7')
+    }
+
+    format 'misc', {
+        target '**/*.gradle', '**/*.md', '**/.gitignore'
+        trimTrailingWhitespace()
+        indentWithSpaces(4)
+        endWithNewline()
+    }
+}
+

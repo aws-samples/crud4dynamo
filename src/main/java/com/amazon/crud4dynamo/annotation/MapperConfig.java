@@ -31,11 +31,13 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface MapperConfig {
 
-    /**
-     * https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/dynamodbv2/datamodeling/DynamoDBMapperConfig.SaveBehavior.html
-     */
-    SaveBehavior saveBehavior() default SaveBehavior.UPDATE;
+  /**
+   * https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/dynamodbv2/datamodeling/DynamoDBMapperConfig.SaveBehavior.html
+   */
+  SaveBehavior saveBehavior() default SaveBehavior.UPDATE;
 
-    /** https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html */
-    ConsistentReads consistentReads() default ConsistentReads.EVENTUAL;
+  /**
+   * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html
+   */
+  ConsistentReads consistentReads() default ConsistentReads.EVENTUAL;
 }

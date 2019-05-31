@@ -21,20 +21,21 @@ import java.util.function.Function;
 
 /** An attribute value converter which is aware of the expression attribute name, e.g, ":value" */
 public interface NameAwareConverter extends AttributeValueConverter {
-    String getName();
+  String getName();
 
-    static Function<String, NameAwareConverter> newLazyConverter(final String attributeValue, final DynamoDBMapperTableModel tableModel) {
-        return name ->
-                new NameAwareConverter() {
-                    @Override
-                    public String getName() {
-                        return attributeValue;
-                    }
+  static Function<String, NameAwareConverter> newLazyConverter(
+      final String attributeValue, final DynamoDBMapperTableModel tableModel) {
+    return name ->
+        new NameAwareConverter() {
+          @Override
+          public String getName() {
+            return attributeValue;
+          }
 
-                    @Override
-                    public AttributeValue convert(final Object object) {
-                        return tableModel.field(name).convert(object);
-                    }
-                };
-    }
+          @Override
+          public AttributeValue convert(final Object object) {
+            return tableModel.field(name).convert(object);
+          }
+        };
+  }
 }

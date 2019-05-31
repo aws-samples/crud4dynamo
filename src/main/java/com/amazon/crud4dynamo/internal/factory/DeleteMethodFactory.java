@@ -23,16 +23,20 @@ import com.amazon.crud4dynamo.extension.method.AbstractMethod;
 import com.amazon.crud4dynamo.internal.method.DeleteMethod;
 
 public class DeleteMethodFactory extends ChainedAbstractMethodFactory {
-    public DeleteMethodFactory(final AbstractMethodFactory delegate) {
-        super(delegate);
-    }
+  public DeleteMethodFactory(final AbstractMethodFactory delegate) {
+    super(delegate);
+  }
 
-    @Override
-    public AbstractMethod create(Context context) {
-        if (context.signature().invokable().isAnnotationPresent(Delete.class)) {
-            return new DeleteMethod(
-                    context.signature(), context.modelType(), context.mapper(), context.amazonDynamoDb(), context.mapperConfig());
-        }
-        return super.create(context);
+  @Override
+  public AbstractMethod create(Context context) {
+    if (context.signature().invokable().isAnnotationPresent(Delete.class)) {
+      return new DeleteMethod(
+          context.signature(),
+          context.modelType(),
+          context.mapper(),
+          context.amazonDynamoDb(),
+          context.mapperConfig());
     }
+    return super.create(context);
+  }
 }

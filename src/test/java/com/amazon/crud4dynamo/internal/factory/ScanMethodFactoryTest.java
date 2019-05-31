@@ -24,70 +24,72 @@ import lombok.Data;
 import org.junit.jupiter.api.Test;
 
 class ScanMethodFactoryTest extends SingleTableDynamoDbTestBase<Model> {
-    @Data
-    @DynamoDBTable(tableName = "Model")
-    public static class Model {
-        @DynamoDBHashKey(attributeName = "HashKey")
-        private String hashKey;
-    }
+  @Data
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+  }
 
-    public interface TestInterface {
-        void nonScan();
+  public interface TestInterface {
+    void nonScan();
 
-        @Scan(filter = "HashKey <> :hashKey")
-        Iterator<Model> scan(@Param(":hashKey") final String keyValue);
+    @Scan(filter = "HashKey <> :hashKey")
+    Iterator<Model> scan(@Param(":hashKey") final String keyValue);
 
-        @Scan(filter = "HashKey <> :hashKey")
-        PageResult<Model> pageScan(@Param(":hashKey") final String keyValue, final PageRequest<Model> request);
-    }
+    @Scan(filter = "HashKey <> :hashKey")
+    PageResult<Model> pageScan(
+        @Param(":hashKey") final String keyValue, final PageRequest<Model> request);
+  }
 
-    @Override
-    protected Class<Model> getModelClass() {
-        return Model.class;
-    }
+  @Override
+  protected Class<Model> getModelClass() {
+    return Model.class;
+  }
 
-    @Test
-    void notGivenScanAnnotation_delegate() throws NoSuchMethodException {
-        final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
-        final ScanMethodFactory scanMethodFactory = new ScanMethodFactory(delegate);
-        final Context context = getContext(TestInterface.class.getMethod("nonScan"));
+  @Test
+  void notGivenScanAnnotation_delegate() throws NoSuchMethodException {
+    final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
+    final ScanMethodFactory scanMethodFactory = new ScanMethodFactory(delegate);
+    final Context context = getContext(TestInterface.class.getMethod("nonScan"));
 
-        final AbstractMethod abstractMethod = scanMethodFactory.create(context);
+    final AbstractMethod abstractMethod = scanMethodFactory.create(context);
 
-        assertThat(abstractMethod).isNull();
-        verify(delegate).create(context);
-    }
+    assertThat(abstractMethod).isNull();
+    verify(delegate).create(context);
+  }
 
-    private Context getContext(final Method rawMethod) {
-        return Context.builder()
-                .signature(Signature.resolve(rawMethod, TestInterface.class))
-                .interfaceType(TestInterface.class)
-                .modelType(Model.class)
-                .mapper(getDynamoDbMapper())
-                .mapperConfig(null)
-                .method(rawMethod)
-                .build();
-    }
+  private Context getContext(final Method rawMethod) {
+    return Context.builder()
+        .signature(Signature.resolve(rawMethod, TestInterface.class))
+        .interfaceType(TestInterface.class)
+        .modelType(Model.class)
+        .mapper(getDynamoDbMapper())
+        .mapperConfig(null)
+        .method(rawMethod)
+        .build();
+  }
 
-    @Test
-    void nonPagingScan() throws NoSuchMethodException {
-        final Context context = getContext(TestInterface.class.getMethod("scan", String.class));
-        final ScanMethodFactory scanMethodFactory = new ScanMethodFactory(null);
+  @Test
+  void nonPagingScan() throws NoSuchMethodException {
+    final Context context = getContext(TestInterface.class.getMethod("scan", String.class));
+    final ScanMethodFactory scanMethodFactory = new ScanMethodFactory(null);
 
-        final AbstractMethod abstractMethod = scanMethodFactory.create(context);
+    final AbstractMethod abstractMethod = scanMethodFactory.create(context);
 
-        assertThat(abstractMethod).isNotNull();
-        assertThat(abstractMethod).isInstanceOf(NonPagingMethod.class);
-    }
+    assertThat(abstractMethod).isNotNull();
+    assertThat(abstractMethod).isInstanceOf(NonPagingMethod.class);
+  }
 
-    @Test
-    void pageScan() throws NoSuchMethodException {
-        final Context context = getContext(TestInterface.class.getMethod("pageScan", String.class, PageRequest.class));
-        final ScanMethodFactory scanMethodFactory = new ScanMethodFactory(null);
+  @Test
+  void pageScan() throws NoSuchMethodException {
+    final Context context =
+        getContext(TestInterface.class.getMethod("pageScan", String.class, PageRequest.class));
+    final ScanMethodFactory scanMethodFactory = new ScanMethodFactory(null);
 
-        final AbstractMethod abstractMethod = scanMethodFactory.create(context);
+    final AbstractMethod abstractMethod = scanMethodFactory.create(context);
 
-        assertThat(abstractMethod).isNotNull();
-        assertThat(abstractMethod).isInstanceOf(PagingMethod.class);
-    }
+    assertThat(abstractMethod).isNotNull();
+    assertThat(abstractMethod).isInstanceOf(PagingMethod.class);
+  }
 }

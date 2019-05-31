@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @DynamoDBTable(tableName = DummyTable.NAME)
 public class DummyTable {
-    public static final String NAME = "DummyTable";
+  public static final String NAME = "DummyTable";
 
-    @DynamoDBHashKey(attributeName = "HashKey")
-    public String hashKey;
+  @DynamoDBHashKey(attributeName = "HashKey")
+  public String hashKey;
 }

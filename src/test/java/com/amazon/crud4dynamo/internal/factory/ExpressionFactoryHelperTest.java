@@ -32,143 +32,151 @@ import org.junit.jupiter.api.Test;
 
 class ExpressionFactoryHelperTest {
 
-    @Test
-    void mapIsEmpty_returnNull() {
-        final Map<String, String> emptyMap = Collections.EMPTY_MAP;
+  @Test
+  void mapIsEmpty_returnNull() {
+    final Map<String, String> emptyMap = Collections.EMPTY_MAP;
 
-        final Map<String, String> returnedMap = MapHelper.toNullIfEmpty(emptyMap);
+    final Map<String, String> returnedMap = MapHelper.toNullIfEmpty(emptyMap);
 
-        assertThat(returnedMap).isNull();
+    assertThat(returnedMap).isNull();
+  }
+
+  @Test
+  void mapIsNotEmpty_returnOriginal() {
+    final Map<String, String> nonEmptyMap = ImmutableMap.of("A", "B");
+
+    final Map<String, String> returnedMap = MapHelper.toNullIfEmpty(nonEmptyMap);
+
+    assertThat(returnedMap == nonEmptyMap).isTrue();
+  }
+
+  @Test
+  void stringIsNull_returnNull() {
+    final String nullStr = null;
+
+    final String returnedStr = ExpressionFactoryHelper.toNullIfBlank(nullStr);
+
+    assertThat(returnedStr).isNull();
+  }
+
+  @Test
+  void stringIsEmpty_returnNull() {
+    final String emptyStr = "";
+
+    final String returnedStr = ExpressionFactoryHelper.toNullIfBlank(emptyStr);
+
+    assertThat(returnedStr).isNull();
+  }
+
+  @Test
+  void stringIsNotEmpty_returnOriginal() {
+    final String nonEmptyStr = "a";
+
+    final String returnedStr = ExpressionFactoryHelper.toNullIfBlank(nonEmptyStr);
+
+    assertThat(returnedStr == nonEmptyStr).isTrue();
+  }
+
+  public interface TestInterface {
+    void aMethod(@Param("#AttrName") String attrName, @Param(":attrValue") Integer attrValue);
+
+    static ImmutableList<Parameter> getMethodParameters() throws NoSuchMethodException {
+      final Method aMethod = TestInterface.class.getMethod("aMethod", String.class, Integer.class);
+      final TypeToken<TestInterface> typeToken = TypeToken.of(TestInterface.class);
+      final Invokable<TestInterface, Object> invokable = typeToken.method(aMethod);
+      return invokable.getParameters();
+    }
+  }
+
+  @Test
+  void getAttributeNames() throws Exception {
+    final ImmutableList<Parameter> parameters = TestInterface.getMethodParameters();
+    final List<Argument> arguments = Argument.newList(parameters, Arrays.asList("AttrName", 1));
+
+    final Map<String, String> exprAttrNames =
+        ExpressionFactoryHelper.getExpressionAttributeNames(arguments);
+
+    assertThat(exprAttrNames).containsOnly(MapEntry.entry("#AttrName", "AttrName"));
+  }
+
+  @Test
+  void getFilteredAttributeNames() throws Exception {
+    final ImmutableList<Parameter> parameters = TestInterface.getMethodParameters();
+    final List<Argument> arguments = Argument.newList(parameters, Arrays.asList("AttrName", 1));
+
+    final Map<String, String> exprAttrNames =
+        ExpressionFactoryHelper.getExpressionAttributeNames(arguments, value -> false);
+
+    assertThat(exprAttrNames).isEmpty();
+  }
+
+  @Test
+  void getAttributeValues() throws Exception {
+    final ImmutableList<Parameter> parameters = TestInterface.getMethodParameters();
+    final List<Argument> arguments = Argument.newList(parameters, Arrays.asList("AttrName", 1));
+    final AttributeValueMapper mapper =
+        new AttributeValueMapper(
+            ImmutableMap.of(":attrValue", object -> new AttributeValue().withN(object.toString())));
+
+    final Map<String, AttributeValue> exprAttrValues =
+        ExpressionFactoryHelper.getExpressionAttributeValues(arguments, mapper);
+
+    assertThat(exprAttrValues)
+        .containsOnly(MapEntry.entry(":attrValue", new AttributeValue().withN("1")));
+  }
+
+  @Test
+  void hasPageRequest() {
+    final PageRequest<Object> request = PageRequest.builder().build();
+
+    final Optional<PageRequest> pageRequest =
+        ExpressionFactoryHelper.findPageRequest(new Object(), request);
+
+    assertThat(pageRequest).contains(request);
+  }
+
+  @Test
+  void noPageRequest() {
+    final Optional<PageRequest> pageRequest = ExpressionFactoryHelper.findPageRequest(new Object());
+
+    assertThat(pageRequest).isEmpty();
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "Table")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+  }
+
+  @Nested
+  class MapperNeededTest extends SingleTableDynamoDbTestBase<Model> {
+    @Override
+    protected Class<Model> getModelClass() {
+      return Model.class;
     }
 
     @Test
-    void mapIsNotEmpty_returnOriginal() {
-        final Map<String, String> nonEmptyMap = ImmutableMap.of("A", "B");
+    void getLastEvaluatedKey() {
+      final PageRequest<Model> request =
+          PageRequest.<Model>builder()
+              .exclusiveStartItem(Model.builder().hashKey("A").build())
+              .build();
 
-        final Map<String, String> returnedMap = MapHelper.toNullIfEmpty(nonEmptyMap);
+      final Map<String, AttributeValue> lastEvaluatedKey =
+          ExpressionFactoryHelper.getLastEvaluatedKey(request, getDynamoDbMapperTableModel());
 
-        assertThat(returnedMap == nonEmptyMap).isTrue();
+      assertThat(lastEvaluatedKey).containsOnly(MapEntry.entry("HashKey", new AttributeValue("A")));
     }
+  }
 
-    @Test
-    void stringIsNull_returnNull() {
-        final String nullStr = null;
+  @Test
+  void getTableName() {
+    final String tableName = ExpressionFactoryHelper.getTableName(Model.class);
 
-        final String returnedStr = ExpressionFactoryHelper.toNullIfBlank(nullStr);
-
-        assertThat(returnedStr).isNull();
-    }
-
-    @Test
-    void stringIsEmpty_returnNull() {
-        final String emptyStr = "";
-
-        final String returnedStr = ExpressionFactoryHelper.toNullIfBlank(emptyStr);
-
-        assertThat(returnedStr).isNull();
-    }
-
-    @Test
-    void stringIsNotEmpty_returnOriginal() {
-        final String nonEmptyStr = "a";
-
-        final String returnedStr = ExpressionFactoryHelper.toNullIfBlank(nonEmptyStr);
-
-        assertThat(returnedStr == nonEmptyStr).isTrue();
-    }
-
-    public interface TestInterface {
-        void aMethod(@Param("#AttrName") String attrName, @Param(":attrValue") Integer attrValue);
-
-        static ImmutableList<Parameter> getMethodParameters() throws NoSuchMethodException {
-            final Method aMethod = TestInterface.class.getMethod("aMethod", String.class, Integer.class);
-            final TypeToken<TestInterface> typeToken = TypeToken.of(TestInterface.class);
-            final Invokable<TestInterface, Object> invokable = typeToken.method(aMethod);
-            return invokable.getParameters();
-        }
-    }
-
-    @Test
-    void getAttributeNames() throws Exception {
-        final ImmutableList<Parameter> parameters = TestInterface.getMethodParameters();
-        final List<Argument> arguments = Argument.newList(parameters, Arrays.asList("AttrName", 1));
-
-        final Map<String, String> exprAttrNames = ExpressionFactoryHelper.getExpressionAttributeNames(arguments);
-
-        assertThat(exprAttrNames).containsOnly(MapEntry.entry("#AttrName", "AttrName"));
-    }
-
-    @Test
-    void getFilteredAttributeNames() throws Exception {
-        final ImmutableList<Parameter> parameters = TestInterface.getMethodParameters();
-        final List<Argument> arguments = Argument.newList(parameters, Arrays.asList("AttrName", 1));
-
-        final Map<String, String> exprAttrNames = ExpressionFactoryHelper.getExpressionAttributeNames(arguments, value -> false);
-
-        assertThat(exprAttrNames).isEmpty();
-    }
-
-    @Test
-    void getAttributeValues() throws Exception {
-        final ImmutableList<Parameter> parameters = TestInterface.getMethodParameters();
-        final List<Argument> arguments = Argument.newList(parameters, Arrays.asList("AttrName", 1));
-        final AttributeValueMapper mapper =
-                new AttributeValueMapper(ImmutableMap.of(":attrValue", object -> new AttributeValue().withN(object.toString())));
-
-        final Map<String, AttributeValue> exprAttrValues = ExpressionFactoryHelper.getExpressionAttributeValues(arguments, mapper);
-
-        assertThat(exprAttrValues).containsOnly(MapEntry.entry(":attrValue", new AttributeValue().withN("1")));
-    }
-
-    @Test
-    void hasPageRequest() {
-        final PageRequest<Object> request = PageRequest.builder().build();
-
-        final Optional<PageRequest> pageRequest = ExpressionFactoryHelper.findPageRequest(new Object(), request);
-
-        assertThat(pageRequest).contains(request);
-    }
-
-    @Test
-    void noPageRequest() {
-        final Optional<PageRequest> pageRequest = ExpressionFactoryHelper.findPageRequest(new Object());
-
-        assertThat(pageRequest).isEmpty();
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @DynamoDBTable(tableName = "Table")
-    public static class Model {
-        @DynamoDBHashKey(attributeName = "HashKey")
-        private String hashKey;
-    }
-
-    @Nested
-    class MapperNeededTest extends SingleTableDynamoDbTestBase<Model> {
-        @Override
-        protected Class<Model> getModelClass() {
-            return Model.class;
-        }
-
-        @Test
-        void getLastEvaluatedKey() {
-            final PageRequest<Model> request =
-                    PageRequest.<Model>builder().exclusiveStartItem(Model.builder().hashKey("A").build()).build();
-
-            final Map<String, AttributeValue> lastEvaluatedKey =
-                    ExpressionFactoryHelper.getLastEvaluatedKey(request, getDynamoDbMapperTableModel());
-
-            assertThat(lastEvaluatedKey).containsOnly(MapEntry.entry("HashKey", new AttributeValue("A")));
-        }
-    }
-
-    @Test
-    void getTableName() {
-        final String tableName = ExpressionFactoryHelper.getTableName(Model.class);
-
-        assertThat(tableName).isEqualTo("Table");
-    }
+    assertThat(tableName).isEqualTo("Table");
+  }
 }

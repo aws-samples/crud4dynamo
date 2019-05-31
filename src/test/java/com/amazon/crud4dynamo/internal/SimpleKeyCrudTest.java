@@ -14,34 +14,34 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 public class SimpleKeyCrudTest extends SimpleKeyTestBase<SimpleKeyCrudTest.Model, SimpleKeyCrud> {
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @DynamoDBTable(tableName = "TestTable")
-    public static class Model {
-        @DynamoDBHashKey(attributeName = "HashKey")
-        private String hashKey;
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "TestTable")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
 
-        @DynamoDBAttribute(attributeName = "Integer1")
-        private Integer integer1;
-    }
+    @DynamoDBAttribute(attributeName = "Integer1")
+    private Integer integer1;
+  }
 
-    @Override
-    protected SimpleKeyCrud newDao() {
-        return new CrudForDynamo(getDynamoDbClient()).createSimple(Model.class);
-    }
+  @Override
+  protected SimpleKeyCrud newDao() {
+    return new CrudForDynamo(getDynamoDbClient()).createSimple(Model.class);
+  }
 
-    @Override
-    protected List<Model> getTestData() {
-        return Arrays.asList(
-                Model.builder().hashKey("A").integer1(1).build(),
-                Model.builder().hashKey("B").integer1(2).build(),
-                Model.builder().hashKey("C").integer1(3).build());
-    }
+  @Override
+  protected List<Model> getTestData() {
+    return Arrays.asList(
+        Model.builder().hashKey("A").integer1(1).build(),
+        Model.builder().hashKey("B").integer1(2).build(),
+        Model.builder().hashKey("C").integer1(3).build());
+  }
 
-    @Override
-    protected Class<Model> getModelClass() {
-        return Model.class;
-    }
+  @Override
+  protected Class<Model> getModelClass() {
+    return Model.class;
+  }
 }

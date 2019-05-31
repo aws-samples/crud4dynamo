@@ -15,47 +15,49 @@ import java.lang.reflect.Method;
 import org.junit.jupiter.api.Test;
 
 class CustomMethodFactoryTest {
-    public interface TestInterface {
-        @Custom(factoryClass = TestFactory.class)
-        void aMethod();
+  public interface TestInterface {
+    @Custom(factoryClass = TestFactory.class)
+    void aMethod();
 
-        @Cached
-        void bMethod();
+    @Cached
+    void bMethod();
+  }
+
+  public static class TestFactory implements AbstractMethodFactory {
+
+    @Override
+    public AbstractMethod create(final Context context) {
+      final AbstractMethod mock = mock(AbstractMethod.class);
+      when(mock.getSignature()).thenReturn(context.signature());
+      return mock;
     }
+  }
 
-    public static class TestFactory implements AbstractMethodFactory {
+  @Test
+  void createCustomMethod() throws Exception {
+    final Method aMethod = TestInterface.class.getMethod("aMethod");
+    final AbstractMethodFactory dummyDelegate = null;
+    final Context context =
+        Context.builder().signature(Signature.resolve(aMethod, TestInterface.class)).build();
+    final CustomMethodFactory customMethodFactory = new CustomMethodFactory(dummyDelegate);
 
-        @Override
-        public AbstractMethod create(final Context context) {
-            final AbstractMethod mock = mock(AbstractMethod.class);
-            when(mock.getSignature()).thenReturn(context.signature());
-            return mock;
-        }
-    }
+    final AbstractMethod abstractMethod = customMethodFactory.create(context);
 
-    @Test
-    void createCustomMethod() throws Exception {
-        final Method aMethod = TestInterface.class.getMethod("aMethod");
-        final AbstractMethodFactory dummyDelegate = null;
-        final Context context = Context.builder().signature(Signature.resolve(aMethod, TestInterface.class)).build();
-        final CustomMethodFactory customMethodFactory = new CustomMethodFactory(dummyDelegate);
+    assertThat(abstractMethod).isNotNull();
+    assertThat(abstractMethod.getSignature()).isEqualTo(context.signature());
+  }
 
-        final AbstractMethod abstractMethod = customMethodFactory.create(context);
+  @Test
+  void noCreatedFromAnnotation_delegateToSuper() throws Exception {
+    final Method bMethod = TestInterface.class.getMethod("bMethod");
+    final AbstractMethodFactory mockDelegate = mock(AbstractMethodFactory.class);
+    final Context context =
+        Context.builder().signature(Signature.resolve(bMethod, TestInterface.class)).build();
+    final CustomMethodFactory customMethodFactory = new CustomMethodFactory(mockDelegate);
 
-        assertThat(abstractMethod).isNotNull();
-        assertThat(abstractMethod.getSignature()).isEqualTo(context.signature());
-    }
+    final AbstractMethod abstractMethod = customMethodFactory.create(context);
 
-    @Test
-    void noCreatedFromAnnotation_delegateToSuper() throws Exception {
-        final Method bMethod = TestInterface.class.getMethod("bMethod");
-        final AbstractMethodFactory mockDelegate = mock(AbstractMethodFactory.class);
-        final Context context = Context.builder().signature(Signature.resolve(bMethod, TestInterface.class)).build();
-        final CustomMethodFactory customMethodFactory = new CustomMethodFactory(mockDelegate);
-
-        final AbstractMethod abstractMethod = customMethodFactory.create(context);
-
-        assertThat(abstractMethod).isNull();
-        verify(mockDelegate).create(context);
-    }
+    assertThat(abstractMethod).isNull();
+    verify(mockDelegate).create(context);
+  }
 }

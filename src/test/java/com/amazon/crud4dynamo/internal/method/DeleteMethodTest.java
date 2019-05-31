@@ -18,62 +18,68 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class DeleteMethodTest extends SingleTableDynamoDbTestBase<DeleteMethodTest.Model> {
-    private static final String KEY_EXPRESSION = "HashKey = :keyValue";
+  private static final String KEY_EXPRESSION = "HashKey = :keyValue";
 
-    @Builder
-    @Data
-    @DynamoDBTable(tableName = "Model")
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Model {
-        @DynamoDBHashKey(attributeName = "HashKey")
-        private String hashKey;
+  @Builder
+  @Data
+  @DynamoDBTable(tableName = "Model")
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
 
-        @DynamoDBAttribute(attributeName = "A")
-        private Integer a;
-    }
+    @DynamoDBAttribute(attributeName = "A")
+    private Integer a;
+  }
 
-    private interface Dao {
-        @Delete(keyExpression = KEY_EXPRESSION)
-        void deleteWithVoidReturnType(@Param(":keyValue") final String keyValue);
+  private interface Dao {
+    @Delete(keyExpression = KEY_EXPRESSION)
+    void deleteWithVoidReturnType(@Param(":keyValue") final String keyValue);
 
-        @Delete(keyExpression = KEY_EXPRESSION, returnValue = ReturnValue.ALL_OLD)
-        Model deleteWithOldValue(@Param(":keyValue") final String keyValue);
-    }
+    @Delete(keyExpression = KEY_EXPRESSION, returnValue = ReturnValue.ALL_OLD)
+    Model deleteWithOldValue(@Param(":keyValue") final String keyValue);
+  }
 
-    @Override
-    protected Class<Model> getModelClass() {
-        return Model.class;
-    }
+  @Override
+  protected Class<Model> getModelClass() {
+    return Model.class;
+  }
 
-    @Test
-    void delete_witNonReturnValue() throws Throwable {
-        final DeleteMethod method = newMethod("deleteWithVoidReturnType");
-        final String hashKey = "dummy";
-        final Model dummyItem = Model.builder().hashKey(hashKey).build();
-        storeItems(dummyItem);
+  @Test
+  void delete_witNonReturnValue() throws Throwable {
+    final DeleteMethod method = newMethod("deleteWithVoidReturnType");
+    final String hashKey = "dummy";
+    final Model dummyItem = Model.builder().hashKey(hashKey).build();
+    storeItems(dummyItem);
 
-        final Object result = method.invoke(hashKey);
+    final Object result = method.invoke(hashKey);
 
-        assertThat(result).isNull();
-        assertThat(getItem(dummyItem)).isEmpty();
-    }
+    assertThat(result).isNull();
+    assertThat(getItem(dummyItem)).isEmpty();
+  }
 
-    @Test
-    void deleteReturnOldValue() throws Throwable {
-        final DeleteMethod method = newMethod("deleteWithOldValue");
-        final String hashKey = "dummy";
-        final Model dummyItem = Model.builder().hashKey(hashKey).build();
-        storeItems(dummyItem);
+  @Test
+  void deleteReturnOldValue() throws Throwable {
+    final DeleteMethod method = newMethod("deleteWithOldValue");
+    final String hashKey = "dummy";
+    final Model dummyItem = Model.builder().hashKey(hashKey).build();
+    storeItems(dummyItem);
 
-        final Object result = method.invoke(hashKey);
+    final Object result = method.invoke(hashKey);
 
-        assertThat(result).isEqualTo(dummyItem);
-        assertThat(getItem(dummyItem)).isEmpty();
-    }
+    assertThat(result).isEqualTo(dummyItem);
+    assertThat(getItem(dummyItem)).isEmpty();
+  }
 
-    private DeleteMethod newMethod(final String methodName) throws NoSuchMethodException {
-        final Signature defaultPutMethod = Signature.resolve(Dao.class.getMethod(methodName, String.class), Dao.class);
-        return new DeleteMethod(defaultPutMethod, getModelClass(), getDynamoDbMapper(), getDynamoDbClient(), DynamoDBMapperConfig.DEFAULT);
-    }
+  private DeleteMethod newMethod(final String methodName) throws NoSuchMethodException {
+    final Signature defaultPutMethod =
+        Signature.resolve(Dao.class.getMethod(methodName, String.class), Dao.class);
+    return new DeleteMethod(
+        defaultPutMethod,
+        getModelClass(),
+        getDynamoDbMapper(),
+        getDynamoDbClient(),
+        DynamoDBMapperConfig.DEFAULT);
+  }
 }

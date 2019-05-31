@@ -20,11 +20,11 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Reflection {
-    public static <T> T newInstance(final Class<T> type) {
-        try {
-            return type.newInstance();
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+  public static <T> T newInstance(final Class<T> type) {
+    try {
+      return type.newInstance();
+    } catch (final Exception e) {
+      throw new RuntimeException(e);
     }
+  }
 }

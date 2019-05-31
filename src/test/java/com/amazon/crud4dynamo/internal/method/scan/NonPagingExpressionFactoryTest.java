@@ -22,45 +22,47 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class NonPagingExpressionFactoryTest extends SingleTableDynamoDbTestBase<Model> {
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @DynamoDBTable(tableName = "Table")
-    public static class Model {
-        @DynamoDBHashKey(attributeName = "HashKey")
-        private String hashKey;
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "Table")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
 
-        @DynamoDBRangeKey(attributeName = "RangeKey")
-        private Integer rangeKey;
-    }
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
+  }
 
-    @Override
-    protected Class<Model> getModelClass() {
-        return Model.class;
-    }
+  @Override
+  protected Class<Model> getModelClass() {
+    return Model.class;
+  }
 
-    private static final String FILTER_EXPRESSION = "#rangeKey > :lower";
+  private static final String FILTER_EXPRESSION = "#rangeKey > :lower";
 
-    private interface Dao extends CompositeKeyCrud<String, Integer, Model> {
-        @Scan(filter = FILTER_EXPRESSION)
-        Iterator<Model> scan(@Param("#rangeKey") String rangeKey, @Param(":lower") Integer lower);
-    }
+  private interface Dao extends CompositeKeyCrud<String, Integer, Model> {
+    @Scan(filter = FILTER_EXPRESSION)
+    Iterator<Model> scan(@Param("#rangeKey") String rangeKey, @Param(":lower") Integer lower);
+  }
 
-    @Test
-    void create() throws Exception {
-        final NonPagingExpressionFactory factory = newFactory();
+  @Test
+  void create() throws Exception {
+    final NonPagingExpressionFactory factory = newFactory();
 
-        final DynamoDBScanExpression expression = factory.create("RangeKey", 3);
+    final DynamoDBScanExpression expression = factory.create("RangeKey", 3);
 
-        assertThat(expression.getIndexName()).isNull();
-        assertThat(expression.getFilterExpression()).isEqualTo(FILTER_EXPRESSION);
-        assertThat(expression.getExpressionAttributeNames()).containsEntry("#rangeKey", "RangeKey");
-        assertThat(expression.getExpressionAttributeValues()).containsEntry(":lower", new AttributeValue().withN("3"));
-    }
+    assertThat(expression.getIndexName()).isNull();
+    assertThat(expression.getFilterExpression()).isEqualTo(FILTER_EXPRESSION);
+    assertThat(expression.getExpressionAttributeNames()).containsEntry("#rangeKey", "RangeKey");
+    assertThat(expression.getExpressionAttributeValues())
+        .containsEntry(":lower", new AttributeValue().withN("3"));
+  }
 
-    private NonPagingExpressionFactory newFactory() throws NoSuchMethodException {
-        final Method method = Dao.class.getMethod("scan", String.class, Integer.class);
-        return new NonPagingExpressionFactory(Signature.resolve(method, Dao.class), getModelClass(), getDynamoDbMapper());
-    }
+  private NonPagingExpressionFactory newFactory() throws NoSuchMethodException {
+    final Method method = Dao.class.getMethod("scan", String.class, Integer.class);
+    return new NonPagingExpressionFactory(
+        Signature.resolve(method, Dao.class), getModelClass(), getDynamoDbMapper());
+  }
 }

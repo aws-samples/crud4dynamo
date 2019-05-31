@@ -27,22 +27,27 @@ import java.util.function.Supplier;
 
 public class CustomMethodFactory extends ChainedAbstractMethodFactory {
 
-    public CustomMethodFactory(final AbstractMethodFactory delegate) {
-        super(delegate);
-    }
+  public CustomMethodFactory(final AbstractMethodFactory delegate) {
+    super(delegate);
+  }
 
-    @Override
-    public AbstractMethod create(final Context context) {
-        final Optional<Custom> annotation = context.signature().getAnnotation(Custom.class);
-        if (!annotation.isPresent()) {
-            return super.create(context);
-        }
-        final AbstractMethodFactory factory =
-                annotation.map(Custom::factoryClass).map(Reflection::newInstance).orElseThrow(getException(context));
-        return factory.create(context);
+  @Override
+  public AbstractMethod create(final Context context) {
+    final Optional<Custom> annotation = context.signature().getAnnotation(Custom.class);
+    if (!annotation.isPresent()) {
+      return super.create(context);
     }
+    final AbstractMethodFactory factory =
+        annotation
+            .map(Custom::factoryClass)
+            .map(Reflection::newInstance)
+            .orElseThrow(getException(context));
+    return factory.create(context);
+  }
 
-    private Supplier<CrudForDynamoException> getException(final Context context) {
-        return () -> new CrudForDynamoException("Cannot create factory for method with signature:" + context.signature());
-    }
+  private Supplier<CrudForDynamoException> getException(final Context context) {
+    return () ->
+        new CrudForDynamoException(
+            "Cannot create factory for method with signature:" + context.signature());
+  }
 }

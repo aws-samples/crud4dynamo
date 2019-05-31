@@ -9,17 +9,22 @@ import java.lang.reflect.Method;
 import org.junit.jupiter.api.Test;
 
 class ThrowingMethodFactoryTest {
-    @Test
-    void throwException() throws Exception {
-        final ThrowingMethodFactory throwingMethodFactory = new ThrowingMethodFactory(null);
-        final Context context = prepareContext();
+  @Test
+  void throwException() throws Exception {
+    final ThrowingMethodFactory throwingMethodFactory = new ThrowingMethodFactory(null);
+    final Context context = prepareContext();
 
-        assertThatThrownBy(() -> throwingMethodFactory.create(context)).isInstanceOf(CrudForDynamoException.class);
-    }
+    assertThatThrownBy(() -> throwingMethodFactory.create(context))
+        .isInstanceOf(CrudForDynamoException.class);
+  }
 
-    private Context prepareContext() throws NoSuchMethodException {
-        final Method method = String.class.getMethod("length");
-        final Signature signature = Signature.resolve(method, String.class);
-        return Context.builder().interfaceType(String.class).signature(signature).method(method).build();
-    }
+  private Context prepareContext() throws NoSuchMethodException {
+    final Method method = String.class.getMethod("length");
+    final Signature signature = Signature.resolve(method, String.class);
+    return Context.builder()
+        .interfaceType(String.class)
+        .signature(signature)
+        .method(method)
+        .build();
+  }
 }

@@ -21,52 +21,63 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class PutFactoryTest extends SingleTableDynamoDbTestBase<PutFactoryTest.Table> {
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @DynamoDBTable(tableName = Table.NAME)
-    public static class Table {
-        private static final String NAME = "TestTable";
-        private static final String HASH_KEY = "HashKey";
-        private static final String STRING_ATTRIBUTE = "StringAttribute";
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = Table.NAME)
+  public static class Table {
+    private static final String NAME = "TestTable";
+    private static final String HASH_KEY = "HashKey";
+    private static final String STRING_ATTRIBUTE = "StringAttribute";
 
-        @DynamoDBHashKey(attributeName = HASH_KEY)
-        private String hashKey;
+    @DynamoDBHashKey(attributeName = HASH_KEY)
+    private String hashKey;
 
-        @DynamoDBAttribute(attributeName = STRING_ATTRIBUTE)
-        private String stringAttribute;
-    }
+    @DynamoDBAttribute(attributeName = STRING_ATTRIBUTE)
+    private String stringAttribute;
+  }
 
-    @Override
-    protected Class<Table> getModelClass() {
-        return Table.class;
-    }
+  @Override
+  protected Class<Table> getModelClass() {
+    return Table.class;
+  }
 
-    private interface Dao {
-        String CONDITION_EXPRESSION = "begins_with(#attribute, :prefix)";
+  private interface Dao {
+    String CONDITION_EXPRESSION = "begins_with(#attribute, :prefix)";
 
-        @Put(tableClass = Table.class, item = ":item", conditionExpression = CONDITION_EXPRESSION)
-        void put(@Param(":item") final Table item, @Param("#attribute") final String attributeName, @Param(":prefix") final String prefix);
-    }
+    @Put(tableClass = Table.class, item = ":item", conditionExpression = CONDITION_EXPRESSION)
+    void put(
+        @Param(":item") final Table item,
+        @Param("#attribute") final String attributeName,
+        @Param(":prefix") final String prefix);
+  }
 
-    @Test
-    void put() throws Exception {
-        final Method deleteMethod = Dao.class.getMethod("put", Table.class, String.class, String.class);
-        final Signature signature = Signature.resolve(deleteMethod, Dao.class);
-        final PutFactory factory = new PutFactory(signature.getAnnotation(Put.class).get(), getDynamoDbMapperTableModel());
-        final String prefix = "prefix";
-        final String hashKey = "hashKey";
-        final Table table = Table.builder().hashKey(hashKey).build();
+  @Test
+  void put() throws Exception {
+    final Method deleteMethod = Dao.class.getMethod("put", Table.class, String.class, String.class);
+    final Signature signature = Signature.resolve(deleteMethod, Dao.class);
+    final PutFactory factory =
+        new PutFactory(signature.getAnnotation(Put.class).get(), getDynamoDbMapperTableModel());
+    final String prefix = "prefix";
+    final String hashKey = "hashKey";
+    final Table table = Table.builder().hashKey(hashKey).build();
 
-        final com.amazonaws.services.dynamodbv2.model.Put put =
-                factory.create(Argument.newList(signature.parameters(), Arrays.asList(table, Table.STRING_ATTRIBUTE, prefix)));
+    final com.amazonaws.services.dynamodbv2.model.Put put =
+        factory.create(
+            Argument.newList(
+                signature.parameters(), Arrays.asList(table, Table.STRING_ATTRIBUTE, prefix)));
 
-        assertThat(put.withTableName(Table.NAME));
-        assertThat(put.getItem()).containsEntry(Table.HASH_KEY, new AttributeValue(hashKey)).hasSize(1);
-        assertThat(put.getConditionExpression()).isEqualTo(Dao.CONDITION_EXPRESSION);
-        assertThat(put.getExpressionAttributeNames()).containsEntry("#attribute", Table.STRING_ATTRIBUTE).hasSize(1);
-        assertThat(put.getExpressionAttributeValues()).containsEntry(":prefix", new AttributeValue(prefix)).hasSize(1);
-        assertThat(put.getReturnValuesOnConditionCheckFailure()).isEqualTo(ReturnValuesOnConditionCheckFailure.NONE.toString());
-    }
+    assertThat(put.withTableName(Table.NAME));
+    assertThat(put.getItem()).containsEntry(Table.HASH_KEY, new AttributeValue(hashKey)).hasSize(1);
+    assertThat(put.getConditionExpression()).isEqualTo(Dao.CONDITION_EXPRESSION);
+    assertThat(put.getExpressionAttributeNames())
+        .containsEntry("#attribute", Table.STRING_ATTRIBUTE)
+        .hasSize(1);
+    assertThat(put.getExpressionAttributeValues())
+        .containsEntry(":prefix", new AttributeValue(prefix))
+        .hasSize(1);
+    assertThat(put.getReturnValuesOnConditionCheckFailure())
+        .isEqualTo(ReturnValuesOnConditionCheckFailure.NONE.toString());
+  }
 }

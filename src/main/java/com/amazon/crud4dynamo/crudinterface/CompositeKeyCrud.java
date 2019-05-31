@@ -29,11 +29,12 @@ import java.util.Optional;
  * @param <M> Model Generic Type Parameter
  */
 public interface CompositeKeyCrud<H, R, M> extends DynamoDbCrud<M> {
-    void deleteBy(final H hashKey, final R rangeKey) throws CrudForDynamoException;
+  void deleteBy(final H hashKey, final R rangeKey) throws CrudForDynamoException;
 
-    Optional<M> findBy(final H hashKey, final R rangeKey) throws CrudForDynamoException;
+  Optional<M> findBy(final H hashKey, final R rangeKey) throws CrudForDynamoException;
 
-    Iterator<M> groupBy(final H hashKey) throws CrudForDynamoException;
+  Iterator<M> groupBy(final H hashKey) throws CrudForDynamoException;
 
-    PageResult<M> groupBy(final H hashKey, final PageRequest<M> pageRequest) throws CrudForDynamoException;
+  PageResult<M> groupBy(final H hashKey, final PageRequest<M> pageRequest)
+      throws CrudForDynamoException;
 }

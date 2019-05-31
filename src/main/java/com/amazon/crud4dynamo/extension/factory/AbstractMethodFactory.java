@@ -19,5 +19,5 @@ import com.amazon.crud4dynamo.extension.Context;
 import com.amazon.crud4dynamo.extension.method.AbstractMethod;
 
 public interface AbstractMethodFactory {
-    AbstractMethod create(final Context context);
+  AbstractMethod create(final Context context);
 }

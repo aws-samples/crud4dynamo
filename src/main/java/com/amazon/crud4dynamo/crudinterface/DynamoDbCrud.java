@@ -29,15 +29,15 @@ import java.util.Iterator;
  * @param <M> Model Type Generic Parameter
  */
 public interface DynamoDbCrud<M> {
-    void save(final M model) throws CrudForDynamoException;
+  void save(final M model) throws CrudForDynamoException;
 
-    FailedBatch<M> saveAll(final Iterable<M> models) throws CrudForDynamoException;
+  FailedBatch<M> saveAll(final Iterable<M> models) throws CrudForDynamoException;
 
-    void delete(final M model) throws CrudForDynamoException;
+  void delete(final M model) throws CrudForDynamoException;
 
-    FailedBatch<M> deleteAll(final Iterable<M> models) throws CrudForDynamoException;
+  FailedBatch<M> deleteAll(final Iterable<M> models) throws CrudForDynamoException;
 
-    Iterator<M> findAll() throws CrudForDynamoException;
+  Iterator<M> findAll() throws CrudForDynamoException;
 
-    PageResult<M> findAll(final PageRequest<M> pageRequest) throws CrudForDynamoException;
+  PageResult<M> findAll(final PageRequest<M> pageRequest) throws CrudForDynamoException;
 }

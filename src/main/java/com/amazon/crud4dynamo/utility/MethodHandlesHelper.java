@@ -23,14 +23,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MethodHandlesHelper {
 
-    public static Lookup getLookup(final Class<?> declaringClass) {
-        try {
-            final Constructor<Lookup> constructor = Lookup.class.getDeclaredConstructor(Class.class, int.class);
-            constructor.setAccessible(true);
-            final Lookup lookup = constructor.newInstance(declaringClass, Lookup.PRIVATE);
-            return lookup;
-        } catch (final Exception e) {
-            throw ExceptionHelper.throwAsUnchecked(e);
-        }
+  public static Lookup getLookup(final Class<?> declaringClass) {
+    try {
+      final Constructor<Lookup> constructor =
+          Lookup.class.getDeclaredConstructor(Class.class, int.class);
+      constructor.setAccessible(true);
+      final Lookup lookup = constructor.newInstance(declaringClass, Lookup.PRIVATE);
+      return lookup;
+    } catch (final Exception e) {
+      throw ExceptionHelper.throwAsUnchecked(e);
     }
+  }
 }

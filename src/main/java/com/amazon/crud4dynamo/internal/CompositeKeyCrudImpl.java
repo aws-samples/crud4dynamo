@@ -35,52 +35,64 @@ import java.util.Optional;
  * @param <R> RangeKey Generic Type Parameter
  * @param <M> Model Generic Type Parameter
  */
-public class CompositeKeyCrudImpl<H, R, M> extends DynamoDbCrudBase<M> implements CompositeKeyCrud<H, R, M> {
+public class CompositeKeyCrudImpl<H, R, M> extends DynamoDbCrudBase<M>
+    implements CompositeKeyCrud<H, R, M> {
 
-    public CompositeKeyCrudImpl(final DynamoDBMapper dynamoDbMapper, final DynamoDBMapperConfig mapperConfig, final Class<M> modelClass) {
-        super(dynamoDbMapper, mapperConfig, modelClass);
-    }
+  public CompositeKeyCrudImpl(
+      final DynamoDBMapper dynamoDbMapper,
+      final DynamoDBMapperConfig mapperConfig,
+      final Class<M> modelClass) {
+    super(dynamoDbMapper, mapperConfig, modelClass);
+  }
 
-    @Override
-    public void deleteBy(final H hashKey, final R rangeKey) throws CrudForDynamoException {
-        final M model = Reflection.newInstance(modelClass);
-        tableModel.hashKey().set(model, hashKey);
-        tableModel.rangeKey().set(model, rangeKey);
-        dynamoDbMapper.delete(model, mapperConfig);
-    }
+  @Override
+  public void deleteBy(final H hashKey, final R rangeKey) throws CrudForDynamoException {
+    final M model = Reflection.newInstance(modelClass);
+    tableModel.hashKey().set(model, hashKey);
+    tableModel.rangeKey().set(model, rangeKey);
+    dynamoDbMapper.delete(model, mapperConfig);
+  }
 
-    @Override
-    public Optional<M> findBy(final H hashKey, final R rangeKey) throws CrudForDynamoException {
-        return Optional.ofNullable(dynamoDbMapper.load(modelClass, hashKey, rangeKey, mapperConfig));
-    }
+  @Override
+  public Optional<M> findBy(final H hashKey, final R rangeKey) throws CrudForDynamoException {
+    return Optional.ofNullable(dynamoDbMapper.load(modelClass, hashKey, rangeKey, mapperConfig));
+  }
 
-    @Override
-    public Iterator<M> groupBy(final H hashKey) throws CrudForDynamoException {
-        final M model = Reflection.newInstance(modelClass);
-        tableModel.hashKey().set(model, hashKey);
-        return dynamoDbMapper
-                .query(
-                        modelClass,
-                        new DynamoDBQueryExpression<M>().withHashKeyValues(model),
-                        DynamoDbMapperConfigHelper.override(
-                                mapperConfig, DynamoDBMapperConfig.PaginationLoadingStrategy.ITERATION_ONLY.config()))
-                .iterator();
-    }
+  @Override
+  public Iterator<M> groupBy(final H hashKey) throws CrudForDynamoException {
+    final M model = Reflection.newInstance(modelClass);
+    tableModel.hashKey().set(model, hashKey);
+    return dynamoDbMapper
+        .query(
+            modelClass,
+            new DynamoDBQueryExpression<M>().withHashKeyValues(model),
+            DynamoDbMapperConfigHelper.override(
+                mapperConfig,
+                DynamoDBMapperConfig.PaginationLoadingStrategy.ITERATION_ONLY.config()))
+        .iterator();
+  }
 
-    @Override
-    public PageResult<M> groupBy(final H hashKey, final PageRequest<M> pageRequest) throws CrudForDynamoException {
-        final M model = Reflection.newInstance(modelClass);
-        tableModel.hashKey().set(model, hashKey);
-        final DynamoDBQueryExpression<M> expression =
-                new DynamoDBQueryExpression<M>()
-                        .withLimit(pageRequest.getLimit())
-                        .withExclusiveStartKey(
-                                Optional.ofNullable(pageRequest.getExclusiveStartItem()).map(tableModel::convert).orElse(null))
-                        .withHashKeyValues(model);
-        final QueryResultPage<M> resultPage = dynamoDbMapper.queryPage(modelClass, expression, mapperConfig);
-        return PageResult.<M>builder()
-                .items(resultPage.getResults())
-                .lastEvaluatedItem(Optional.ofNullable(resultPage.getLastEvaluatedKey()).map(tableModel::unconvert).orElse(null))
-                .build();
-    }
+  @Override
+  public PageResult<M> groupBy(final H hashKey, final PageRequest<M> pageRequest)
+      throws CrudForDynamoException {
+    final M model = Reflection.newInstance(modelClass);
+    tableModel.hashKey().set(model, hashKey);
+    final DynamoDBQueryExpression<M> expression =
+        new DynamoDBQueryExpression<M>()
+            .withLimit(pageRequest.getLimit())
+            .withExclusiveStartKey(
+                Optional.ofNullable(pageRequest.getExclusiveStartItem())
+                    .map(tableModel::convert)
+                    .orElse(null))
+            .withHashKeyValues(model);
+    final QueryResultPage<M> resultPage =
+        dynamoDbMapper.queryPage(modelClass, expression, mapperConfig);
+    return PageResult.<M>builder()
+        .items(resultPage.getResults())
+        .lastEvaluatedItem(
+            Optional.ofNullable(resultPage.getLastEvaluatedKey())
+                .map(tableModel::unconvert)
+                .orElse(null))
+        .build();
+  }
 }

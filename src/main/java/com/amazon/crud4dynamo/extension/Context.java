@@ -27,11 +27,11 @@ import lombok.experimental.Accessors;
 @Value
 @Accessors(fluent = true, chain = true)
 public class Context {
-    private final Signature signature;
-    private final DynamoDBMapper mapper;
-    private final AmazonDynamoDB amazonDynamoDb;
-    private final Class<?> modelType;
-    private final Class<?> interfaceType;
-    private final DynamoDBMapperConfig mapperConfig;
-    private final Method method;
+  private final Signature signature;
+  private final DynamoDBMapper mapper;
+  private final AmazonDynamoDB amazonDynamoDb;
+  private final Class<?> modelType;
+  private final Class<?> interfaceType;
+  private final DynamoDBMapperConfig mapperConfig;
+  private final Method method;
 }

@@ -25,21 +25,23 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
 
-public enum DefaultTransactionFactoryConfig implements ChainedMethodFactoryConfig<DefaultTransactionFactoryConfig> {
-    DEFAULT_METHOD(10000, DefaultMethodFactory::new),
-    TRANSACTION_WRITE_METHOD(20000, TransactionWriteMethodFactory::new),
-    TRANSACTION_GET_METHOD(30000, TransactionGetMethodFactory::new),
-    THROWING_METHOD(Integer.MAX_VALUE, ThrowingMethodFactory::new);
+public enum DefaultTransactionFactoryConfig
+    implements ChainedMethodFactoryConfig<DefaultTransactionFactoryConfig> {
+  DEFAULT_METHOD(10000, DefaultMethodFactory::new),
+  TRANSACTION_WRITE_METHOD(20000, TransactionWriteMethodFactory::new),
+  TRANSACTION_GET_METHOD(30000, TransactionGetMethodFactory::new),
+  THROWING_METHOD(Integer.MAX_VALUE, ThrowingMethodFactory::new);
 
-    @Getter private final int order;
-    @Getter private final ChainedFactoryConstructor chainedFactoryConstructor;
+  @Getter private final int order;
+  @Getter private final ChainedFactoryConstructor chainedFactoryConstructor;
 
-    DefaultTransactionFactoryConfig(final int order, final ChainedFactoryConstructor chainedFactoryConstructor) {
-        this.order = order;
-        this.chainedFactoryConstructor = chainedFactoryConstructor;
-    }
+  DefaultTransactionFactoryConfig(
+      final int order, final ChainedFactoryConstructor chainedFactoryConstructor) {
+    this.order = order;
+    this.chainedFactoryConstructor = chainedFactoryConstructor;
+  }
 
-    public static List<ChainedMethodFactoryConfig> getConfigs() {
-        return Arrays.asList(values());
-    }
+  public static List<ChainedMethodFactoryConfig> getConfigs() {
+    return Arrays.asList(values());
+  }
 }

@@ -18,47 +18,47 @@ import org.junit.jupiter.api.Test;
 
 class CachedMethodFactoryTest {
 
-    private AbstractMethodFactory delegateFactory;
-    private AbstractMethod delegateMethod;
-    private CachedMethodFactory cachedMethodFactory;
+  private AbstractMethodFactory delegateFactory;
+  private AbstractMethod delegateMethod;
+  private CachedMethodFactory cachedMethodFactory;
 
-    public interface TestInterface {
-        @Cached
-        void cachedMethod();
+  public interface TestInterface {
+    @Cached
+    void cachedMethod();
 
-        void nonCachedMethod();
-    }
+    void nonCachedMethod();
+  }
 
-    @BeforeEach
-    void setUp() {
-        delegateFactory = mock(AbstractMethodFactory.class);
-        delegateMethod = mock(AbstractMethod.class);
-        when(delegateFactory.create(any())).thenReturn(delegateMethod);
-        cachedMethodFactory = new CachedMethodFactory(delegateFactory);
-    }
+  @BeforeEach
+  void setUp() {
+    delegateFactory = mock(AbstractMethodFactory.class);
+    delegateMethod = mock(AbstractMethod.class);
+    when(delegateFactory.create(any())).thenReturn(delegateMethod);
+    cachedMethodFactory = new CachedMethodFactory(delegateFactory);
+  }
 
-    @Test
-    void createCachedMethod() throws Exception {
-        final Context context = getContext("cachedMethod");
+  @Test
+  void createCachedMethod() throws Exception {
+    final Context context = getContext("cachedMethod");
 
-        assertThat(cachedMethodFactory.create(context)).isInstanceOf(CachedMethod.class);
-        verify(delegateFactory).create(context);
-    }
+    assertThat(cachedMethodFactory.create(context)).isInstanceOf(CachedMethod.class);
+    verify(delegateFactory).create(context);
+  }
 
-    private Context getContext(final String methodName) throws NoSuchMethodException {
-        final Method method = TestInterface.class.getMethod(methodName);
-        return Context.builder()
-                .interfaceType(TestInterface.class)
-                .method(method)
-                .signature(Signature.resolve(method, TestInterface.class))
-                .build();
-    }
+  private Context getContext(final String methodName) throws NoSuchMethodException {
+    final Method method = TestInterface.class.getMethod(methodName);
+    return Context.builder()
+        .interfaceType(TestInterface.class)
+        .method(method)
+        .signature(Signature.resolve(method, TestInterface.class))
+        .build();
+  }
 
-    @Test
-    void returnDelegateForNonCachedMethod() throws Exception {
-        final Context context = getContext("nonCachedMethod");
+  @Test
+  void returnDelegateForNonCachedMethod() throws Exception {
+    final Context context = getContext("nonCachedMethod");
 
-        assertThat(cachedMethodFactory.create(context)).isEqualTo(delegateMethod);
-        verify(delegateFactory).create(context);
-    }
+    assertThat(cachedMethodFactory.create(context)).isEqualTo(delegateMethod);
+    verify(delegateFactory).create(context);
+  }
 }

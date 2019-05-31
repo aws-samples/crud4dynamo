@@ -17,48 +17,49 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 public class CompositeKeyCrudImplTest extends CompositeKeyTestBase<Model, CompositeKeyCrudImpl> {
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @DynamoDBTable(tableName = "TestTable")
-    public static class Model {
-        @DynamoDBHashKey(attributeName = "HashKey")
-        private String hashKey;
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "TestTable")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
 
-        @DynamoDBRangeKey(attributeName = "RangeKey")
-        private Integer rangeKey;
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
 
-        @DynamoDBAttribute(attributeName = "StringAttribute")
-        private String stringAttribute;
+    @DynamoDBAttribute(attributeName = "StringAttribute")
+    private String stringAttribute;
 
-        @DynamoDBIndexRangeKey(localSecondaryIndexName = "Lsi", attributeName = "LsiRangeKey")
-        private Integer lsiRangeKey;
+    @DynamoDBIndexRangeKey(localSecondaryIndexName = "Lsi", attributeName = "LsiRangeKey")
+    private Integer lsiRangeKey;
 
-        @DynamoDBIndexHashKey(globalSecondaryIndexName = "Gsi", attributeName = "GsiHashKey")
-        private String gsiHashKey;
+    @DynamoDBIndexHashKey(globalSecondaryIndexName = "Gsi", attributeName = "GsiHashKey")
+    private String gsiHashKey;
 
-        @DynamoDBIndexRangeKey(globalSecondaryIndexName = "Gsi", attributeName = "GsiRangeKey")
-        private Integer gsiRangeKey;
-    }
+    @DynamoDBIndexRangeKey(globalSecondaryIndexName = "Gsi", attributeName = "GsiRangeKey")
+    private Integer gsiRangeKey;
+  }
 
-    @Override
-    protected Class<Model> getModelClass() {
-        return Model.class;
-    }
+  @Override
+  protected Class<Model> getModelClass() {
+    return Model.class;
+  }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    protected CompositeKeyCrudImpl newDao() {
-        return new CompositeKeyCrudImpl<>(getDynamoDbMapper(), DynamoDBMapperConfig.DEFAULT, getModelClass());
-    }
+  @Override
+  @SuppressWarnings("unchecked")
+  protected CompositeKeyCrudImpl newDao() {
+    return new CompositeKeyCrudImpl<>(
+        getDynamoDbMapper(), DynamoDBMapperConfig.DEFAULT, getModelClass());
+  }
 
-    @Override
-    protected List<Model> getTestData() {
-        return Arrays.asList(
-                Model.builder().hashKey("A").rangeKey(1).stringAttribute("A").build(),
-                Model.builder().hashKey("A").rangeKey(2).stringAttribute("B").build(),
-                Model.builder().hashKey("A").rangeKey(3).stringAttribute("C").build(),
-                Model.builder().hashKey("B").rangeKey(4).stringAttribute("D").build());
-    }
+  @Override
+  protected List<Model> getTestData() {
+    return Arrays.asList(
+        Model.builder().hashKey("A").rangeKey(1).stringAttribute("A").build(),
+        Model.builder().hashKey("A").rangeKey(2).stringAttribute("B").build(),
+        Model.builder().hashKey("A").rangeKey(3).stringAttribute("C").build(),
+        Model.builder().hashKey("B").rangeKey(4).stringAttribute("D").build());
+  }
 }

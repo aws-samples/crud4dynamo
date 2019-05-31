@@ -21,62 +21,64 @@ import lombok.Data;
 import org.junit.jupiter.api.Test;
 
 class PutMethodFactoryTest extends SingleTableDynamoDbTestBase<PutMethodFactoryTest.Model> {
-    @Data
-    @DynamoDBTable(tableName = "Model")
-    public static class Model {
-        @DynamoDBHashKey(attributeName = "HashKey")
-        private String hashKey;
+  @Data
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
 
-        @DynamoDBAttribute(attributeName = "A")
-        private Integer a;
-    }
+    @DynamoDBAttribute(attributeName = "A")
+    private Integer a;
+  }
 
-    public interface Dao {
-        void nonPutMethod();
+  public interface Dao {
+    void nonPutMethod();
 
-        @Put
-        void putMethod(final @Param(":item") Model model);
-    }
+    @Put
+    void putMethod(final @Param(":item") Model model);
+  }
 
-    @Override
-    protected Class<Model> getModelClass() {
-        return Model.class;
-    }
+  @Override
+  protected Class<Model> getModelClass() {
+    return Model.class;
+  }
 
-    @Test
-    void notGivenPutAnnotation_delegate() throws Exception {
-        final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
-        final PutMethodFactory putMethodFactory = new PutMethodFactory(delegate);
-        final Context context = getContext("nonPutMethod");
+  @Test
+  void notGivenPutAnnotation_delegate() throws Exception {
+    final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
+    final PutMethodFactory putMethodFactory = new PutMethodFactory(delegate);
+    final Context context = getContext("nonPutMethod");
 
-        putMethodFactory.create(context);
+    putMethodFactory.create(context);
 
-        verify(delegate).create(context);
-    }
+    verify(delegate).create(context);
+  }
 
-    @Test
-    void givenPutAnnotation_createPutMethod() throws Exception {
-        final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
-        final PutMethodFactory putMethodFactory = new PutMethodFactory(delegate);
-        final Context context = getContext("putMethod", Model.class);
+  @Test
+  void givenPutAnnotation_createPutMethod() throws Exception {
+    final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
+    final PutMethodFactory putMethodFactory = new PutMethodFactory(delegate);
+    final Context context = getContext("putMethod", Model.class);
 
-        final AbstractMethod method = putMethodFactory.create(context);
+    final AbstractMethod method = putMethodFactory.create(context);
 
-        assertThat(method).isNotNull().isInstanceOf(PutMethod.class);
-    }
+    assertThat(method).isNotNull().isInstanceOf(PutMethod.class);
+  }
 
-    private Context getContext(final String methodName, final Class<?>... parameterTypes) throws NoSuchMethodException {
-        return Context.builder()
-                .signature(getSignature(methodName, parameterTypes))
-                .mapper(getDynamoDbMapper())
-                .amazonDynamoDb(getDynamoDbClient())
-                .mapperConfig(DynamoDBMapperConfig.DEFAULT)
-                .modelType(getModelClass())
-                .build();
-    }
+  private Context getContext(final String methodName, final Class<?>... parameterTypes)
+      throws NoSuchMethodException {
+    return Context.builder()
+        .signature(getSignature(methodName, parameterTypes))
+        .mapper(getDynamoDbMapper())
+        .amazonDynamoDb(getDynamoDbClient())
+        .mapperConfig(DynamoDBMapperConfig.DEFAULT)
+        .modelType(getModelClass())
+        .build();
+  }
 
-    private static Signature getSignature(final String name, final Class<?>... parameterTypes) throws NoSuchMethodException {
-        final Method method = Dao.class.getMethod(name, parameterTypes);
-        return Signature.resolve(method, Dao.class);
-    }
+  private static Signature getSignature(final String name, final Class<?>... parameterTypes)
+      throws NoSuchMethodException {
+    final Method method = Dao.class.getMethod(name, parameterTypes);
+    return Signature.resolve(method, Dao.class);
+  }
 }

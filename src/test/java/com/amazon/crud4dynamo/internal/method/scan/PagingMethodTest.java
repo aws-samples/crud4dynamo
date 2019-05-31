@@ -26,61 +26,65 @@ import org.junit.jupiter.api.Test;
 
 class PagingMethodTest extends SingleTableDynamoDbTestBase<Model> {
 
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @DynamoDBTable(tableName = "Model")
-    public static class Model {
-        @DynamoDBHashKey(attributeName = "HashKey")
-        private String hashKey;
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
 
-        @DynamoDBRangeKey(attributeName = "RangeKey")
-        private Integer rangeKey;
-    }
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
+  }
 
-    public interface Dao extends CompositeKeyCrud<String, Integer, Model> {
-        @Scan(filter = "#rangeKey between :lower and :upper")
-        PageResult<Model> scan(
-                @Param("#rangeKey") String rangeKeyName,
-                @Param(":lower") int lower,
-                @Param(":upper") int upper,
-                final PageRequest<Model> request);
-    }
+  public interface Dao extends CompositeKeyCrud<String, Integer, Model> {
+    @Scan(filter = "#rangeKey between :lower and :upper")
+    PageResult<Model> scan(
+        @Param("#rangeKey") String rangeKeyName,
+        @Param(":lower") int lower,
+        @Param(":upper") int upper,
+        final PageRequest<Model> request);
+  }
 
-    @Override
-    protected Class<Model> getModelClass() {
-        return Model.class;
-    }
+  @Override
+  protected Class<Model> getModelClass() {
+    return Model.class;
+  }
 
-    @Test
-    void scan() throws Throwable {
-        final List<Model> testData = storeItems(prepareData());
-        final PagingMethod scanMethod = getMethod();
+  @Test
+  void scan() throws Throwable {
+    final List<Model> testData = storeItems(prepareData());
+    final PagingMethod scanMethod = getMethod();
 
-        final List<Model> models =
-                PageResultCollector.newCollector(PageRequest.<Model>builder().limit(1).build(), newRequester(scanMethod)).get();
+    final List<Model> models =
+        PageResultCollector.newCollector(
+                PageRequest.<Model>builder().limit(1).build(), newRequester(scanMethod))
+            .get();
 
-        assertThat(models).containsAll(testData.subList(3, 10));
-    }
+    assertThat(models).containsAll(testData.subList(3, 10));
+  }
 
-    private static Requester<Model> newRequester(final PagingMethod scanMethod) {
-        return req -> {
-            try {
-                return (PageResult<Model>) scanMethod.invoke("RangeKey", 3, 9, req);
-            } catch (final Throwable throwable) {
-                throw new RuntimeException(throwable);
-            }
-        };
-    }
+  private static Requester<Model> newRequester(final PagingMethod scanMethod) {
+    return req -> {
+      try {
+        return (PageResult<Model>) scanMethod.invoke("RangeKey", 3, 9, req);
+      } catch (final Throwable throwable) {
+        throw new RuntimeException(throwable);
+      }
+    };
+  }
 
-    private PagingMethod getMethod() throws NoSuchMethodException {
-        final Signature signature =
-                Signature.resolve(Dao.class.getMethod("scan", String.class, int.class, int.class, PageRequest.class), Dao.class);
-        return new PagingMethod(signature, getModelClass(), getDynamoDbMapper(), null);
-    }
+  private PagingMethod getMethod() throws NoSuchMethodException {
+    final Signature signature =
+        Signature.resolve(
+            Dao.class.getMethod("scan", String.class, int.class, int.class, PageRequest.class),
+            Dao.class);
+    return new PagingMethod(signature, getModelClass(), getDynamoDbMapper(), null);
+  }
 
-    private static Stream<Model> prepareData() {
-        return IntStream.range(0, 10).mapToObj(i -> Model.builder().hashKey("A").rangeKey(i).build());
-    }
+  private static Stream<Model> prepareData() {
+    return IntStream.range(0, 10).mapToObj(i -> Model.builder().hashKey("A").rangeKey(i).build());
+  }
 }

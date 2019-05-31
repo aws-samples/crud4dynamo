@@ -20,62 +20,64 @@ import lombok.Data;
 import org.junit.jupiter.api.Test;
 
 class DeleteMethodFactoryTest extends SingleTableDynamoDbTestBase<DeleteMethodFactoryTest.Model> {
-    @Data
-    @DynamoDBTable(tableName = "Model")
-    public static class Model {
-        @DynamoDBHashKey(attributeName = "HashKey")
-        private String hashKey;
+  @Data
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
 
-        @DynamoDBAttribute(attributeName = "A")
-        private Integer a;
-    }
+    @DynamoDBAttribute(attributeName = "A")
+    private Integer a;
+  }
 
-    @Override
-    protected Class getModelClass() {
-        return Model.class;
-    }
+  @Override
+  protected Class getModelClass() {
+    return Model.class;
+  }
 
-    private interface Dao {
-        void nonDeleteMethod();
+  private interface Dao {
+    void nonDeleteMethod();
 
-        @Delete(keyExpression = "")
-        void delete();
-    }
+    @Delete(keyExpression = "")
+    void delete();
+  }
 
-    @Test
-    void notGivenDeleteAnnotation_delegate() throws Exception {
-        final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
-        final DeleteMethodFactory factory = new DeleteMethodFactory(delegate);
-        final Context context = getContext("nonDeleteMethod");
+  @Test
+  void notGivenDeleteAnnotation_delegate() throws Exception {
+    final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
+    final DeleteMethodFactory factory = new DeleteMethodFactory(delegate);
+    final Context context = getContext("nonDeleteMethod");
 
-        factory.create(context);
+    factory.create(context);
 
-        verify(delegate).create(context);
-    }
+    verify(delegate).create(context);
+  }
 
-    @Test
-    void givenDeleteAnnotation_createDeleteMethod() throws Exception {
-        final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
-        final DeleteMethodFactory factory = new DeleteMethodFactory(delegate);
-        final Context context = getContext("delete");
+  @Test
+  void givenDeleteAnnotation_createDeleteMethod() throws Exception {
+    final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
+    final DeleteMethodFactory factory = new DeleteMethodFactory(delegate);
+    final Context context = getContext("delete");
 
-        final AbstractMethod method = factory.create(context);
+    final AbstractMethod method = factory.create(context);
 
-        assertThat(method).isInstanceOf(DeleteMethod.class);
-    }
+    assertThat(method).isInstanceOf(DeleteMethod.class);
+  }
 
-    private Context getContext(final String methodName, final Class<?>... parameterTypes) throws NoSuchMethodException {
-        return Context.builder()
-                .signature(getSignature(methodName, parameterTypes))
-                .mapper(getDynamoDbMapper())
-                .amazonDynamoDb(getDynamoDbClient())
-                .mapperConfig(DynamoDBMapperConfig.DEFAULT)
-                .modelType(getModelClass())
-                .build();
-    }
+  private Context getContext(final String methodName, final Class<?>... parameterTypes)
+      throws NoSuchMethodException {
+    return Context.builder()
+        .signature(getSignature(methodName, parameterTypes))
+        .mapper(getDynamoDbMapper())
+        .amazonDynamoDb(getDynamoDbClient())
+        .mapperConfig(DynamoDBMapperConfig.DEFAULT)
+        .modelType(getModelClass())
+        .build();
+  }
 
-    private static Signature getSignature(final String name, final Class<?>... parameterTypes) throws NoSuchMethodException {
-        final Method method = Dao.class.getMethod(name, parameterTypes);
-        return Signature.resolve(method, Dao.class);
-    }
+  private static Signature getSignature(final String name, final Class<?>... parameterTypes)
+      throws NoSuchMethodException {
+    final Method method = Dao.class.getMethod(name, parameterTypes);
+    return Signature.resolve(method, Dao.class);
+  }
 }

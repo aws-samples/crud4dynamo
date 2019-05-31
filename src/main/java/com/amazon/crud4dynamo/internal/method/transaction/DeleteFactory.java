@@ -26,27 +26,34 @@ import com.amazonaws.services.dynamodbv2.model.Delete;
 import java.util.List;
 
 public class DeleteFactory {
-    private final com.amazon.crud4dynamo.annotation.transaction.Delete deleteAnnotation;
-    private final DynamoDBMapperTableModel<?> tableModel;
-    private final KeyAttributeConstructor keyAttributeConstructor;
-    private final ExpressionAttributesFactory expressionAttributesFactory;
+  private final com.amazon.crud4dynamo.annotation.transaction.Delete deleteAnnotation;
+  private final DynamoDBMapperTableModel<?> tableModel;
+  private final KeyAttributeConstructor keyAttributeConstructor;
+  private final ExpressionAttributesFactory expressionAttributesFactory;
 
-    public DeleteFactory(
-            final com.amazon.crud4dynamo.annotation.transaction.Delete deleteAnnotation, final DynamoDBMapperTableModel<?> tableModel) {
-        this.deleteAnnotation = deleteAnnotation;
-        this.tableModel = tableModel;
-        keyAttributeConstructor = new KeyAttributeConstructor(deleteAnnotation.keyExpression(), tableModel);
-        expressionAttributesFactory =
-                new ExpressionAttributesFactory(new ConditionExpressionParser(deleteAnnotation.conditionExpression(), tableModel));
-    }
+  public DeleteFactory(
+      final com.amazon.crud4dynamo.annotation.transaction.Delete deleteAnnotation,
+      final DynamoDBMapperTableModel<?> tableModel) {
+    this.deleteAnnotation = deleteAnnotation;
+    this.tableModel = tableModel;
+    keyAttributeConstructor =
+        new KeyAttributeConstructor(deleteAnnotation.keyExpression(), tableModel);
+    expressionAttributesFactory =
+        new ExpressionAttributesFactory(
+            new ConditionExpressionParser(deleteAnnotation.conditionExpression(), tableModel));
+  }
 
-    public Delete create(final List<Argument> arguments) {
-        return new Delete()
-                .withTableName(DynamoDbHelper.getTableName(deleteAnnotation.tableClass()))
-                .withKey(keyAttributeConstructor.create(arguments))
-                .withConditionExpression(ExpressionFactoryHelper.toNullIfBlank(deleteAnnotation.conditionExpression()))
-                .withExpressionAttributeNames(expressionAttributesFactory.newExpressionAttributeNames(arguments))
-                .withExpressionAttributeValues(expressionAttributesFactory.newExpressionAttributeValues(arguments))
-                .withReturnValuesOnConditionCheckFailure(deleteAnnotation.returnValuesOnConditionCheckFailure());
-    }
+  public Delete create(final List<Argument> arguments) {
+    return new Delete()
+        .withTableName(DynamoDbHelper.getTableName(deleteAnnotation.tableClass()))
+        .withKey(keyAttributeConstructor.create(arguments))
+        .withConditionExpression(
+            ExpressionFactoryHelper.toNullIfBlank(deleteAnnotation.conditionExpression()))
+        .withExpressionAttributeNames(
+            expressionAttributesFactory.newExpressionAttributeNames(arguments))
+        .withExpressionAttributeValues(
+            expressionAttributesFactory.newExpressionAttributeValues(arguments))
+        .withReturnValuesOnConditionCheckFailure(
+            deleteAnnotation.returnValuesOnConditionCheckFailure());
+  }
 }

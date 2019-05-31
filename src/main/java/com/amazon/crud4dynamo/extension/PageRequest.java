@@ -21,6 +21,6 @@ import lombok.Value;
 @Value
 @Builder
 public class PageRequest<T> {
-    private final Integer limit;
-    private final T exclusiveStartItem;
+  private final Integer limit;
+  private final T exclusiveStartItem;
 }

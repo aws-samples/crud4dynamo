@@ -23,6 +23,6 @@ import lombok.Value;
 @Value
 @Builder
 public class PageResult<T> {
-    @Singular private List<T> items;
-    private T lastEvaluatedItem;
+  @Singular private List<T> items;
+  private T lastEvaluatedItem;
 }

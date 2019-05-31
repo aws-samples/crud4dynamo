@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 /** TODO: add more test cases */
 class MethodHandlesHelperTest {
 
-    @Test
-    void canCreateMethodLookup() {
-        final Lookup lookup = MethodHandlesHelper.getLookup(String.class);
+  @Test
+  void canCreateMethodLookup() {
+    final Lookup lookup = MethodHandlesHelper.getLookup(String.class);
 
-        assertThat(lookup).isNotNull();
-    }
+    assertThat(lookup).isNotNull();
+  }
 }

@@ -26,23 +26,27 @@ import java.util.stream.Stream;
 import lombok.NonNull;
 
 public class ExpressionAttributesFactory {
-    private final ExpressionParser mergedParser;
+  private final ExpressionParser mergedParser;
 
-    public ExpressionAttributesFactory(final ExpressionParser... parsers) {
-        mergedParser = Stream.of(parsers).reduce(ExpressionParser.newEmptyInstance(), ExpressionParser::merge);
-    }
+  public ExpressionAttributesFactory(final ExpressionParser... parsers) {
+    mergedParser =
+        Stream.of(parsers).reduce(ExpressionParser.newEmptyInstance(), ExpressionParser::merge);
+  }
 
-    public Map<String, String> newExpressionAttributeNames(@NonNull final List<Argument> arguments) {
-        final Set<String> names = mergedParser.getExpressionAttributeNames();
-        return MapHelper.toNullIfEmpty(ExpressionFactoryHelper.getExpressionAttributeNames(arguments, names::contains));
-    }
+  public Map<String, String> newExpressionAttributeNames(@NonNull final List<Argument> arguments) {
+    final Set<String> names = mergedParser.getExpressionAttributeNames();
+    return MapHelper.toNullIfEmpty(
+        ExpressionFactoryHelper.getExpressionAttributeNames(arguments, names::contains));
+  }
 
-    public Map<String, AttributeValue> newExpressionAttributeValues(@NonNull final List<Argument> arguments) {
-        final AttributeValueMapper mergedMapper =
-                mergedParser
-                        .getAttributeNameMapper()
-                        .toValueMapper(ExpressionFactoryHelper.getExpressionAttributeNames(arguments))
-                        .merge(mergedParser.getAttributeValueMapper());
-        return MapHelper.toNullIfEmpty(ExpressionFactoryHelper.getExpressionAttributeValues(arguments, mergedMapper));
-    }
+  public Map<String, AttributeValue> newExpressionAttributeValues(
+      @NonNull final List<Argument> arguments) {
+    final AttributeValueMapper mergedMapper =
+        mergedParser
+            .getAttributeNameMapper()
+            .toValueMapper(ExpressionFactoryHelper.getExpressionAttributeNames(arguments))
+            .merge(mergedParser.getAttributeValueMapper());
+    return MapHelper.toNullIfEmpty(
+        ExpressionFactoryHelper.getExpressionAttributeValues(arguments, mergedMapper));
+  }
 }

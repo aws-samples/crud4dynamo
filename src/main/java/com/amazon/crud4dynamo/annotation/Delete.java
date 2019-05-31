@@ -25,28 +25,29 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Delete {
-    /**
-     * Key Expression has the following syntax.
-     *
-     * <pre>
-     * keyExpression
-     *   : equalityExpression (',' equalityExpression)?
-     *   ;
-     *
-     * equalityExpression
-     *   : (expressionAttributeName | attributeName) '=' expressionAttributeValue
-     *   ;
-     * </pre>
-     */
-    String keyExpression();
+  /**
+   * Key Expression has the following syntax.
+   *
+   * <pre>
+   * keyExpression
+   *   : equalityExpression (',' equalityExpression)?
+   *   ;
+   *
+   * equalityExpression
+   *   : (expressionAttributeName | attributeName) '=' expressionAttributeValue
+   *   ;
+   * </pre>
+   */
+  String keyExpression();
 
-    /* https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html */
-    String conditionExpression() default "";
+  /* https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html */
+  String conditionExpression() default "";
 
-    /**
-     * Use ReturnValues if you want to get the item attributes as they appeared before they were deleted.
-     *
-     * <p>https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DeleteItem.html#DDB-DeleteItem-request-ReturnValues
-     */
-    ReturnValue returnValue() default ReturnValue.NONE;
+  /**
+   * Use ReturnValues if you want to get the item attributes as they appeared before they were
+   * deleted.
+   *
+   * <p>https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DeleteItem.html#DDB-DeleteItem-request-ReturnValues
+   */
+  ReturnValue returnValue() default ReturnValue.NONE;
 }

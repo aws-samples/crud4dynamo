@@ -6,11 +6,15 @@ import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 
 class DefaultCrudFactoryConfigTest {
-    @Test
-    void order_should_be_unique() {
-        final int numberOfUniqueConfigs =
-                DefaultCrudFactoryConfig.getConfigs().stream().map(ChainedMethodFactoryConfig::getOrder).collect(Collectors.toSet()).size();
+  @Test
+  void order_should_be_unique() {
+    final int numberOfUniqueConfigs =
+        DefaultCrudFactoryConfig.getConfigs().stream()
+            .map(ChainedMethodFactoryConfig::getOrder)
+            .collect(Collectors.toSet())
+            .size();
 
-        AssertionsForClassTypes.assertThat(DefaultCrudFactoryConfig.getConfigs().size()).isEqualTo(numberOfUniqueConfigs);
-    }
+    AssertionsForClassTypes.assertThat(DefaultCrudFactoryConfig.getConfigs().size())
+        .isEqualTo(numberOfUniqueConfigs);
+  }
 }

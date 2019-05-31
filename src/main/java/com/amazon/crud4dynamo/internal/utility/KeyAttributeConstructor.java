@@ -32,38 +32,53 @@ import java.util.Optional;
 
 public class KeyAttributeConstructor {
 
-    private final KeyExpressionMapper keyExpressionMapper;
+  private final KeyExpressionMapper keyExpressionMapper;
 
-    public KeyAttributeConstructor(final String keyExpression, final DynamoDBMapperTableModel<?> tableModel) {
-        keyExpressionMapper = new KeyExpressionMapper(keyExpression, tableModel);
+  public KeyAttributeConstructor(
+      final String keyExpression, final DynamoDBMapperTableModel<?> tableModel) {
+    keyExpressionMapper = new KeyExpressionMapper(keyExpression, tableModel);
+  }
+
+  public Map<String, AttributeValue> create(final List<Argument> arguments) {
+    final Map<String, String> expAttrNames =
+        ExpressionFactoryHelper.getExpressionAttributeNames(arguments);
+    final Map<String, AttributeValue> hashKey =
+        getKey(keyExpressionMapper.getHashKeyContext(), arguments, expAttrNames);
+    final Map<String, AttributeValue> rangeKey =
+        keyExpressionMapper
+            .getRangeKeyContext()
+            .map(ctx -> getKey(ctx, arguments, expAttrNames))
+            .orElse(Collections.emptyMap());
+    return MapHelper.overrideMerge(hashKey, rangeKey);
+  }
+
+  private static Map<String, AttributeValue> getKey(
+      final KeyExpressionMapper.Context context,
+      final List<Argument> argList,
+      final Map<String, String> expAttrNames) {
+    final AttributeValueMapper valueMapper =
+        context.getNameMapper().toValueMapper(expAttrNames).merge(context.getValueMapper());
+
+    final Map<String, AttributeValue> exprAttrValues =
+        ExpressionFactoryHelper.getExpressionAttributeValues(argList, valueMapper);
+    final AttributeValue keyAttributeValue = getKeyAttributeOrThrow(context, exprAttrValues);
+    final String keyName =
+        Optional.ofNullable(expAttrNames.get(context.getKeyStringText()))
+            .orElse(context.getKeyStringText());
+    return ImmutableMap.of(keyName, keyAttributeValue);
+  }
+
+  private static AttributeValue getKeyAttributeOrThrow(
+      KeyExpressionMapper.Context context, Map<String, AttributeValue> attrExpValues) {
+    return attrExpValues.values().stream()
+        .findFirst()
+        .orElseThrow(() -> new NoKeyAttributeException(context.getKeyStringText()));
+  }
+
+  @VisibleForTesting
+  static class NoKeyAttributeException extends CrudForDynamoException {
+    NoKeyAttributeException(final String keyText) {
+      super(String.format("There is no argument provided for key %s", keyText));
     }
-
-    public Map<String, AttributeValue> create(final List<Argument> arguments) {
-        final Map<String, String> expAttrNames = ExpressionFactoryHelper.getExpressionAttributeNames(arguments);
-        final Map<String, AttributeValue> hashKey = getKey(keyExpressionMapper.getHashKeyContext(), arguments, expAttrNames);
-        final Map<String, AttributeValue> rangeKey =
-                keyExpressionMapper.getRangeKeyContext().map(ctx -> getKey(ctx, arguments, expAttrNames)).orElse(Collections.emptyMap());
-        return MapHelper.overrideMerge(hashKey, rangeKey);
-    }
-
-    private static Map<String, AttributeValue> getKey(
-            final KeyExpressionMapper.Context context, final List<Argument> argList, final Map<String, String> expAttrNames) {
-        final AttributeValueMapper valueMapper = context.getNameMapper().toValueMapper(expAttrNames).merge(context.getValueMapper());
-
-        final Map<String, AttributeValue> exprAttrValues = ExpressionFactoryHelper.getExpressionAttributeValues(argList, valueMapper);
-        final AttributeValue keyAttributeValue = getKeyAttributeOrThrow(context, exprAttrValues);
-        final String keyName = Optional.ofNullable(expAttrNames.get(context.getKeyStringText())).orElse(context.getKeyStringText());
-        return ImmutableMap.of(keyName, keyAttributeValue);
-    }
-
-    private static AttributeValue getKeyAttributeOrThrow(KeyExpressionMapper.Context context, Map<String, AttributeValue> attrExpValues) {
-        return attrExpValues.values().stream().findFirst().orElseThrow(() -> new NoKeyAttributeException(context.getKeyStringText()));
-    }
-
-    @VisibleForTesting
-    static class NoKeyAttributeException extends CrudForDynamoException {
-        NoKeyAttributeException(final String keyText) {
-            super(String.format("There is no argument provided for key %s", keyText));
-        }
-    }
+  }
 }
