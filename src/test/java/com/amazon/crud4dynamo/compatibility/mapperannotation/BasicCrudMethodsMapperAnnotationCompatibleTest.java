@@ -18,10 +18,10 @@ package com.amazon.crud4dynamo.compatibility.mapperannotation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.amazon.crud4dynamo.CrudForDynamo;
-import com.amazon.crud4dynamo.compatibility.Book;
-import com.amazon.crud4dynamo.compatibility.Book.Attributes;
-import com.amazon.crud4dynamo.compatibility.Book.CustomDate;
-import com.amazon.crud4dynamo.compatibility.Book.Picture;
+import com.amazon.crud4dynamo.compatibility.testmodel.Book;
+import com.amazon.crud4dynamo.compatibility.testmodel.Book.Attributes;
+import com.amazon.crud4dynamo.compatibility.testmodel.Book.CustomDate;
+import com.amazon.crud4dynamo.compatibility.testmodel.Book.Picture;
 import com.amazon.crud4dynamo.crudinterface.CompositeKeyCrud;
 import com.amazon.crud4dynamo.testbase.SingleTableDynamoDbTestBase;
 import com.amazonaws.services.dynamodbv2.document.Item;
