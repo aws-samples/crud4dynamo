@@ -19,6 +19,18 @@ import org.junit.jupiter.api.Test;
 
 public class ConditionExpressionParserTest
     extends SingleTableDynamoDbTestBase<ConditionExpressionParserTest.Model> {
+  private static List<AttributeValue> applyArguments(
+      final ImmutableMap<String, Object> arguments, final AttributeValueMapper valueMapper) {
+    return arguments.keySet().stream()
+        .map(key -> valueMapper.get(key).convert(arguments.get(key)))
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  protected Class<Model> getModelClass() {
+    return Model.class;
+  }
+
   @Data
   @Builder
   @NoArgsConstructor
@@ -30,11 +42,6 @@ public class ConditionExpressionParserTest
 
     @DynamoDBRangeKey(attributeName = "RangeKey")
     private Integer rangeKey;
-  }
-
-  @Override
-  protected Class<Model> getModelClass() {
-    return Model.class;
   }
 
   @Nested
@@ -387,12 +394,5 @@ public class ConditionExpressionParserTest
       assertThat(applyArguments(arguments, valueMapper))
           .isEqualTo(applyArguments(arguments, expectedValueMapper));
     }
-  }
-
-  private static List<AttributeValue> applyArguments(
-      final ImmutableMap<String, Object> arguments, final AttributeValueMapper valueMapper) {
-    return arguments.keySet().stream()
-        .map(key -> valueMapper.get(key).convert(arguments.get(key)))
-        .collect(Collectors.toList());
   }
 }

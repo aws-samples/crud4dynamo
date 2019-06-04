@@ -15,19 +15,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 public class CompositeKeyCrudTest extends CompositeKeyTestBase<Model, CompositeKeyCrud> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "TestTable")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
-  }
-
   @Override
   protected CompositeKeyCrud newDao() {
     return new CrudForDynamo(getDynamoDbClient()).createComposite(Model.class);
@@ -44,5 +31,18 @@ public class CompositeKeyCrudTest extends CompositeKeyTestBase<Model, CompositeK
   @Override
   protected Class<Model> getModelClass() {
     return Model.class;
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "TestTable")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
   }
 }

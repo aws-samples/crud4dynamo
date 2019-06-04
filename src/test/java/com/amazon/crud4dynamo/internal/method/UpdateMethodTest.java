@@ -30,166 +30,14 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class UpdateMethodTest extends SingleTableDynamoDbTestBase<Model> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "Model")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
-
-    @DynamoDBAttribute(attributeName = "Integer1")
-    private Integer integer1;
-
-    @DynamoDBAttribute(attributeName = "StrList1")
-    private List<String> strList1;
-
-    @DynamoDBAttribute(attributeName = "StrMap1")
-    private Map<String, Map<String, String>> strMap1;
-
-    @DynamoDBAttribute(attributeName = "StrSet1")
-    private Set<String> strSet1;
+  private static Model invoke(final UpdateMethod updateMethod, final Object... args)
+      throws Throwable {
+    return (Model) updateMethod.invoke(args);
   }
 
   @Override
   protected Class<Model> getModelClass() {
     return Model.class;
-  }
-
-  interface Dao {
-    @Update(
-        keyExpression = "HashKey = :hashKey, #rangeKey = :rangeKey",
-        updateExpression = "SET #attr = #rangeKey")
-    Model set_base_case1(
-        @Param(":hashKey") final String hashKeyValue,
-        @Param("#rangeKey") final String rangeKeyName,
-        @Param(":rangeKey") final String rangeKeyValue,
-        @Param("#attr") final String targetAttrName);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, #rangeKey = :rangeKey",
-        updateExpression = "SET #attr = #rangeKey",
-        returnValue = ReturnValue.ALL_NEW)
-    Model set_base_case2(
-        @Param(":hashKey") final String hashKeyValue,
-        @Param("#rangeKey") final String rangeKeyName,
-        @Param(":rangeKey") final String rangeKeyValue,
-        @Param("#attr") final String targetAttrName);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
-        updateExpression = "SET Integer1 = if_not_exists(Integer1, :val)",
-        returnValue = ReturnValue.ALL_NEW)
-    Model set_if_not_exists(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final String rangeKey,
-        @Param(":val") int val);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
-        updateExpression = "SET StrList1 = list_append(StrList1, :vals)",
-        returnValue = ReturnValue.ALL_NEW)
-    Model set_list_append(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final String rangeKey,
-        @Param(":vals") List<String> vals);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
-        updateExpression = "SET StrList1 = list_append(StrList1, :vals)",
-        conditionExpression = "Integer1 > :val",
-        returnValue = ReturnValue.ALL_NEW)
-    Model set_list_append_with_condition(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final String rangeKey,
-        @Param(":vals") List<String> vals,
-        @Param(":val") int val);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
-        updateExpression = "SET StrList1[0] = :val",
-        returnValue = ReturnValue.ALL_NEW)
-    Model set_add_element_to_a_list(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final String rangeKey,
-        @Param(":val") String val);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
-        updateExpression = "SET #path1.#path2.#path3 = :val",
-        returnValue = ReturnValue.ALL_NEW)
-    Model set_adding_nested_map_attributes(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final String rangeKey,
-        @Param("#path1") String path1,
-        @Param("#path2") String path2,
-        @Param("#path3") String path3,
-        @Param(":val") String value);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
-        updateExpression = "SET StrMap1 = :val",
-        returnValue = ReturnValue.ALL_NEW)
-    Model set_adding_nested_map_attributes_2(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final String rangeKey,
-        @Param(":val") String value);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
-        updateExpression = "SET StrMap1.A = :val",
-        returnValue = ReturnValue.ALL_NEW)
-    Model set_adding_nested_map(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final String rangeKey,
-        @Param(":val") Map<String, String> value);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
-        updateExpression = "REMOVE #path",
-        returnValue = ReturnValue.ALL_NEW)
-    Model remove_attribute(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final String rangeKey,
-        @Param("#path") final String path);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
-        updateExpression = "REMOVE StrList1[0], StrList1[2]",
-        returnValue = ReturnValue.ALL_NEW)
-    Model remove_elements_from_a_list(
-        @Param(":hashKey") final String hashKey, @Param(":rangeKey") final String rangeKey);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
-        updateExpression = "ADD Integer1 :val",
-        returnValue = ReturnValue.ALL_NEW)
-    Model add_a_number(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final String rangeKey,
-        @Param(":val") final int val);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
-        updateExpression = "ADD StrSet1 :val",
-        returnValue = ReturnValue.ALL_NEW)
-    Model add_elements_to_a_set(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final String rangeKey,
-        @Param(":val") final Set<String> val);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
-        updateExpression = "DELETE StrSet1 :val",
-        returnValue = ReturnValue.ALL_NEW)
-    Model delete_elements_to_a_set(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final String rangeKey,
-        @Param(":val") final Set<String> val);
   }
 
   @Test
@@ -457,11 +305,6 @@ class UpdateMethodTest extends SingleTableDynamoDbTestBase<Model> {
     verify(result, expected, expected);
   }
 
-  private static Model invoke(final UpdateMethod updateMethod, final Object... args)
-      throws Throwable {
-    return (Model) updateMethod.invoke(args);
-  }
-
   private UpdateMethod newUpdateMethod(final Method method) {
     return new UpdateMethod(
         Signature.resolve(method, Dao.class),
@@ -469,5 +312,162 @@ class UpdateMethodTest extends SingleTableDynamoDbTestBase<Model> {
         getDynamoDbMapper(),
         getDynamoDbClient(),
         null);
+  }
+
+  interface Dao {
+    @Update(
+        keyExpression = "HashKey = :hashKey, #rangeKey = :rangeKey",
+        updateExpression = "SET #attr = #rangeKey")
+    Model set_base_case1(
+        @Param(":hashKey") final String hashKeyValue,
+        @Param("#rangeKey") final String rangeKeyName,
+        @Param(":rangeKey") final String rangeKeyValue,
+        @Param("#attr") final String targetAttrName);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, #rangeKey = :rangeKey",
+        updateExpression = "SET #attr = #rangeKey",
+        returnValue = ReturnValue.ALL_NEW)
+    Model set_base_case2(
+        @Param(":hashKey") final String hashKeyValue,
+        @Param("#rangeKey") final String rangeKeyName,
+        @Param(":rangeKey") final String rangeKeyValue,
+        @Param("#attr") final String targetAttrName);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
+        updateExpression = "SET Integer1 = if_not_exists(Integer1, :val)",
+        returnValue = ReturnValue.ALL_NEW)
+    Model set_if_not_exists(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final String rangeKey,
+        @Param(":val") int val);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
+        updateExpression = "SET StrList1 = list_append(StrList1, :vals)",
+        returnValue = ReturnValue.ALL_NEW)
+    Model set_list_append(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final String rangeKey,
+        @Param(":vals") List<String> vals);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
+        updateExpression = "SET StrList1 = list_append(StrList1, :vals)",
+        conditionExpression = "Integer1 > :val",
+        returnValue = ReturnValue.ALL_NEW)
+    Model set_list_append_with_condition(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final String rangeKey,
+        @Param(":vals") List<String> vals,
+        @Param(":val") int val);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
+        updateExpression = "SET StrList1[0] = :val",
+        returnValue = ReturnValue.ALL_NEW)
+    Model set_add_element_to_a_list(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final String rangeKey,
+        @Param(":val") String val);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
+        updateExpression = "SET #path1.#path2.#path3 = :val",
+        returnValue = ReturnValue.ALL_NEW)
+    Model set_adding_nested_map_attributes(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final String rangeKey,
+        @Param("#path1") String path1,
+        @Param("#path2") String path2,
+        @Param("#path3") String path3,
+        @Param(":val") String value);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
+        updateExpression = "SET StrMap1 = :val",
+        returnValue = ReturnValue.ALL_NEW)
+    Model set_adding_nested_map_attributes_2(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final String rangeKey,
+        @Param(":val") String value);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
+        updateExpression = "SET StrMap1.A = :val",
+        returnValue = ReturnValue.ALL_NEW)
+    Model set_adding_nested_map(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final String rangeKey,
+        @Param(":val") Map<String, String> value);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
+        updateExpression = "REMOVE #path",
+        returnValue = ReturnValue.ALL_NEW)
+    Model remove_attribute(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final String rangeKey,
+        @Param("#path") final String path);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
+        updateExpression = "REMOVE StrList1[0], StrList1[2]",
+        returnValue = ReturnValue.ALL_NEW)
+    Model remove_elements_from_a_list(
+        @Param(":hashKey") final String hashKey, @Param(":rangeKey") final String rangeKey);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
+        updateExpression = "ADD Integer1 :val",
+        returnValue = ReturnValue.ALL_NEW)
+    Model add_a_number(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final String rangeKey,
+        @Param(":val") final int val);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
+        updateExpression = "ADD StrSet1 :val",
+        returnValue = ReturnValue.ALL_NEW)
+    Model add_elements_to_a_set(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final String rangeKey,
+        @Param(":val") final Set<String> val);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
+        updateExpression = "DELETE StrSet1 :val",
+        returnValue = ReturnValue.ALL_NEW)
+    Model delete_elements_to_a_set(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final String rangeKey,
+        @Param(":val") final Set<String> val);
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
+
+    @DynamoDBAttribute(attributeName = "Integer1")
+    private Integer integer1;
+
+    @DynamoDBAttribute(attributeName = "StrList1")
+    private List<String> strList1;
+
+    @DynamoDBAttribute(attributeName = "StrMap1")
+    private Map<String, Map<String, String>> strMap1;
+
+    @DynamoDBAttribute(attributeName = "StrSet1")
+    private Set<String> strSet1;
   }
 }

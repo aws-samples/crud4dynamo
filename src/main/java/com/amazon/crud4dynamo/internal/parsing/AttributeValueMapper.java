@@ -40,13 +40,13 @@ public class AttributeValueMapper {
     this.innerMap = innerMap;
   }
 
-  public AttributeValueMapper merge(final AttributeValueMapper other) {
-    return merge(this, other);
-  }
-
   public static AttributeValueMapper merge(
       final AttributeValueMapper m1, final AttributeValueMapper m2) {
     return new AttributeValueMapper(MapHelper.overrideMerge(m1.innerMap, m2.innerMap));
+  }
+
+  public AttributeValueMapper merge(final AttributeValueMapper other) {
+    return merge(this, other);
   }
 
   public AttributeValueMapper put(final String name, final AttributeValueConverter converter) {

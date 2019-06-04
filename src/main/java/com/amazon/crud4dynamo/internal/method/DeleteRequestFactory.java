@@ -56,20 +56,6 @@ class DeleteRequestFactory {
         new KeyAttributeConstructor(deleteAnnotation.keyExpression(), tableModel);
   }
 
-  public DeleteItemRequest create(final Object... args) {
-    final List<Argument> argList = Argument.newList(signature.parameters(), Arrays.asList(args));
-    return new DeleteItemRequest()
-        .withTableName(ExpressionFactoryHelper.getTableName(tableClass))
-        .withKey(keyAttributeConstructor.create(argList))
-        .withExpressionAttributeNames(
-            expressionAttributesFactory.newExpressionAttributeNames(argList))
-        .withExpressionAttributeValues(
-            expressionAttributesFactory.newExpressionAttributeValues(argList))
-        .withConditionExpression(
-            ExpressionFactoryHelper.toNullIfBlank(deleteAnnotation.conditionExpression()))
-        .withReturnValues(deleteAnnotation.returnValue());
-  }
-
   private static Signature checkSignatureOrThrow(
       final Signature signature, final Class<?> modelType) {
     final Delete delete = signature.getAnnotation(Delete.class).orElse(null);
@@ -82,6 +68,20 @@ class DeleteRequestFactory {
       throw new ReturnTypeInvalidException(signature, returnValue, modelType);
     }
     return signature;
+  }
+
+  public DeleteItemRequest create(final Object... args) {
+    final List<Argument> argList = Argument.newList(signature.parameters(), Arrays.asList(args));
+    return new DeleteItemRequest()
+        .withTableName(ExpressionFactoryHelper.getTableName(tableClass))
+        .withKey(keyAttributeConstructor.create(argList))
+        .withExpressionAttributeNames(
+            expressionAttributesFactory.newExpressionAttributeNames(argList))
+        .withExpressionAttributeValues(
+            expressionAttributesFactory.newExpressionAttributeValues(argList))
+        .withConditionExpression(
+            ExpressionFactoryHelper.toNullIfBlank(deleteAnnotation.conditionExpression()))
+        .withReturnValues(deleteAnnotation.returnValue());
   }
 
   @VisibleForTesting

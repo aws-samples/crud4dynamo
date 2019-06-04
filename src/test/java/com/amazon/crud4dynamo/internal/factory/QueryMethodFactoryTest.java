@@ -21,21 +21,9 @@ import org.junit.jupiter.api.Test;
 public class QueryMethodFactoryTest
     extends SingleTableDynamoDbTestBase<QueryMethodFactoryTest.TestModel> {
 
-  @Data
-  @DynamoDBTable(tableName = "Model")
-  public static class TestModel {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-  }
-
-  public interface TestInterface {
-    void nonQuery();
-
-    @Query(keyCondition = "HashKey = :hashKey")
-    void query();
-
-    @Query(keyCondition = "HashKey = :hashKey")
-    PageResult pagingQuery();
+  private static Signature getSignature(final String nonQuery2) throws NoSuchMethodException {
+    final Method nonQuery = TestInterface.class.getMethod(nonQuery2);
+    return Signature.resolve(nonQuery, TestInterface.class);
   }
 
   @Override
@@ -51,11 +39,6 @@ public class QueryMethodFactoryTest
     new QueryMethodFactory(delegate).create(context);
 
     verify(delegate).create(context);
-  }
-
-  private static Signature getSignature(final String nonQuery2) throws NoSuchMethodException {
-    final Method nonQuery = TestInterface.class.getMethod(nonQuery2);
-    return Signature.resolve(nonQuery, TestInterface.class);
   }
 
   @Test
@@ -80,5 +63,22 @@ public class QueryMethodFactoryTest
         .mapper(getDynamoDbMapper())
         .modelType(getModelClass())
         .build();
+  }
+
+  public interface TestInterface {
+    void nonQuery();
+
+    @Query(keyCondition = "HashKey = :hashKey")
+    void query();
+
+    @Query(keyCondition = "HashKey = :hashKey")
+    PageResult pagingQuery();
+  }
+
+  @Data
+  @DynamoDBTable(tableName = "Model")
+  public static class TestModel {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
   }
 }

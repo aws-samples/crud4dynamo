@@ -35,6 +35,13 @@ public abstract class SingleTableDynamoDbTestBase<T> extends Log4jEnabledTestBas
   private DynamoDBMapper dynamoDbMapper;
   private DynamoDBMapperTableModel tableModel;
 
+  private static Consumer<GlobalSecondaryIndex> configureGsi() {
+    return gsi -> {
+      gsi.setProvisionedThroughput(PROVISIONED_THROUGHPUT);
+      gsi.setProjection(PROJECTION_ALL);
+    };
+  }
+
   @BeforeEach
   public void setUp() throws Exception {
     AwsDynamoDbLocalTestUtils.initSqLite();
@@ -111,13 +118,6 @@ public abstract class SingleTableDynamoDbTestBase<T> extends Log4jEnabledTestBas
     Optional.ofNullable(createTableRequest.getGlobalSecondaryIndexes())
         .ifPresent(gsis -> gsis.forEach(configureGsi()));
     return createTableRequest;
-  }
-
-  private static Consumer<GlobalSecondaryIndex> configureGsi() {
-    return gsi -> {
-      gsi.setProvisionedThroughput(PROVISIONED_THROUGHPUT);
-      gsi.setProjection(PROJECTION_ALL);
-    };
   }
 
   private void waitTableToBeActive(final Class<?> modelClass) throws InterruptedException {

@@ -20,27 +20,6 @@ import org.junit.jupiter.api.Test;
 class DeleteMethodTest extends SingleTableDynamoDbTestBase<DeleteMethodTest.Model> {
   private static final String KEY_EXPRESSION = "HashKey = :keyValue";
 
-  @Builder
-  @Data
-  @DynamoDBTable(tableName = "Model")
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBAttribute(attributeName = "A")
-    private Integer a;
-  }
-
-  private interface Dao {
-    @Delete(keyExpression = KEY_EXPRESSION)
-    void deleteWithVoidReturnType(@Param(":keyValue") final String keyValue);
-
-    @Delete(keyExpression = KEY_EXPRESSION, returnValue = ReturnValue.ALL_OLD)
-    Model deleteWithOldValue(@Param(":keyValue") final String keyValue);
-  }
-
   @Override
   protected Class<Model> getModelClass() {
     return Model.class;
@@ -81,5 +60,26 @@ class DeleteMethodTest extends SingleTableDynamoDbTestBase<DeleteMethodTest.Mode
         getDynamoDbMapper(),
         getDynamoDbClient(),
         DynamoDBMapperConfig.DEFAULT);
+  }
+
+  private interface Dao {
+    @Delete(keyExpression = KEY_EXPRESSION)
+    void deleteWithVoidReturnType(@Param(":keyValue") final String keyValue);
+
+    @Delete(keyExpression = KEY_EXPRESSION, returnValue = ReturnValue.ALL_OLD)
+    Model deleteWithOldValue(@Param(":keyValue") final String keyValue);
+  }
+
+  @Builder
+  @Data
+  @DynamoDBTable(tableName = "Model")
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBAttribute(attributeName = "A")
+    private Integer a;
   }
 }

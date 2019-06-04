@@ -21,17 +21,10 @@ import org.junit.jupiter.api.Test;
 class PagingExpressionFactoryTest
     extends SingleTableDynamoDbTestBase<PagingExpressionFactoryTest.Model> {
 
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "Model")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
+  private static QueryExpressionFactory getMockExpressionFactory() {
+    final QueryExpressionFactory mockFactory = mock(QueryExpressionFactory.class);
+    when(mockFactory.create(any())).thenReturn(new DynamoDBQueryExpression());
+    return mockFactory;
   }
 
   @Override
@@ -56,9 +49,16 @@ class PagingExpressionFactoryTest
         .isEqualTo(getDynamoDbMapperTableModel().convert(model));
   }
 
-  private static QueryExpressionFactory getMockExpressionFactory() {
-    final QueryExpressionFactory mockFactory = mock(QueryExpressionFactory.class);
-    when(mockFactory.create(any())).thenReturn(new DynamoDBQueryExpression());
-    return mockFactory;
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
   }
 }

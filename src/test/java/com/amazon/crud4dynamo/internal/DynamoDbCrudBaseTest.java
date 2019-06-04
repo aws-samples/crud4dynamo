@@ -24,20 +24,6 @@ import org.junit.jupiter.api.Test;
 public class DynamoDbCrudBaseTest extends SingleTableDynamoDbTestBase<Model> {
   private static final List<Model> TEST_ITEMS =
       Arrays.asList(Model.builder().hashKey("A").build(), Model.builder().hashKey("B").build());
-
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "TestTable")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBAttribute(attributeName = "Integer1")
-    private Integer integer1;
-  }
-
   private DynamoDbCrudBase<Model> dao;
 
   @Override
@@ -121,5 +107,18 @@ public class DynamoDbCrudBaseTest extends SingleTableDynamoDbTestBase<Model> {
     return PageResultCollector.newCollector(
         PageRequest.<Model>builder().exclusiveStartItem(null).limit(1).build(),
         req -> dao.findAll(req));
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "TestTable")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBAttribute(attributeName = "Integer1")
+    private Integer integer1;
   }
 }

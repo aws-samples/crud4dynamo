@@ -17,13 +17,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class TransactionGetMethodFactoryTest extends DynamoDbTestBase {
-  private interface Dao {
-    void nonTransactionGet();
-
-    @Get(tableClass = DummyTable.class, keyExpression = "", projectionExpression = "")
-    List<Object> transactionGet();
-  }
-
   @Test
   void withoutTransactionGetAnnotation_callDelegate() throws Exception {
     final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
@@ -55,5 +48,12 @@ class TransactionGetMethodFactoryTest extends DynamoDbTestBase {
 
     assertThat(method).isInstanceOf(TransactionGetMethod.class);
     verifyZeroInteractions(delegate);
+  }
+
+  private interface Dao {
+    void nonTransactionGet();
+
+    @Get(tableClass = DummyTable.class, keyExpression = "", projectionExpression = "")
+    List<Object> transactionGet();
   }
 }

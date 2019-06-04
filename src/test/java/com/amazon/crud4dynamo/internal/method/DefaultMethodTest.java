@@ -15,21 +15,12 @@ class DefaultMethodTest {
   private static final String SUFFIX = "suffix";
   private static final String PREFIX = "prefix";
   private static final String CONTENT = "content";
-
-  public interface TestInterface {
-
-    default String suffix() {
-      return SUFFIX;
-    }
-
-    String prefix();
-
-    default String content() {
-      return prefix() + suffix();
-    }
-  }
-
   private static final TestInterface TEST_INTERFACE_IMPL = () -> PREFIX;
+
+  private static DefaultMethod getDefaultMethod(final String name) throws Throwable {
+    final Method method = TestInterface.class.getMethod(name);
+    return new DefaultMethod(method, Signature.resolve(method, TestInterface.class));
+  }
 
   @Test
   void getSignature() throws Throwable {
@@ -88,8 +79,16 @@ class DefaultMethodTest {
         });
   }
 
-  private static DefaultMethod getDefaultMethod(final String name) throws Throwable {
-    final Method method = TestInterface.class.getMethod(name);
-    return new DefaultMethod(method, Signature.resolve(method, TestInterface.class));
+  public interface TestInterface {
+
+    default String suffix() {
+      return SUFFIX;
+    }
+
+    String prefix();
+
+    default String content() {
+      return prefix() + suffix();
+    }
   }
 }

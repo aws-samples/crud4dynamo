@@ -21,39 +21,10 @@ import org.junit.jupiter.api.Test;
 
 class KeyAttributeConstructorTest {
 
-  private AmazonDynamoDBLocal amazonDynamoDBLocal;
-  private DynamoDBMapper dynamoDBMapper;
-
   private static final String HASH_KEY = "HashKey";
   private static final String RANGE_KEY = "RangeKey";
-
-  @Data
-  private static class SimpleKeyModel {
-    @DynamoDBHashKey(attributeName = HASH_KEY)
-    private String hashKey;
-  }
-
-  @Data
-  private static class CompositeKeyModel {
-    @DynamoDBHashKey(attributeName = HASH_KEY)
-    private String hashKey;
-
-    @DynamoDBHashKey(attributeName = RANGE_KEY)
-    private String rangeKey;
-  }
-
-  private interface Dao {
-    void emptyArgumentMethod();
-
-    void validSimpleKeyMethod(
-        @Param("#hashKey") final String hashKey, @Param(":hashKeyValue") final String hashKeyValue);
-
-    void validCompositeKeyMethod(
-        @Param("#hashKey") final String hashKey,
-        @Param(":hashKeyValue") final String hashKeyValue,
-        @Param("#rangeKey") final String rangeKey,
-        @Param(":rangeKey") final String rangeKeyValue);
-  }
+  private AmazonDynamoDBLocal amazonDynamoDBLocal;
+  private DynamoDBMapper dynamoDBMapper;
 
   @BeforeEach
   void setUp() {
@@ -113,5 +84,33 @@ class KeyAttributeConstructorTest {
         .containsEntry(HASH_KEY, new AttributeValue(value1))
         .containsEntry(RANGE_KEY, new AttributeValue(value2))
         .hasSize(2);
+  }
+
+  private interface Dao {
+    void emptyArgumentMethod();
+
+    void validSimpleKeyMethod(
+        @Param("#hashKey") final String hashKey, @Param(":hashKeyValue") final String hashKeyValue);
+
+    void validCompositeKeyMethod(
+        @Param("#hashKey") final String hashKey,
+        @Param(":hashKeyValue") final String hashKeyValue,
+        @Param("#rangeKey") final String rangeKey,
+        @Param(":rangeKey") final String rangeKeyValue);
+  }
+
+  @Data
+  private static class SimpleKeyModel {
+    @DynamoDBHashKey(attributeName = HASH_KEY)
+    private String hashKey;
+  }
+
+  @Data
+  private static class CompositeKeyModel {
+    @DynamoDBHashKey(attributeName = HASH_KEY)
+    private String hashKey;
+
+    @DynamoDBHashKey(attributeName = RANGE_KEY)
+    private String rangeKey;
   }
 }

@@ -25,44 +25,9 @@ import org.junit.jupiter.api.Test;
 class PutRequestFactoryTest extends SingleTableDynamoDbTestBase<PutRequestFactoryTest.Model> {
   private static final String TABLE_NAME = "Table";
 
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = TABLE_NAME)
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
-
-    @DynamoDBAttribute(attributeName = "Str1")
-    private String str1;
-  }
-
   @Override
   protected Class<Model> getModelClass() {
     return Model.class;
-  }
-
-  private interface Dao {
-    void methodWithoutPutAnnotation();
-
-    @Put
-    void methodWithoutPutItem();
-
-    @Put(returnValue = ReturnValue.ALL_NEW)
-    void method_withNotNonReturnValue(@Param(":item") final Model item);
-
-    @Put
-    void defaultPut(@Param(":item") final Model item);
-
-    @Put(returnValue = ReturnValue.ALL_OLD, conditionExpression = "#attribute > :value")
-    Model method_withCustomPut(
-        @Param(":item") final Model item,
-        @Param("#attribute") String attribute,
-        @Param(":value") String value);
   }
 
   @Test
@@ -126,5 +91,40 @@ class PutRequestFactoryTest extends SingleTableDynamoDbTestBase<PutRequestFactor
   private PutRequestFactory newFactory(final Method method) {
     return new PutRequestFactory(
         Signature.resolve(method, Dao.class), getModelClass(), getDynamoDbMapper());
+  }
+
+  private interface Dao {
+    void methodWithoutPutAnnotation();
+
+    @Put
+    void methodWithoutPutItem();
+
+    @Put(returnValue = ReturnValue.ALL_NEW)
+    void method_withNotNonReturnValue(@Param(":item") final Model item);
+
+    @Put
+    void defaultPut(@Param(":item") final Model item);
+
+    @Put(returnValue = ReturnValue.ALL_OLD, conditionExpression = "#attribute > :value")
+    Model method_withCustomPut(
+        @Param(":item") final Model item,
+        @Param("#attribute") String attribute,
+        @Param(":value") String value);
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = TABLE_NAME)
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
+
+    @DynamoDBAttribute(attributeName = "Str1")
+    private String str1;
   }
 }

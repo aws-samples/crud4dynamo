@@ -21,32 +21,9 @@ import org.junit.jupiter.api.Test;
 public class DefaultMethodFactoryTest extends SingleTableDynamoDbTestBase<Model> {
 
   private static final String DUMMY_STRING = "DUMMY STRING";
-
-  public interface TestInterface {
-
-    default String defaultMethod() {
-      return DUMMY_STRING;
-    }
-  }
-
   private static final TestInterface IMPL = new TestInterface() {};
-
   private final AbstractMethodFactory dummyFactory = mock(AbstractMethodFactory.class);
-
   private Context context;
-
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "TestTable")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBAttribute(attributeName = "Integer1")
-    private Integer integer1;
-  }
 
   @BeforeEach
   @Override
@@ -71,5 +48,25 @@ public class DefaultMethodFactoryTest extends SingleTableDynamoDbTestBase<Model>
     final AbstractMethod abstractMethod = new DefaultMethodFactory(dummyFactory).create(context);
 
     assertThat(abstractMethod.bind(IMPL).invoke()).isEqualTo(DUMMY_STRING);
+  }
+
+  public interface TestInterface {
+
+    default String defaultMethod() {
+      return DUMMY_STRING;
+    }
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "TestTable")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBAttribute(attributeName = "Integer1")
+    private Integer integer1;
   }
 }

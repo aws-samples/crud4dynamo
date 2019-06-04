@@ -18,48 +18,6 @@ import org.junit.jupiter.api.Test;
 class CachedMethodTest {
   private static final int EXPIRE_AFTER_WRITE = 2;
 
-  public interface TestInterface {
-    @Cached
-    int aMethod();
-
-    @Cached(expireAfterWrite = EXPIRE_AFTER_WRITE, expireAfterWriteTimeUnit = TimeUnit.SECONDS)
-    int methodWithoutArgument();
-
-    @Cached(expireAfterWrite = EXPIRE_AFTER_WRITE, expireAfterWriteTimeUnit = TimeUnit.SECONDS)
-    int methodWithArgument(int i);
-  }
-
-  @Nested
-  class BasicMethodVerification {
-
-    private CachedMethod cachedMethod;
-    private Method method;
-    private AbstractMethod delegate;
-
-    @BeforeEach
-    void setUp() throws Throwable {
-      delegate = mock(AbstractMethod.class);
-      method = TestInterface.class.getMethod("aMethod");
-      cachedMethod = getCachedMethod(delegate, method);
-    }
-
-    @Test
-    void getSignature() {
-      final Signature signature = cachedMethod.getSignature();
-
-      assertThat(signature).isEqualTo(Signature.resolve(method, TestInterface.class));
-    }
-
-    @Test
-    void invokeDelegateBind() throws Throwable {
-      final Object dummy = new Object();
-
-      cachedMethod.bind(dummy);
-
-      verify(delegate).bind(dummy);
-    }
-  }
-
   private CachedMethod getCachedMethod(final AbstractMethod delegate, final Method method) {
     final Signature signature = Signature.resolve(method, TestInterface.class);
     return new CachedMethod(signature, delegate);
@@ -112,5 +70,47 @@ class CachedMethodTest {
 
   private void waitExpire() throws InterruptedException {
     TimeUnit.SECONDS.sleep(EXPIRE_AFTER_WRITE);
+  }
+
+  public interface TestInterface {
+    @Cached
+    int aMethod();
+
+    @Cached(expireAfterWrite = EXPIRE_AFTER_WRITE, expireAfterWriteTimeUnit = TimeUnit.SECONDS)
+    int methodWithoutArgument();
+
+    @Cached(expireAfterWrite = EXPIRE_AFTER_WRITE, expireAfterWriteTimeUnit = TimeUnit.SECONDS)
+    int methodWithArgument(int i);
+  }
+
+  @Nested
+  class BasicMethodVerification {
+
+    private CachedMethod cachedMethod;
+    private Method method;
+    private AbstractMethod delegate;
+
+    @BeforeEach
+    void setUp() throws Throwable {
+      delegate = mock(AbstractMethod.class);
+      method = TestInterface.class.getMethod("aMethod");
+      cachedMethod = getCachedMethod(delegate, method);
+    }
+
+    @Test
+    void getSignature() {
+      final Signature signature = cachedMethod.getSignature();
+
+      assertThat(signature).isEqualTo(Signature.resolve(method, TestInterface.class));
+    }
+
+    @Test
+    void invokeDelegateBind() throws Throwable {
+      final Object dummy = new Object();
+
+      cachedMethod.bind(dummy);
+
+      verify(delegate).bind(dummy);
+    }
   }
 }

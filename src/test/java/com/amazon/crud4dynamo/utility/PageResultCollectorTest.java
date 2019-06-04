@@ -34,9 +34,9 @@ class PageResultCollectorTest {
   private static class PageRequestMocker<T> {
     private static final int DUMMY_MAX_PAGE_SIZE = 100;
     @Getter private final PageResultCollector.Requester requester;
+    @Getter private final List<T> allItems = new ArrayList<>();
     @Getter private PageRequest<T> firstRequest;
     private T lastEvaluatedItem = null;
-    @Getter private final List<T> allItems = new ArrayList<>();
 
     private PageRequestMocker() {
       requester = mock(PageResultCollector.Requester.class);

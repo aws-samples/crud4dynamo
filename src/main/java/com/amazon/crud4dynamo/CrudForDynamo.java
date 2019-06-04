@@ -38,17 +38,15 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CrudForDynamo {
-  private final Supplier<AbstractMethodFactory> crudMethodFactorySupplier;
-  private final Supplier<AbstractMethodFactory> transactionMethodFactorySupplier;
-  private final Supplier<DynamoDBMapper> dynamoDbMapperSupplier;
-
   private static final Config DEFAULT_CONFIG =
       Config.builder()
           .mapperConfig(DynamoDBMapperConfig.DEFAULT)
           .crudFactoryConstructorConfigs(DefaultCrudFactoryConfig.getConfigs())
           .transactionFactoryConstructorConfigs(DefaultTransactionFactoryConfig.getConfigs())
           .build();
-
+  private final Supplier<AbstractMethodFactory> crudMethodFactorySupplier;
+  private final Supplier<AbstractMethodFactory> transactionMethodFactorySupplier;
+  private final Supplier<DynamoDBMapper> dynamoDbMapperSupplier;
   private final AmazonDynamoDB dynamoDb;
 
   private final Config mergedConfig;
@@ -75,6 +73,25 @@ public class CrudForDynamo {
     } else {
       return typeToken.resolveType(CompositeKeyCrud.class.getTypeParameters()[2]).getRawType();
     }
+  }
+
+  private static AbstractMethodFactory newChainedFactories(
+      final List<ChainedMethodFactoryConfig> configs) {
+    String chainedString = "null";
+    AbstractMethodFactory chained = null;
+    for (final ChainedMethodFactoryConfig config : reverse(configs)) {
+      chained = config.getChainedFactoryConstructor().apply(chained);
+      chainedString = chained.getClass().getSimpleName() + "(" + chainedString + ")";
+    }
+    log.info("Constructed chained method factory: {}", chainedString);
+    return chained;
+  }
+
+  private static List<ChainedMethodFactoryConfig> reverse(
+      final List<ChainedMethodFactoryConfig> configs) {
+    final List<ChainedMethodFactoryConfig> reversed = new ArrayList<>(configs);
+    Collections.reverse(reversed);
+    return reversed;
   }
 
   public <T> T createTransaction(final Class<T> transactionInterface) {
@@ -121,24 +138,5 @@ public class CrudForDynamo {
         .signature(Signature.resolve(method, interfaceType))
         .method(method)
         .build();
-  }
-
-  private static AbstractMethodFactory newChainedFactories(
-      final List<ChainedMethodFactoryConfig> configs) {
-    String chainedString = "null";
-    AbstractMethodFactory chained = null;
-    for (final ChainedMethodFactoryConfig config : reverse(configs)) {
-      chained = config.getChainedFactoryConstructor().apply(chained);
-      chainedString = chained.getClass().getSimpleName() + "(" + chainedString + ")";
-    }
-    log.info("Constructed chained method factory: {}", chainedString);
-    return chained;
-  }
-
-  private static List<ChainedMethodFactoryConfig> reverse(
-      final List<ChainedMethodFactoryConfig> configs) {
-    final List<ChainedMethodFactoryConfig> reversed = new ArrayList<>(configs);
-    Collections.reverse(reversed);
-    return reversed;
   }
 }

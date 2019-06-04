@@ -18,18 +18,6 @@ import org.junit.jupiter.api.Test;
 
 class MapperConfigAwareMethodFactoryTest {
 
-  public interface TestInterface {
-    void withoutMapperConfigAnnotation();
-
-    @MapperConfig
-    void withDefaultMapperConfigAnnotation();
-
-    @MapperConfig(
-        saveBehavior = SaveBehavior.APPEND_SET,
-        consistentReads = ConsistentReads.CONSISTENT)
-    void withCustomMapperConfigAnnotation();
-  }
-
   private ContextAwareFactory delegateFactory;
   private AbstractMethod delegateMethod;
   private MapperConfigAwareMethodFactory mapperConfigAwareMethodFactory;
@@ -93,6 +81,18 @@ class MapperConfigAwareMethodFactoryTest {
         .method(method)
         .signature(Signature.resolve(method, TestInterface.class))
         .build();
+  }
+
+  public interface TestInterface {
+    void withoutMapperConfigAnnotation();
+
+    @MapperConfig
+    void withDefaultMapperConfigAnnotation();
+
+    @MapperConfig(
+        saveBehavior = SaveBehavior.APPEND_SET,
+        consistentReads = ConsistentReads.CONSISTENT)
+    void withCustomMapperConfigAnnotation();
   }
 
   private static class ContextAwareFactory implements AbstractMethodFactory {

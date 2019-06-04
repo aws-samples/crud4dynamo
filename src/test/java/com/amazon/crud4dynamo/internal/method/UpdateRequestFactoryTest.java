@@ -22,63 +22,6 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class UpdateRequestFactoryTest extends SingleTableDynamoDbTestBase<Model> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "Table")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
-
-    @DynamoDBAttribute(attributeName = "Str1")
-    private String str1;
-  }
-
-  private interface Dao {
-    /* keyExpression shares nothing with other expressions. */
-    @Update(
-        keyExpression = "HashKey = :hashKey, #rangeKey = :rangeKey",
-        updateExpression = "SET RangeKey = RangeKey")
-    void update1(
-        @Param(":hashKey") final String hashKey,
-        @Param("#rangeKey") final String rangeKey,
-        @Param(":rangeKey") final int rangeKeyValue);
-
-    /* keyExpression shares a argument with other expressions. */
-    @Update(
-        keyExpression = "HashKey = :hashKey, #rangeKey = :rangeKey",
-        updateExpression = "SET RangeKey = :rangeKey")
-    void update2(
-        @Param(":hashKey") final String hashKeyValue,
-        @Param("#rangeKey") final String rangeKeyName,
-        @Param(":rangeKey") final int rangeKeyValue);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, #rangeKey = :rangeKey",
-        updateExpression = "SET RangeKey = :rangeKey",
-        conditionExpression = "#attr in (:str)")
-    void update3(
-        @Param(":hashKey") final String hashKeyValue,
-        @Param("#rangeKey") final String rangeKeyName,
-        @Param(":rangeKey") final int rangeKeyValue,
-        @Param("#attr") final String attrName,
-        @Param(":str") final String str);
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, #rangeKey = :rangeKey",
-        updateExpression = "SET #attr = #attr",
-        returnValue = ReturnValue.ALL_OLD)
-    void update4(
-        @Param(":hashKey") final String hashKeyValue,
-        @Param("#rangeKey") final String rangeKeyName,
-        @Param(":rangeKey") final int rangeKeyValue,
-        @Param("#attr") final String attrName);
-  }
-
   @Override
   protected Class<Model> getModelClass() {
     return Model.class;
@@ -178,5 +121,62 @@ class UpdateRequestFactoryTest extends SingleTableDynamoDbTestBase<Model> {
     assertThat(updateItemRequest.getExpressionAttributeNames()).containsEntry("#attr", "Str1");
     assertThat(updateItemRequest.getExpressionAttributeValues()).isNull();
     assertThat(updateItemRequest.getReturnValues()).isEqualTo(ReturnValue.ALL_OLD.toString());
+  }
+
+  private interface Dao {
+    /* keyExpression shares nothing with other expressions. */
+    @Update(
+        keyExpression = "HashKey = :hashKey, #rangeKey = :rangeKey",
+        updateExpression = "SET RangeKey = RangeKey")
+    void update1(
+        @Param(":hashKey") final String hashKey,
+        @Param("#rangeKey") final String rangeKey,
+        @Param(":rangeKey") final int rangeKeyValue);
+
+    /* keyExpression shares a argument with other expressions. */
+    @Update(
+        keyExpression = "HashKey = :hashKey, #rangeKey = :rangeKey",
+        updateExpression = "SET RangeKey = :rangeKey")
+    void update2(
+        @Param(":hashKey") final String hashKeyValue,
+        @Param("#rangeKey") final String rangeKeyName,
+        @Param(":rangeKey") final int rangeKeyValue);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, #rangeKey = :rangeKey",
+        updateExpression = "SET RangeKey = :rangeKey",
+        conditionExpression = "#attr in (:str)")
+    void update3(
+        @Param(":hashKey") final String hashKeyValue,
+        @Param("#rangeKey") final String rangeKeyName,
+        @Param(":rangeKey") final int rangeKeyValue,
+        @Param("#attr") final String attrName,
+        @Param(":str") final String str);
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, #rangeKey = :rangeKey",
+        updateExpression = "SET #attr = #attr",
+        returnValue = ReturnValue.ALL_OLD)
+    void update4(
+        @Param(":hashKey") final String hashKeyValue,
+        @Param("#rangeKey") final String rangeKeyName,
+        @Param(":rangeKey") final int rangeKeyValue,
+        @Param("#attr") final String attrName);
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "Table")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
+
+    @DynamoDBAttribute(attributeName = "Str1")
+    private String str1;
   }
 }

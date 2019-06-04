@@ -25,6 +25,13 @@ public class TableProvisioner {
     dynamoDbMapper = new DynamoDBMapper(dynamoDb);
   }
 
+  private static Consumer<GlobalSecondaryIndex> configureGsi() {
+    return gsi -> {
+      gsi.setProvisionedThroughput(PROVISIONED_THROUGHPUT);
+      gsi.setProjection(PROJECTION_ALL);
+    };
+  }
+
   public void create(final Class<?> tableClass) throws Exception {
     dynamoDb.createTable(newCreateTableRequest(tableClass));
     waitTableToBeActive(tableClass);
@@ -37,13 +44,6 @@ public class TableProvisioner {
     Optional.ofNullable(createTableRequest.getGlobalSecondaryIndexes())
         .ifPresent(gsis -> gsis.forEach(configureGsi()));
     return createTableRequest;
-  }
-
-  private static Consumer<GlobalSecondaryIndex> configureGsi() {
-    return gsi -> {
-      gsi.setProvisionedThroughput(PROVISIONED_THROUGHPUT);
-      gsi.setProjection(PROJECTION_ALL);
-    };
   }
 
   private void waitTableToBeActive(final Class<?> modelClass) throws InterruptedException {

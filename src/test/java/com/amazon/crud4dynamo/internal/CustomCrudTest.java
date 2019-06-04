@@ -54,142 +54,6 @@ public class CustomCrudTest
   private static final String GSI = "GSI";
   private static final String LSI = "LSI";
 
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "TestTable")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
-
-    @DynamoDBIndexRangeKey(attributeName = "LsiRangeKey", localSecondaryIndexName = LSI)
-    private Integer lisRangeKey;
-
-    @DynamoDBTypeConverted(converter = CompositeIndexHashKeyConverter.class)
-    @DynamoDBIndexHashKey(attributeName = "IndexHashKey", globalSecondaryIndexName = GSI)
-    private CompositeIndexHashKey indexKey;
-
-    @DynamoDBAttribute(attributeName = "Str1")
-    private String str1;
-  }
-
-  @Data
-  @AllArgsConstructor
-  public static class CompositeIndexHashKey {
-    private String field1;
-    private String field2;
-  }
-
-  public static class CompositeIndexHashKeyConverter
-      implements DynamoDBTypeConverter<String, CompositeIndexHashKey> {
-    private static final String DELIMITER = "_";
-
-    @Override
-    public String convert(final CompositeIndexHashKey object) {
-      return String.join(DELIMITER, object.field1, object.field2);
-    }
-
-    @Override
-    public CompositeIndexHashKey unconvert(final String object) {
-      final String[] split = object.split(DELIMITER, 2);
-      return new CompositeIndexHashKey(split[0], split[1]);
-    }
-  }
-
-  public interface CustomDao extends CompositeKeyCrud<String, Integer, Model> {
-    @Override
-    Optional<Model> findBy(final String s, final Integer integer) throws CrudForDynamoException;
-
-    default Optional<Model> findModelWithKey_A_and_One() {
-      return findBy("A", 1);
-    }
-
-    @Query(
-        keyCondition = "HashKey = :hashKey and RangeKey between :lower and :upper",
-        scanIndexForward = false)
-    PageResult<Model> groupByFilterAndReverse(
-        @Param(":hashKey") final String hashKey,
-        @Param(":lower") final int lower,
-        @Param(":upper") final int upper,
-        final PageRequest<Model> request);
-
-    @Query(
-        keyCondition = "HashKey = :hashKey and LsiRangeKey > :lower",
-        scanIndexForward = false,
-        index = LSI)
-    Iterator<Model> sortByLsi(
-        @Param(":hashKey") final String hashKey, @Param(":lower") final int lower);
-
-    @Scan(filter = "Str1 <> :value")
-    PageResult<Model> pageScan(
-        @Param(":value") final String value, final PageRequest<Model> request);
-
-    @Parallel(totalSegments = 2)
-    @Scan(filter = "begins_with(Str1, :prefix)")
-    Iterator<Model> parallelScanAndFilterByPrefix(@Param(":prefix") final String prefix);
-
-    @Cached(expireAfterAccess = 2, expireAfterAccessTimeUnit = TimeUnit.SECONDS)
-    default List<Model> convertFindAllToList_andCache() {
-      return Lists.newArrayList(findAll());
-    }
-
-    @Custom(factoryClass = CustomMethodFactory.class)
-    Model customMethod();
-
-    @Update(
-        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
-        updateExpression = "SET Str1 = :value",
-        returnValue = ReturnValue.ALL_NEW)
-    Model update(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final int rangeKey,
-        @Param(":value") final String value);
-
-    @Put(
-        conditionExpression = "attribute_exists(#attributeName)",
-        returnValue = ReturnValue.ALL_OLD)
-    Model put(@Param(":item") Model model, @Param("#attributeName") final String attributeName);
-
-    @MapperConfig(saveBehavior = SaveBehavior.UPDATE_SKIP_NULL_ATTRIBUTES)
-    void save(final Model model) throws CrudForDynamoException;
-
-    @Delete(
-        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
-        conditionExpression = "attribute_exists(#attributeName)",
-        returnValue = ReturnValue.ALL_OLD)
-    Model delete(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final Integer rangeKey,
-        @Param("#attributeName") final String attributeName);
-  }
-
-  public static class CustomMethodFactory implements AbstractMethodFactory {
-
-    @Override
-    public AbstractMethod create(final Context context) {
-      return new AbstractMethod() {
-        @Override
-        public Signature getSignature() {
-          return Signature.resolve(context.method(), CustomDao.class);
-        }
-
-        @Override
-        public Object invoke(final Object... args) throws Throwable {
-          return Model.builder().hashKey("CustomMethod").rangeKey(1).build();
-        }
-
-        @Override
-        public AbstractMethod bind(final Object target) {
-          return this;
-        }
-      };
-    }
-  }
-
   @Override
   protected CustomDao newDao() {
     return new CrudForDynamo(getDynamoDbClient()).create(CustomDao.class);
@@ -395,5 +259,141 @@ public class CustomCrudTest
     final Model deleted = getDao().delete(dummyHashKey, dummyRangeKey, "Str1");
 
     assertThat(deleted).isEqualTo(model);
+  }
+
+  public interface CustomDao extends CompositeKeyCrud<String, Integer, Model> {
+    @Override
+    Optional<Model> findBy(final String s, final Integer integer) throws CrudForDynamoException;
+
+    default Optional<Model> findModelWithKey_A_and_One() {
+      return findBy("A", 1);
+    }
+
+    @Query(
+        keyCondition = "HashKey = :hashKey and RangeKey between :lower and :upper",
+        scanIndexForward = false)
+    PageResult<Model> groupByFilterAndReverse(
+        @Param(":hashKey") final String hashKey,
+        @Param(":lower") final int lower,
+        @Param(":upper") final int upper,
+        final PageRequest<Model> request);
+
+    @Query(
+        keyCondition = "HashKey = :hashKey and LsiRangeKey > :lower",
+        scanIndexForward = false,
+        index = LSI)
+    Iterator<Model> sortByLsi(
+        @Param(":hashKey") final String hashKey, @Param(":lower") final int lower);
+
+    @Scan(filter = "Str1 <> :value")
+    PageResult<Model> pageScan(
+        @Param(":value") final String value, final PageRequest<Model> request);
+
+    @Parallel(totalSegments = 2)
+    @Scan(filter = "begins_with(Str1, :prefix)")
+    Iterator<Model> parallelScanAndFilterByPrefix(@Param(":prefix") final String prefix);
+
+    @Cached(expireAfterAccess = 2, expireAfterAccessTimeUnit = TimeUnit.SECONDS)
+    default List<Model> convertFindAllToList_andCache() {
+      return Lists.newArrayList(findAll());
+    }
+
+    @Custom(factoryClass = CustomMethodFactory.class)
+    Model customMethod();
+
+    @Update(
+        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
+        updateExpression = "SET Str1 = :value",
+        returnValue = ReturnValue.ALL_NEW)
+    Model update(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final int rangeKey,
+        @Param(":value") final String value);
+
+    @Put(
+        conditionExpression = "attribute_exists(#attributeName)",
+        returnValue = ReturnValue.ALL_OLD)
+    Model put(@Param(":item") Model model, @Param("#attributeName") final String attributeName);
+
+    @MapperConfig(saveBehavior = SaveBehavior.UPDATE_SKIP_NULL_ATTRIBUTES)
+    void save(final Model model) throws CrudForDynamoException;
+
+    @Delete(
+        keyExpression = "HashKey = :hashKey, RangeKey = :rangeKey",
+        conditionExpression = "attribute_exists(#attributeName)",
+        returnValue = ReturnValue.ALL_OLD)
+    Model delete(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final Integer rangeKey,
+        @Param("#attributeName") final String attributeName);
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "TestTable")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
+
+    @DynamoDBIndexRangeKey(attributeName = "LsiRangeKey", localSecondaryIndexName = LSI)
+    private Integer lisRangeKey;
+
+    @DynamoDBTypeConverted(converter = CompositeIndexHashKeyConverter.class)
+    @DynamoDBIndexHashKey(attributeName = "IndexHashKey", globalSecondaryIndexName = GSI)
+    private CompositeIndexHashKey indexKey;
+
+    @DynamoDBAttribute(attributeName = "Str1")
+    private String str1;
+  }
+
+  @Data
+  @AllArgsConstructor
+  public static class CompositeIndexHashKey {
+    private String field1;
+    private String field2;
+  }
+
+  public static class CompositeIndexHashKeyConverter
+      implements DynamoDBTypeConverter<String, CompositeIndexHashKey> {
+    private static final String DELIMITER = "_";
+
+    @Override
+    public String convert(final CompositeIndexHashKey object) {
+      return String.join(DELIMITER, object.field1, object.field2);
+    }
+
+    @Override
+    public CompositeIndexHashKey unconvert(final String object) {
+      final String[] split = object.split(DELIMITER, 2);
+      return new CompositeIndexHashKey(split[0], split[1]);
+    }
+  }
+
+  public static class CustomMethodFactory implements AbstractMethodFactory {
+
+    @Override
+    public AbstractMethod create(final Context context) {
+      return new AbstractMethod() {
+        @Override
+        public Signature getSignature() {
+          return Signature.resolve(context.method(), CustomDao.class);
+        }
+
+        @Override
+        public Object invoke(final Object... args) throws Throwable {
+          return Model.builder().hashKey("CustomMethod").rangeKey(1).build();
+        }
+
+        @Override
+        public AbstractMethod bind(final Object target) {
+          return this;
+        }
+      };
+    }
   }
 }

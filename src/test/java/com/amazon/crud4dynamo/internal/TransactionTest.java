@@ -23,6 +23,59 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class TransactionTest extends DynamoDbTestBase {
+  @Override
+  @BeforeEach
+  public void setUp() throws Exception {
+    super.setUp();
+    new TableProvisioner(getDbClient()).create(Customer.class);
+    new TableProvisioner(getDbClient()).create(ProductCatalog.class);
+    new TableProvisioner(getDbClient()).create(Orders.class);
+  }
+
+  private interface Transaction {
+    @ConditionCheck(
+        tableClass = Customer.class,
+        keyExpression = "CustomerId = :customerId",
+        conditionExpression = "attribute_exists(CustomerId)")
+    @Update(
+        tableClass = ProductCatalog.class,
+        keyExpression = "ProductId = :productId",
+        updateExpression = "SET ProductStatus = :newProductStatus",
+        conditionExpression = "ProductStatus = :expectedOldProductStatus")
+    @Put(
+        tableClass = Orders.class,
+        item = ":newOrder",
+        conditionExpression = "attribute_not_exists(OrderId)")
+    void write(
+        @Param(":customerId") final String customerId,
+        @Param(":productId") final String productId,
+        @Param(":newProductStatus") final String newProductStatus,
+        @Param(":expectedOldProductStatus") final String expectedOldProductStatus,
+        @Param(":newOrder") final Orders newOrder);
+
+    @Get(
+        tableClass = Customer.class,
+        keyExpression = "CustomerId = :customerId",
+        projectionExpression = "CustomerId")
+    @Get(
+        tableClass = ProductCatalog.class,
+        keyExpression = "ProductId = :productId",
+        projectionExpression = "ProductId, ProductStatus")
+    @Get(
+        tableClass = Orders.class,
+        keyExpression = "OrderId = :orderId",
+        projectionExpression = "OrderId,OrderStatus,OrderTotal")
+    @Get(
+        tableClass = Customer.class,
+        keyExpression = "CustomerId = :nonExistingCustomerId",
+        projectionExpression = "CustomerId")
+    List<Object> get(
+        @Param(":customerId") final String customerId,
+        @Param(":productId") final String productId,
+        @Param(":orderId") final String orderId,
+        @Param(":nonExistingCustomerId") final String nonExistingCustomerId);
+  }
+
   @Data
   @Builder
   @NoArgsConstructor
@@ -72,59 +125,6 @@ public class TransactionTest extends DynamoDbTestBase {
 
     @DynamoDBAttribute(attributeName = TOTAL)
     private Integer total;
-  }
-
-  private interface Transaction {
-    @ConditionCheck(
-        tableClass = Customer.class,
-        keyExpression = "CustomerId = :customerId",
-        conditionExpression = "attribute_exists(CustomerId)")
-    @Update(
-        tableClass = ProductCatalog.class,
-        keyExpression = "ProductId = :productId",
-        updateExpression = "SET ProductStatus = :newProductStatus",
-        conditionExpression = "ProductStatus = :expectedOldProductStatus")
-    @Put(
-        tableClass = Orders.class,
-        item = ":newOrder",
-        conditionExpression = "attribute_not_exists(OrderId)")
-    void write(
-        @Param(":customerId") final String customerId,
-        @Param(":productId") final String productId,
-        @Param(":newProductStatus") final String newProductStatus,
-        @Param(":expectedOldProductStatus") final String expectedOldProductStatus,
-        @Param(":newOrder") final Orders newOrder);
-
-    @Get(
-        tableClass = Customer.class,
-        keyExpression = "CustomerId = :customerId",
-        projectionExpression = "CustomerId")
-    @Get(
-        tableClass = ProductCatalog.class,
-        keyExpression = "ProductId = :productId",
-        projectionExpression = "ProductId, ProductStatus")
-    @Get(
-        tableClass = Orders.class,
-        keyExpression = "OrderId = :orderId",
-        projectionExpression = "OrderId,OrderStatus,OrderTotal")
-    @Get(
-        tableClass = Customer.class,
-        keyExpression = "CustomerId = :nonExistingCustomerId",
-        projectionExpression = "CustomerId")
-    List<Object> get(
-        @Param(":customerId") final String customerId,
-        @Param(":productId") final String productId,
-        @Param(":orderId") final String orderId,
-        @Param(":nonExistingCustomerId") final String nonExistingCustomerId);
-  }
-
-  @Override
-  @BeforeEach
-  public void setUp() throws Exception {
-    super.setUp();
-    new TableProvisioner(getDbClient()).create(Customer.class);
-    new TableProvisioner(getDbClient()).create(ProductCatalog.class);
-    new TableProvisioner(getDbClient()).create(Orders.class);
   }
 
   @Nested

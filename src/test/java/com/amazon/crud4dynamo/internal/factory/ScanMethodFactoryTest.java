@@ -24,24 +24,6 @@ import lombok.Data;
 import org.junit.jupiter.api.Test;
 
 class ScanMethodFactoryTest extends SingleTableDynamoDbTestBase<Model> {
-  @Data
-  @DynamoDBTable(tableName = "Model")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-  }
-
-  public interface TestInterface {
-    void nonScan();
-
-    @Scan(filter = "HashKey <> :hashKey")
-    Iterator<Model> scan(@Param(":hashKey") final String keyValue);
-
-    @Scan(filter = "HashKey <> :hashKey")
-    PageResult<Model> pageScan(
-        @Param(":hashKey") final String keyValue, final PageRequest<Model> request);
-  }
-
   @Override
   protected Class<Model> getModelClass() {
     return Model.class;
@@ -91,5 +73,23 @@ class ScanMethodFactoryTest extends SingleTableDynamoDbTestBase<Model> {
 
     assertThat(abstractMethod).isNotNull();
     assertThat(abstractMethod).isInstanceOf(PagingMethod.class);
+  }
+
+  public interface TestInterface {
+    void nonScan();
+
+    @Scan(filter = "HashKey <> :hashKey")
+    Iterator<Model> scan(@Param(":hashKey") final String keyValue);
+
+    @Scan(filter = "HashKey <> :hashKey")
+    PageResult<Model> pageScan(
+        @Param(":hashKey") final String keyValue, final PageRequest<Model> request);
+  }
+
+  @Data
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
   }
 }

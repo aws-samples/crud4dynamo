@@ -33,36 +33,6 @@ import org.junit.jupiter.api.Test;
 
 public class UpdateMethodsMapperAnnotationTest extends SingleTableDynamoDbTestBase<Book> {
 
-  public interface BookDao extends CompositeKeyCrud<String, Integer, Book> {
-
-    @Update(
-        keyExpression =
-            Attributes.HASH_KEY + " = :hashKey, " + Attributes.RANGE_KEY + " = :rangeKey",
-        updateExpression = "SET " + Attributes.CUSTOM_DATE + " = :value")
-    Book updateCustomDate(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final String rangeKey,
-        @Param(":value") final CustomDate customDate);
-
-    @Update(
-        keyExpression =
-            Attributes.HASH_KEY + " = :hashKey, " + Attributes.RANGE_KEY + " = :rangeKey",
-        updateExpression = "SET " + Attributes.COVER + " = :value")
-    Book updateCover(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final String rangeKey,
-        @Param(":value") final Picture cover);
-
-    @Update(
-        keyExpression =
-            Attributes.HASH_KEY + " = :hashKey, " + Attributes.RANGE_KEY + " = :rangeKey",
-        updateExpression = "SET " + Attributes.INTEGER_STORED_AS_STRING + " = :value")
-    Book updateIntegerStoredAsString(
-        @Param(":hashKey") final String hashKey,
-        @Param(":rangeKey") final String rangeKey,
-        @Param(":value") final int value);
-  }
-
   private BookDao bookDao;
 
   @Override
@@ -127,5 +97,35 @@ public class UpdateMethodsMapperAnnotationTest extends SingleTableDynamoDbTestBa
     books = Lists.newArrayList(bookDao.groupBy(dummyAuthor));
     assertThat(books).hasSize(1);
     assertThat(books.get(0).getIntegerStoredAsString()).isEqualTo(dummyInteger);
+  }
+
+  public interface BookDao extends CompositeKeyCrud<String, Integer, Book> {
+
+    @Update(
+        keyExpression =
+            Attributes.HASH_KEY + " = :hashKey, " + Attributes.RANGE_KEY + " = :rangeKey",
+        updateExpression = "SET " + Attributes.CUSTOM_DATE + " = :value")
+    Book updateCustomDate(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final String rangeKey,
+        @Param(":value") final CustomDate customDate);
+
+    @Update(
+        keyExpression =
+            Attributes.HASH_KEY + " = :hashKey, " + Attributes.RANGE_KEY + " = :rangeKey",
+        updateExpression = "SET " + Attributes.COVER + " = :value")
+    Book updateCover(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final String rangeKey,
+        @Param(":value") final Picture cover);
+
+    @Update(
+        keyExpression =
+            Attributes.HASH_KEY + " = :hashKey, " + Attributes.RANGE_KEY + " = :rangeKey",
+        updateExpression = "SET " + Attributes.INTEGER_STORED_AS_STRING + " = :value")
+    Book updateIntegerStoredAsString(
+        @Param(":hashKey") final String hashKey,
+        @Param(":rangeKey") final String rangeKey,
+        @Param(":value") final int value);
   }
 }

@@ -77,17 +77,6 @@ class ExpressionFactoryHelperTest {
     assertThat(returnedStr == nonEmptyStr).isTrue();
   }
 
-  public interface TestInterface {
-    void aMethod(@Param("#AttrName") String attrName, @Param(":attrValue") Integer attrValue);
-
-    static ImmutableList<Parameter> getMethodParameters() throws NoSuchMethodException {
-      final Method aMethod = TestInterface.class.getMethod("aMethod", String.class, Integer.class);
-      final TypeToken<TestInterface> typeToken = TypeToken.of(TestInterface.class);
-      final Invokable<TestInterface, Object> invokable = typeToken.method(aMethod);
-      return invokable.getParameters();
-    }
-  }
-
   @Test
   void getAttributeNames() throws Exception {
     final ImmutableList<Parameter> parameters = TestInterface.getMethodParameters();
@@ -142,6 +131,24 @@ class ExpressionFactoryHelperTest {
     assertThat(pageRequest).isEmpty();
   }
 
+  @Test
+  void getTableName() {
+    final String tableName = ExpressionFactoryHelper.getTableName(Model.class);
+
+    assertThat(tableName).isEqualTo("Table");
+  }
+
+  public interface TestInterface {
+    static ImmutableList<Parameter> getMethodParameters() throws NoSuchMethodException {
+      final Method aMethod = TestInterface.class.getMethod("aMethod", String.class, Integer.class);
+      final TypeToken<TestInterface> typeToken = TypeToken.of(TestInterface.class);
+      final Invokable<TestInterface, Object> invokable = typeToken.method(aMethod);
+      return invokable.getParameters();
+    }
+
+    void aMethod(@Param("#AttrName") String attrName, @Param(":attrValue") Integer attrValue);
+  }
+
   @Data
   @Builder
   @NoArgsConstructor
@@ -171,12 +178,5 @@ class ExpressionFactoryHelperTest {
 
       assertThat(lastEvaluatedKey).containsOnly(MapEntry.entry("HashKey", new AttributeValue("A")));
     }
-  }
-
-  @Test
-  void getTableName() {
-    final String tableName = ExpressionFactoryHelper.getTableName(Model.class);
-
-    assertThat(tableName).isEqualTo("Table");
   }
 }

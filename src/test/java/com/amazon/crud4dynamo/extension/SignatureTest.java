@@ -12,17 +12,6 @@ import org.junit.jupiter.api.Test;
 
 class SignatureTest {
 
-  private interface ParameterizedFunctionInterface extends Function<String, Integer> {
-    @Cached
-    void aMethod();
-
-    @ConditionCheck(tableClass = Class.class, keyExpression = "A", conditionExpression = "")
-    @ConditionChecks({
-      @ConditionCheck(tableClass = Class.class, keyExpression = "B", conditionExpression = "")
-    })
-    void bMethod();
-  }
-
   @Test
   void resolveGenericTypes() throws Exception {
     final Method applyMethod = Function.class.getMethod("apply", Object.class);
@@ -50,5 +39,16 @@ class SignatureTest {
 
     assertThat(sig.getAnnotationsByType(ConditionCheck.class)).hasSize(2);
     assertThat(sig.getAnnotationsByType(ConditionChecks.class)).hasSize(1);
+  }
+
+  private interface ParameterizedFunctionInterface extends Function<String, Integer> {
+    @Cached
+    void aMethod();
+
+    @ConditionCheck(tableClass = Class.class, keyExpression = "A", conditionExpression = "")
+    @ConditionChecks({
+      @ConditionCheck(tableClass = Class.class, keyExpression = "B", conditionExpression = "")
+    })
+    void bMethod();
   }
 }

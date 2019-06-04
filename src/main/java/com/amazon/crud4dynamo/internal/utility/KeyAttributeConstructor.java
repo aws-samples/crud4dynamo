@@ -39,19 +39,6 @@ public class KeyAttributeConstructor {
     keyExpressionMapper = new KeyExpressionMapper(keyExpression, tableModel);
   }
 
-  public Map<String, AttributeValue> create(final List<Argument> arguments) {
-    final Map<String, String> expAttrNames =
-        ExpressionFactoryHelper.getExpressionAttributeNames(arguments);
-    final Map<String, AttributeValue> hashKey =
-        getKey(keyExpressionMapper.getHashKeyContext(), arguments, expAttrNames);
-    final Map<String, AttributeValue> rangeKey =
-        keyExpressionMapper
-            .getRangeKeyContext()
-            .map(ctx -> getKey(ctx, arguments, expAttrNames))
-            .orElse(Collections.emptyMap());
-    return MapHelper.overrideMerge(hashKey, rangeKey);
-  }
-
   private static Map<String, AttributeValue> getKey(
       final KeyExpressionMapper.Context context,
       final List<Argument> argList,
@@ -73,6 +60,19 @@ public class KeyAttributeConstructor {
     return attrExpValues.values().stream()
         .findFirst()
         .orElseThrow(() -> new NoKeyAttributeException(context.getKeyStringText()));
+  }
+
+  public Map<String, AttributeValue> create(final List<Argument> arguments) {
+    final Map<String, String> expAttrNames =
+        ExpressionFactoryHelper.getExpressionAttributeNames(arguments);
+    final Map<String, AttributeValue> hashKey =
+        getKey(keyExpressionMapper.getHashKeyContext(), arguments, expAttrNames);
+    final Map<String, AttributeValue> rangeKey =
+        keyExpressionMapper
+            .getRangeKeyContext()
+            .map(ctx -> getKey(ctx, arguments, expAttrNames))
+            .orElse(Collections.emptyMap());
+    return MapHelper.overrideMerge(hashKey, rangeKey);
   }
 
   @VisibleForTesting

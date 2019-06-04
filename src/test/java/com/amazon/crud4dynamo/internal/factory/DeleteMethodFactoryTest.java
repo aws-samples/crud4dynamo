@@ -20,26 +20,15 @@ import lombok.Data;
 import org.junit.jupiter.api.Test;
 
 class DeleteMethodFactoryTest extends SingleTableDynamoDbTestBase<DeleteMethodFactoryTest.Model> {
-  @Data
-  @DynamoDBTable(tableName = "Model")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBAttribute(attributeName = "A")
-    private Integer a;
+  private static Signature getSignature(final String name, final Class<?>... parameterTypes)
+      throws NoSuchMethodException {
+    final Method method = Dao.class.getMethod(name, parameterTypes);
+    return Signature.resolve(method, Dao.class);
   }
 
   @Override
   protected Class getModelClass() {
     return Model.class;
-  }
-
-  private interface Dao {
-    void nonDeleteMethod();
-
-    @Delete(keyExpression = "")
-    void delete();
   }
 
   @Test
@@ -75,9 +64,20 @@ class DeleteMethodFactoryTest extends SingleTableDynamoDbTestBase<DeleteMethodFa
         .build();
   }
 
-  private static Signature getSignature(final String name, final Class<?>... parameterTypes)
-      throws NoSuchMethodException {
-    final Method method = Dao.class.getMethod(name, parameterTypes);
-    return Signature.resolve(method, Dao.class);
+  private interface Dao {
+    void nonDeleteMethod();
+
+    @Delete(keyExpression = "")
+    void delete();
+  }
+
+  @Data
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBAttribute(attributeName = "A")
+    private Integer a;
   }
 }

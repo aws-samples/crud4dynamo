@@ -21,6 +21,25 @@ import java.util.Set;
 import lombok.NonNull;
 
 public interface ExpressionParser {
+  static ExpressionParser newEmptyInstance() {
+    return new ExpressionParser() {
+      @Override
+      public AttributeNameMapper getAttributeNameMapper() {
+        return new AttributeNameMapper();
+      }
+
+      @Override
+      public AttributeValueMapper getAttributeValueMapper() {
+        return new AttributeValueMapper();
+      }
+
+      @Override
+      public Set<String> getExpressionAttributeNames() {
+        return ImmutableSet.of();
+      }
+    };
+  }
+
   AttributeNameMapper getAttributeNameMapper();
 
   AttributeValueMapper getAttributeValueMapper();
@@ -47,25 +66,6 @@ public interface ExpressionParser {
         names.addAll(ExpressionParser.this.getExpressionAttributeNames());
         names.addAll(other.getExpressionAttributeNames());
         return names;
-      }
-    };
-  }
-
-  static ExpressionParser newEmptyInstance() {
-    return new ExpressionParser() {
-      @Override
-      public AttributeNameMapper getAttributeNameMapper() {
-        return new AttributeNameMapper();
-      }
-
-      @Override
-      public AttributeValueMapper getAttributeValueMapper() {
-        return new AttributeValueMapper();
-      }
-
-      @Override
-      public Set<String> getExpressionAttributeNames() {
-        return ImmutableSet.of();
       }
     };
   }

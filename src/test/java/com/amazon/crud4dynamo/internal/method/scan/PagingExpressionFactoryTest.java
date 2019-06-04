@@ -19,19 +19,6 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class PagingExpressionFactoryTest extends SingleTableDynamoDbTestBase<Model> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "Model")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
-  }
-
   @Override
   protected Class<Model> getModelClass() {
     return Model.class;
@@ -56,5 +43,18 @@ class PagingExpressionFactoryTest extends SingleTableDynamoDbTestBase<Model> {
     final ScanExpressionFactory mockFactory = mock(ScanExpressionFactory.class);
     when(mockFactory.create(any())).thenReturn(new DynamoDBScanExpression());
     return new PagingExpressionFactory(mockFactory, Model.class, getDynamoDbMapper());
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
   }
 }

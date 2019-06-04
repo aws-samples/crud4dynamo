@@ -24,6 +24,35 @@ public class TransactionWriteMethodWithUpdateOnlyTest {
   private static final String TABLE_NAME_1 = "TestTable1";
   private static final String TABLE_NAME_2 = "TestTable2";
 
+  private interface TestDao {
+    @Update(
+        tableClass = Table1.class,
+        keyExpression = "HashKey = :hashKey",
+        updateExpression = "SET #attribute = :newValue",
+        conditionExpression = "#attribute = :oldValue")
+    void update1(
+        @Param(":hashKey") final String hashKey,
+        @Param("#attribute") final String attribute,
+        @Param(":newValue") final int newValue,
+        @Param(":oldValue") final int oldValue);
+
+    @Update(
+        tableClass = Table1.class,
+        keyExpression = "HashKey = :hashKey",
+        updateExpression = "SET #attribute = :newValue",
+        conditionExpression = "#attribute = :oldValue")
+    @Update(
+        tableClass = Table2.class,
+        keyExpression = "HashKey = :hashKey",
+        updateExpression = "SET #attribute = :newValue",
+        conditionExpression = "#attribute = :oldValue")
+    void update2(
+        @Param(":hashKey") final String hashKey,
+        @Param("#attribute") final String attribute,
+        @Param(":newValue") final int newValue,
+        @Param(":oldValue") final int oldValue);
+  }
+
   @Data
   @Builder
   @DynamoDBTable(tableName = TABLE_NAME_1)
@@ -54,35 +83,6 @@ public class TransactionWriteMethodWithUpdateOnlyTest {
 
     @DynamoDBAttribute(attributeName = INT_ATTRIBUTE)
     private Integer integerAttribute;
-  }
-
-  private interface TestDao {
-    @Update(
-        tableClass = Table1.class,
-        keyExpression = "HashKey = :hashKey",
-        updateExpression = "SET #attribute = :newValue",
-        conditionExpression = "#attribute = :oldValue")
-    void update1(
-        @Param(":hashKey") final String hashKey,
-        @Param("#attribute") final String attribute,
-        @Param(":newValue") final int newValue,
-        @Param(":oldValue") final int oldValue);
-
-    @Update(
-        tableClass = Table1.class,
-        keyExpression = "HashKey = :hashKey",
-        updateExpression = "SET #attribute = :newValue",
-        conditionExpression = "#attribute = :oldValue")
-    @Update(
-        tableClass = Table2.class,
-        keyExpression = "HashKey = :hashKey",
-        updateExpression = "SET #attribute = :newValue",
-        conditionExpression = "#attribute = :oldValue")
-    void update2(
-        @Param(":hashKey") final String hashKey,
-        @Param("#attribute") final String attribute,
-        @Param(":newValue") final int newValue,
-        @Param(":oldValue") final int oldValue);
   }
 
   @Nested

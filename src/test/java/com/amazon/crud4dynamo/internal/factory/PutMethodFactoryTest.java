@@ -21,21 +21,10 @@ import lombok.Data;
 import org.junit.jupiter.api.Test;
 
 class PutMethodFactoryTest extends SingleTableDynamoDbTestBase<PutMethodFactoryTest.Model> {
-  @Data
-  @DynamoDBTable(tableName = "Model")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBAttribute(attributeName = "A")
-    private Integer a;
-  }
-
-  public interface Dao {
-    void nonPutMethod();
-
-    @Put
-    void putMethod(final @Param(":item") Model model);
+  private static Signature getSignature(final String name, final Class<?>... parameterTypes)
+      throws NoSuchMethodException {
+    final Method method = Dao.class.getMethod(name, parameterTypes);
+    return Signature.resolve(method, Dao.class);
   }
 
   @Override
@@ -76,9 +65,20 @@ class PutMethodFactoryTest extends SingleTableDynamoDbTestBase<PutMethodFactoryT
         .build();
   }
 
-  private static Signature getSignature(final String name, final Class<?>... parameterTypes)
-      throws NoSuchMethodException {
-    final Method method = Dao.class.getMethod(name, parameterTypes);
-    return Signature.resolve(method, Dao.class);
+  public interface Dao {
+    void nonPutMethod();
+
+    @Put
+    void putMethod(final @Param(":item") Model model);
+  }
+
+  @Data
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBAttribute(attributeName = "A")
+    private Integer a;
   }
 }

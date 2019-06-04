@@ -21,21 +21,9 @@ import org.junit.jupiter.api.Test;
 
 class UpdateMethodFactoryTest extends SingleTableDynamoDbTestBase<Model> {
 
-  @Data
-  @DynamoDBTable(tableName = "Model")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBAttribute(attributeName = "A")
-    private Integer a;
-  }
-
-  public interface Dao {
-    void nonUpdateMethod();
-
-    @Update(keyExpression = "HashKey = :hashKey", updateExpression = "SET A = :b")
-    void updateMethod();
+  private static Signature getSignature(final String name) throws NoSuchMethodException {
+    final Method method = Dao.class.getMethod(name);
+    return Signature.resolve(method, Dao.class);
   }
 
   @Override
@@ -76,8 +64,20 @@ class UpdateMethodFactoryTest extends SingleTableDynamoDbTestBase<Model> {
         .build();
   }
 
-  private static Signature getSignature(final String name) throws NoSuchMethodException {
-    final Method method = Dao.class.getMethod(name);
-    return Signature.resolve(method, Dao.class);
+  public interface Dao {
+    void nonUpdateMethod();
+
+    @Update(keyExpression = "HashKey = :hashKey", updateExpression = "SET A = :b")
+    void updateMethod();
+  }
+
+  @Data
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBAttribute(attributeName = "A")
+    private Integer a;
   }
 }

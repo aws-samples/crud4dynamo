@@ -26,26 +26,18 @@ import org.junit.jupiter.api.Test;
 
 class PagingMethodTest extends SingleTableDynamoDbTestBase<Model> {
 
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "Model")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
+  private static Requester<Model> newRequester(final PagingMethod scanMethod) {
+    return req -> {
+      try {
+        return (PageResult<Model>) scanMethod.invoke("RangeKey", 3, 9, req);
+      } catch (final Throwable throwable) {
+        throw new RuntimeException(throwable);
+      }
+    };
   }
 
-  public interface Dao extends CompositeKeyCrud<String, Integer, Model> {
-    @Scan(filter = "#rangeKey between :lower and :upper")
-    PageResult<Model> scan(
-        @Param("#rangeKey") String rangeKeyName,
-        @Param(":lower") int lower,
-        @Param(":upper") int upper,
-        final PageRequest<Model> request);
+  private static Stream<Model> prepareData() {
+    return IntStream.range(0, 10).mapToObj(i -> Model.builder().hashKey("A").rangeKey(i).build());
   }
 
   @Override
@@ -66,16 +58,6 @@ class PagingMethodTest extends SingleTableDynamoDbTestBase<Model> {
     assertThat(models).containsAll(testData.subList(3, 10));
   }
 
-  private static Requester<Model> newRequester(final PagingMethod scanMethod) {
-    return req -> {
-      try {
-        return (PageResult<Model>) scanMethod.invoke("RangeKey", 3, 9, req);
-      } catch (final Throwable throwable) {
-        throw new RuntimeException(throwable);
-      }
-    };
-  }
-
   private PagingMethod getMethod() throws NoSuchMethodException {
     final Signature signature =
         Signature.resolve(
@@ -84,7 +66,25 @@ class PagingMethodTest extends SingleTableDynamoDbTestBase<Model> {
     return new PagingMethod(signature, getModelClass(), getDynamoDbMapper(), null);
   }
 
-  private static Stream<Model> prepareData() {
-    return IntStream.range(0, 10).mapToObj(i -> Model.builder().hashKey("A").rangeKey(i).build());
+  public interface Dao extends CompositeKeyCrud<String, Integer, Model> {
+    @Scan(filter = "#rangeKey between :lower and :upper")
+    PageResult<Model> scan(
+        @Param("#rangeKey") String rangeKeyName,
+        @Param(":lower") int lower,
+        @Param(":upper") int upper,
+        final PageRequest<Model> request);
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
   }
 }

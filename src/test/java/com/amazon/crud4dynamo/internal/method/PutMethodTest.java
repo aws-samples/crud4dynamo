@@ -18,27 +18,6 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class PutMethodTest extends SingleTableDynamoDbTestBase<PutMethodTest.Model> {
-  @Builder
-  @Data
-  @DynamoDBTable(tableName = "Model")
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBAttribute(attributeName = "A")
-    private Integer a;
-  }
-
-  private interface Dao {
-    @Put()
-    void defaultPutMethod(final @Param(":item") Model model);
-
-    @Put(returnValue = ReturnValue.ALL_OLD)
-    Model putWithOldValueReturned(final @Param(":item") Model model);
-  }
-
   @Override
   protected Class<Model> getModelClass() {
     return Model.class;
@@ -85,5 +64,26 @@ class PutMethodTest extends SingleTableDynamoDbTestBase<PutMethodTest.Model> {
       assertThat(result).isNotNull().isEqualTo(putItem1);
       assertThat(getItem(Model.builder().hashKey(key).build())).contains(putItem2);
     }
+  }
+
+  private interface Dao {
+    @Put()
+    void defaultPutMethod(final @Param(":item") Model model);
+
+    @Put(returnValue = ReturnValue.ALL_OLD)
+    Model putWithOldValueReturned(final @Param(":item") Model model);
+  }
+
+  @Builder
+  @Data
+  @DynamoDBTable(tableName = "Model")
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBAttribute(attributeName = "A")
+    private Integer a;
   }
 }

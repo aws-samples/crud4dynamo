@@ -18,19 +18,6 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class KeyExpressionMapperTest extends SingleTableDynamoDbTestBase<Model> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "TestTable")
-  static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
-  }
-
   @Override
   protected Class<Model> getModelClass() {
     return Model.class;
@@ -109,5 +96,18 @@ class KeyExpressionMapperTest extends SingleTableDynamoDbTestBase<Model> {
 
     assertThat(converter).isNotNull();
     assertThat(converter.convert(123)).isEqualTo(new AttributeValue().withN("123"));
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "TestTable")
+  static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
   }
 }

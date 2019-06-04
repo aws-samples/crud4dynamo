@@ -15,24 +15,6 @@ import java.lang.reflect.Method;
 import org.junit.jupiter.api.Test;
 
 class CustomMethodFactoryTest {
-  public interface TestInterface {
-    @Custom(factoryClass = TestFactory.class)
-    void aMethod();
-
-    @Cached
-    void bMethod();
-  }
-
-  public static class TestFactory implements AbstractMethodFactory {
-
-    @Override
-    public AbstractMethod create(final Context context) {
-      final AbstractMethod mock = mock(AbstractMethod.class);
-      when(mock.getSignature()).thenReturn(context.signature());
-      return mock;
-    }
-  }
-
   @Test
   void createCustomMethod() throws Exception {
     final Method aMethod = TestInterface.class.getMethod("aMethod");
@@ -59,5 +41,23 @@ class CustomMethodFactoryTest {
 
     assertThat(abstractMethod).isNull();
     verify(mockDelegate).create(context);
+  }
+
+  public interface TestInterface {
+    @Custom(factoryClass = TestFactory.class)
+    void aMethod();
+
+    @Cached
+    void bMethod();
+  }
+
+  public static class TestFactory implements AbstractMethodFactory {
+
+    @Override
+    public AbstractMethod create(final Context context) {
+      final AbstractMethod mock = mock(AbstractMethod.class);
+      when(mock.getSignature()).thenReturn(context.signature());
+      return mock;
+    }
   }
 }

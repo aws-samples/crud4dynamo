@@ -21,42 +21,9 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class UpdateFactoryTest extends SingleTableDynamoDbTestBase<UpdateFactoryTest.Table> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = Table.NAME)
-  public static class Table {
-    private static final String NAME = "TestTable";
-    private static final String HASH_KEY = "HashKey";
-    private static final String STRING_ATTRIBUTE = "StringAttribute";
-
-    @DynamoDBHashKey(attributeName = HASH_KEY)
-    private String hashKey;
-
-    @DynamoDBAttribute(attributeName = STRING_ATTRIBUTE)
-    private String stringAttribute;
-  }
-
   @Override
   protected Class<Table> getModelClass() {
     return Table.class;
-  }
-
-  private interface Dao {
-    String UPDATE_EXPRESSION = "SET #attribute = :newValue";
-    String CONDITION_EXPRESSION = "#attribute = :oldValue";
-
-    @Update(
-        tableClass = Table.class,
-        keyExpression = "HashKey = :hashKey",
-        updateExpression = UPDATE_EXPRESSION,
-        conditionExpression = CONDITION_EXPRESSION)
-    void update(
-        @Param(":hashKey") final String hashKey,
-        @Param("#attribute") final String attribute,
-        @Param(":newValue") final String newValue,
-        @Param(":oldValue") final String oldValue);
   }
 
   @Test
@@ -90,5 +57,38 @@ class UpdateFactoryTest extends SingleTableDynamoDbTestBase<UpdateFactoryTest.Ta
         .containsEntry(":newValue", new AttributeValue(newValue));
     assertThat(update.getReturnValuesOnConditionCheckFailure())
         .isEqualTo(ReturnValuesOnConditionCheckFailure.NONE.toString());
+  }
+
+  private interface Dao {
+    String UPDATE_EXPRESSION = "SET #attribute = :newValue";
+    String CONDITION_EXPRESSION = "#attribute = :oldValue";
+
+    @Update(
+        tableClass = Table.class,
+        keyExpression = "HashKey = :hashKey",
+        updateExpression = UPDATE_EXPRESSION,
+        conditionExpression = CONDITION_EXPRESSION)
+    void update(
+        @Param(":hashKey") final String hashKey,
+        @Param("#attribute") final String attribute,
+        @Param(":newValue") final String newValue,
+        @Param(":oldValue") final String oldValue);
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = Table.NAME)
+  public static class Table {
+    private static final String NAME = "TestTable";
+    private static final String HASH_KEY = "HashKey";
+    private static final String STRING_ATTRIBUTE = "StringAttribute";
+
+    @DynamoDBHashKey(attributeName = HASH_KEY)
+    private String hashKey;
+
+    @DynamoDBAttribute(attributeName = STRING_ATTRIBUTE)
+    private String stringAttribute;
   }
 }

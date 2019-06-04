@@ -31,12 +31,6 @@ public class MapperConfigAwareMethodFactory extends ChainedAbstractMethodFactory
     super(delegate);
   }
 
-  @Override
-  public AbstractMethod create(final Context context) {
-    return super.create(
-        getAnnotation(context).map(overrideConfigInContext(context)).orElse(context));
-  }
-
   private static Optional<MapperConfig> getAnnotation(Context context) {
     return context.signature().getAnnotation(MapperConfig.class);
   }
@@ -64,5 +58,11 @@ public class MapperConfigAwareMethodFactory extends ChainedAbstractMethodFactory
         .interfaceType(context.interfaceType())
         .mapper(context.mapper())
         .amazonDynamoDb(context.amazonDynamoDb());
+  }
+
+  @Override
+  public AbstractMethod create(final Context context) {
+    return super.create(
+        getAnnotation(context).map(overrideConfigInContext(context)).orElse(context));
   }
 }

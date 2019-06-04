@@ -27,6 +27,10 @@ public class PutMethodFactory extends ChainedAbstractMethodFactory {
     super(delegate);
   }
 
+  private static boolean isAnnotatedWithPut(final Context context) {
+    return context.signature().invokable().isAnnotationPresent(Put.class);
+  }
+
   @Override
   public AbstractMethod create(final Context context) {
     if (isAnnotatedWithPut(context)) {
@@ -38,9 +42,5 @@ public class PutMethodFactory extends ChainedAbstractMethodFactory {
           context.mapperConfig());
     }
     return super.create(context);
-  }
-
-  private static boolean isAnnotatedWithPut(final Context context) {
-    return context.signature().invokable().isAnnotationPresent(Put.class);
   }
 }

@@ -17,6 +17,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 public class CompositeKeyCrudImplTest extends CompositeKeyTestBase<Model, CompositeKeyCrudImpl> {
+  @Override
+  protected Class<Model> getModelClass() {
+    return Model.class;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  protected CompositeKeyCrudImpl newDao() {
+    return new CompositeKeyCrudImpl<>(
+        getDynamoDbMapper(), DynamoDBMapperConfig.DEFAULT, getModelClass());
+  }
+
+  @Override
+  protected List<Model> getTestData() {
+    return Arrays.asList(
+        Model.builder().hashKey("A").rangeKey(1).stringAttribute("A").build(),
+        Model.builder().hashKey("A").rangeKey(2).stringAttribute("B").build(),
+        Model.builder().hashKey("A").rangeKey(3).stringAttribute("C").build(),
+        Model.builder().hashKey("B").rangeKey(4).stringAttribute("D").build());
+  }
+
   @Data
   @Builder
   @NoArgsConstructor
@@ -40,26 +61,5 @@ public class CompositeKeyCrudImplTest extends CompositeKeyTestBase<Model, Compos
 
     @DynamoDBIndexRangeKey(globalSecondaryIndexName = "Gsi", attributeName = "GsiRangeKey")
     private Integer gsiRangeKey;
-  }
-
-  @Override
-  protected Class<Model> getModelClass() {
-    return Model.class;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  protected CompositeKeyCrudImpl newDao() {
-    return new CompositeKeyCrudImpl<>(
-        getDynamoDbMapper(), DynamoDBMapperConfig.DEFAULT, getModelClass());
-  }
-
-  @Override
-  protected List<Model> getTestData() {
-    return Arrays.asList(
-        Model.builder().hashKey("A").rangeKey(1).stringAttribute("A").build(),
-        Model.builder().hashKey("A").rangeKey(2).stringAttribute("B").build(),
-        Model.builder().hashKey("A").rangeKey(3).stringAttribute("C").build(),
-        Model.builder().hashKey("B").rangeKey(4).stringAttribute("D").build());
   }
 }

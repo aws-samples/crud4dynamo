@@ -14,19 +14,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 public class SimpleKeyCrudTest extends SimpleKeyTestBase<SimpleKeyCrudTest.Model, SimpleKeyCrud> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "TestTable")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBAttribute(attributeName = "Integer1")
-    private Integer integer1;
-  }
-
   @Override
   protected SimpleKeyCrud newDao() {
     return new CrudForDynamo(getDynamoDbClient()).createSimple(Model.class);
@@ -43,5 +30,18 @@ public class SimpleKeyCrudTest extends SimpleKeyTestBase<SimpleKeyCrudTest.Model
   @Override
   protected Class<Model> getModelClass() {
     return Model.class;
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "TestTable")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBAttribute(attributeName = "Integer1")
+    private Integer integer1;
   }
 }

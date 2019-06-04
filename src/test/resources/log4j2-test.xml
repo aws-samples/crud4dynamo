@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="ERROR">
-    <Appenders>
-        <Console name="STDOUT" target="SYSTEM_OUT">
-            <PatternLayout>
-                <pattern>%d{ISO-8601} %highlight{[%p]} %X{RequestId} (%t) %c: %m%n</pattern>
-            </PatternLayout>
-        </Console>
-    </Appenders>
-    <Loggers>
-        <Root level="INFO">
-            <AppenderRef ref="STDOUT"/>
-        </Root>
-        <Logger name="com.amazon.crud4dynamo" level="DEBUG"/>
-    </Loggers>
+  <Appenders>
+    <Console name="STDOUT" target="SYSTEM_OUT">
+      <PatternLayout>
+        <pattern>%d{ISO-8601} %highlight{[%p]} %X{RequestId} (%t) %c: %m%n</pattern>
+      </PatternLayout>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger level="DEBUG" name="com.amazon.crud4dynamo"/>
+    <Root level="INFO">
+      <AppenderRef ref="STDOUT"/>
+    </Root>
+  </Loggers>
 </Configuration>

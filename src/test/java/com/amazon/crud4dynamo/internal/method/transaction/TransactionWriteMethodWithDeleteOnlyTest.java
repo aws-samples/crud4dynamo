@@ -23,6 +23,30 @@ public class TransactionWriteMethodWithDeleteOnlyTest {
   private static final String TABLE_NAME_1 = "TestTable1";
   private static final String TABLE_NAME_2 = "TestTable2";
 
+  private interface TestDao {
+    @Delete(
+        tableClass = Table1.class,
+        keyExpression = "HashKey = :hashKey",
+        conditionExpression = "#attributeName > :value")
+    void delete1(
+        @Param(":hashKey") final String key,
+        @Param("#attributeName") final String attribute,
+        @Param(":value") final int value);
+
+    @Delete(
+        tableClass = Table1.class,
+        keyExpression = "HashKey = :hashKey",
+        conditionExpression = "#attributeName > :value")
+    @Delete(
+        tableClass = Table2.class,
+        keyExpression = "HashKey = :hashKey",
+        conditionExpression = "#attributeName > :value")
+    void delete2(
+        @Param(":hashKey") final String key,
+        @Param("#attributeName") final String attribute,
+        @Param(":value") final int value);
+  }
+
   @Data
   @Builder
   @DynamoDBTable(tableName = TABLE_NAME_1)
@@ -53,30 +77,6 @@ public class TransactionWriteMethodWithDeleteOnlyTest {
 
     @DynamoDBAttribute(attributeName = INT_ATTRIBUTE)
     private Integer integerAttribute;
-  }
-
-  private interface TestDao {
-    @Delete(
-        tableClass = Table1.class,
-        keyExpression = "HashKey = :hashKey",
-        conditionExpression = "#attributeName > :value")
-    void delete1(
-        @Param(":hashKey") final String key,
-        @Param("#attributeName") final String attribute,
-        @Param(":value") final int value);
-
-    @Delete(
-        tableClass = Table1.class,
-        keyExpression = "HashKey = :hashKey",
-        conditionExpression = "#attributeName > :value")
-    @Delete(
-        tableClass = Table2.class,
-        keyExpression = "HashKey = :hashKey",
-        conditionExpression = "#attributeName > :value")
-    void delete2(
-        @Param(":hashKey") final String key,
-        @Param("#attributeName") final String attribute,
-        @Param(":value") final int value);
   }
 
   @Nested

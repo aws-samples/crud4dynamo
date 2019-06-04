@@ -16,13 +16,6 @@ import com.amazon.crud4dynamo.testdata.DummyTable;
 import org.junit.jupiter.api.Test;
 
 class TransactionWriteMethodFactoryTest extends DynamoDbTestBase {
-  private interface Dao {
-    void nonTransactionWriteMethod();
-
-    @ConditionCheck(tableClass = DummyTable.class, keyExpression = "", conditionExpression = "")
-    void transactionWriteMethod();
-  }
-
   @Test
   void withoutTransactionWriteAnnotation_callDelegate() throws Exception {
     final AbstractMethodFactory delegate = mock(AbstractMethodFactory.class);
@@ -54,5 +47,12 @@ class TransactionWriteMethodFactoryTest extends DynamoDbTestBase {
 
     assertThat(method).isInstanceOf(TransactionWriteMethod.class);
     verifyZeroInteractions(delegate);
+  }
+
+  private interface Dao {
+    void nonTransactionWriteMethod();
+
+    @ConditionCheck(tableClass = DummyTable.class, keyExpression = "", conditionExpression = "")
+    void transactionWriteMethod();
   }
 }

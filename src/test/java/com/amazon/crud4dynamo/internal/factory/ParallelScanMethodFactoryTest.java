@@ -27,33 +27,9 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class ParallelScanMethodFactoryTest extends SingleTableDynamoDbTestBase<Model> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "Model")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
-  }
-
   @Override
   protected Class getModelClass() {
     return Model.class;
-  }
-
-  public interface Dao extends CompositeKeyCrud<String, Integer, Model> {
-    @Parallel(totalSegments = 10)
-    @Scan(filter = "#rangeKey between :lower and :upper")
-    Iterator<Model> scan(
-        @Param("#rangeKey") String rangeKeyName,
-        @Param(":lower") int lower,
-        @Param(":upper") int upper);
-
-    void aNormalMethod();
   }
 
   @Test
@@ -86,5 +62,29 @@ class ParallelScanMethodFactoryTest extends SingleTableDynamoDbTestBase<Model> {
 
     assertThat(abstractMethod).isNull();
     verify(mockDelegate).create(context);
+  }
+
+  public interface Dao extends CompositeKeyCrud<String, Integer, Model> {
+    @Parallel(totalSegments = 10)
+    @Scan(filter = "#rangeKey between :lower and :upper")
+    Iterator<Model> scan(
+        @Param("#rangeKey") String rangeKeyName,
+        @Param(":lower") int lower,
+        @Param(":upper") int upper);
+
+    void aNormalMethod();
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
   }
 }

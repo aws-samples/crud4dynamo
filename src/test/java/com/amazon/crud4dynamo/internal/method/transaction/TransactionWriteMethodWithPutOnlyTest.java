@@ -23,6 +23,31 @@ class TransactionWriteMethodWithPutOnlyTest {
   private static final String TABLE_NAME_1 = "TestTable1";
   private static final String TABLE_NAME_2 = "TestTable2";
 
+  private interface TestDao {
+    @Put(
+        tableClass = Table1.class,
+        item = ":putItem",
+        conditionExpression = "#attribute = :oldValue")
+    void put1(
+        @Param(":putItem") final Table1 newItem,
+        @Param("#attribute") final String attribute,
+        @Param(":oldValue") final int oldValue);
+
+    @Put(
+        tableClass = Table1.class,
+        item = ":putItem1",
+        conditionExpression = "#attribute = :oldValue")
+    @Put(
+        tableClass = Table2.class,
+        item = ":putItem2",
+        conditionExpression = "#attribute = :oldValue")
+    void put2(
+        @Param(":putItem1") final Table1 newItem1,
+        @Param(":putItem2") final Table1 newItem2,
+        @Param("#attribute") final String attribute,
+        @Param(":oldValue") final int oldValue);
+  }
+
   @Data
   @Builder
   @DynamoDBTable(tableName = TABLE_NAME_1)
@@ -53,31 +78,6 @@ class TransactionWriteMethodWithPutOnlyTest {
 
     @DynamoDBAttribute(attributeName = INT_ATTRIBUTE)
     private Integer integerAttribute;
-  }
-
-  private interface TestDao {
-    @Put(
-        tableClass = Table1.class,
-        item = ":putItem",
-        conditionExpression = "#attribute = :oldValue")
-    void put1(
-        @Param(":putItem") final Table1 newItem,
-        @Param("#attribute") final String attribute,
-        @Param(":oldValue") final int oldValue);
-
-    @Put(
-        tableClass = Table1.class,
-        item = ":putItem1",
-        conditionExpression = "#attribute = :oldValue")
-    @Put(
-        tableClass = Table2.class,
-        item = ":putItem2",
-        conditionExpression = "#attribute = :oldValue")
-    void put2(
-        @Param(":putItem1") final Table1 newItem1,
-        @Param(":putItem2") final Table1 newItem2,
-        @Param("#attribute") final String attribute,
-        @Param(":oldValue") final int oldValue);
   }
 
   @Nested

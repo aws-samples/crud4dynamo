@@ -21,36 +21,9 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class PutFactoryTest extends SingleTableDynamoDbTestBase<PutFactoryTest.Table> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = Table.NAME)
-  public static class Table {
-    private static final String NAME = "TestTable";
-    private static final String HASH_KEY = "HashKey";
-    private static final String STRING_ATTRIBUTE = "StringAttribute";
-
-    @DynamoDBHashKey(attributeName = HASH_KEY)
-    private String hashKey;
-
-    @DynamoDBAttribute(attributeName = STRING_ATTRIBUTE)
-    private String stringAttribute;
-  }
-
   @Override
   protected Class<Table> getModelClass() {
     return Table.class;
-  }
-
-  private interface Dao {
-    String CONDITION_EXPRESSION = "begins_with(#attribute, :prefix)";
-
-    @Put(tableClass = Table.class, item = ":item", conditionExpression = CONDITION_EXPRESSION)
-    void put(
-        @Param(":item") final Table item,
-        @Param("#attribute") final String attributeName,
-        @Param(":prefix") final String prefix);
   }
 
   @Test
@@ -79,5 +52,32 @@ class PutFactoryTest extends SingleTableDynamoDbTestBase<PutFactoryTest.Table> {
         .hasSize(1);
     assertThat(put.getReturnValuesOnConditionCheckFailure())
         .isEqualTo(ReturnValuesOnConditionCheckFailure.NONE.toString());
+  }
+
+  private interface Dao {
+    String CONDITION_EXPRESSION = "begins_with(#attribute, :prefix)";
+
+    @Put(tableClass = Table.class, item = ":item", conditionExpression = CONDITION_EXPRESSION)
+    void put(
+        @Param(":item") final Table item,
+        @Param("#attribute") final String attributeName,
+        @Param(":prefix") final String prefix);
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = Table.NAME)
+  public static class Table {
+    private static final String NAME = "TestTable";
+    private static final String HASH_KEY = "HashKey";
+    private static final String STRING_ATTRIBUTE = "StringAttribute";
+
+    @DynamoDBHashKey(attributeName = HASH_KEY)
+    private String hashKey;
+
+    @DynamoDBAttribute(attributeName = STRING_ATTRIBUTE)
+    private String stringAttribute;
   }
 }

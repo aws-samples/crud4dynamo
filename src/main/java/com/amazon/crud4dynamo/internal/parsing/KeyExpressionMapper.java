@@ -33,18 +33,9 @@ import lombok.Value;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 public class KeyExpressionMapper {
-  @Value
-  @Builder
-  public static class Context {
-    private final String keyStringText;
-    private final AttributeNameMapper nameMapper;
-    private final AttributeValueMapper valueMapper;
-  }
-
   private final String keyExpression;
   private final DynamoDBMapperTableModel tableModel;
   private final Optional<StartContext> contextRoot;
-
   public KeyExpressionMapper(
       final String keyExpression, final DynamoDBMapperTableModel tableModel) {
     this.keyExpression = keyExpression;
@@ -181,5 +172,13 @@ public class KeyExpressionMapper {
                 new ParserFactory<>(KeyExpressionLexer.class, KeyExpressionParser.class)
                     .create(expr))
         .map(KeyExpressionParser::start);
+  }
+
+  @Value
+  @Builder
+  public static class Context {
+    private final String keyStringText;
+    private final AttributeNameMapper nameMapper;
+    private final AttributeValueMapper valueMapper;
   }
 }

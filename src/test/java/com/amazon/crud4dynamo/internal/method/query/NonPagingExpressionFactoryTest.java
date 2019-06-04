@@ -23,34 +23,19 @@ import org.junit.jupiter.api.Test;
 
 class NonPagingExpressionFactoryTest
     extends SingleTableDynamoDbTestBase<NonPagingExpressionFactoryTest.Model> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "Table")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
-
-    @DynamoDBAttribute(attributeName = "Str1")
-    private String str1;
-  }
-
   private static final String KEY_CONDITION_EXPRESSION =
       "#hashKey = :hashKey and #rangeKey between :lower and :upper";
   private static final String FILTER_EXPRESSION = "begins_with(Str1, :prefix)";
 
-  private interface Dao extends CompositeKeyCrud<String, Integer, Model> {
-    @Query(keyCondition = KEY_CONDITION_EXPRESSION, filter = FILTER_EXPRESSION)
-    Iterable<Model> query(
-        @Param("#hashKey") String hashKey,
-        @Param("#rangeKey") int rangeKey,
-        @Param(":lower") int lower,
-        @Param(":upper") int upper,
-        @Param(":prefix") String prefix);
+  private static ImmutableMap<String, AttributeValue> getExpectedValueMap() {
+    return ImmutableMap.of(
+        ":lower", new AttributeValue().withN("1"),
+        ":upper", new AttributeValue().withN("10"),
+        ":prefix", new AttributeValue().withS("Abc"));
+  }
+
+  private static ImmutableMap<String, String> getExpectedNameMap() {
+    return ImmutableMap.of("#hashKey", "HashKey", "#rangeKey", "RangeKey");
   }
 
   @Override
@@ -78,14 +63,29 @@ class NonPagingExpressionFactoryTest
     assertThat(expression.getExpressionAttributeValues()).isEqualTo(getExpectedValueMap());
   }
 
-  private static ImmutableMap<String, AttributeValue> getExpectedValueMap() {
-    return ImmutableMap.of(
-        ":lower", new AttributeValue().withN("1"),
-        ":upper", new AttributeValue().withN("10"),
-        ":prefix", new AttributeValue().withS("Abc"));
+  private interface Dao extends CompositeKeyCrud<String, Integer, Model> {
+    @Query(keyCondition = KEY_CONDITION_EXPRESSION, filter = FILTER_EXPRESSION)
+    Iterable<Model> query(
+        @Param("#hashKey") String hashKey,
+        @Param("#rangeKey") int rangeKey,
+        @Param(":lower") int lower,
+        @Param(":upper") int upper,
+        @Param(":prefix") String prefix);
   }
 
-  private static ImmutableMap<String, String> getExpectedNameMap() {
-    return ImmutableMap.of("#hashKey", "HashKey", "#rangeKey", "RangeKey");
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "Table")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
+
+    @DynamoDBAttribute(attributeName = "Str1")
+    private String str1;
   }
 }

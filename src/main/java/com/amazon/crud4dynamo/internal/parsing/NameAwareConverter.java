@@ -21,8 +21,6 @@ import java.util.function.Function;
 
 /** An attribute value converter which is aware of the expression attribute name, e.g, ":value" */
 public interface NameAwareConverter extends AttributeValueConverter {
-  String getName();
-
   static Function<String, NameAwareConverter> newLazyConverter(
       final String attributeValue, final DynamoDBMapperTableModel tableModel) {
     return name ->
@@ -38,4 +36,6 @@ public interface NameAwareConverter extends AttributeValueConverter {
           }
         };
   }
+
+  String getName();
 }

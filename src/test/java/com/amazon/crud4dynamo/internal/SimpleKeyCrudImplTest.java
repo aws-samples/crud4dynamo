@@ -14,19 +14,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 public class SimpleKeyCrudImplTest extends SimpleKeyTestBase<Model, SimpleKeyCrudImpl> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "TestTable")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBAttribute(attributeName = "Integer1")
-    private Integer integer1;
-  }
-
   @Override
   @SuppressWarnings("unchecked")
   protected SimpleKeyCrudImpl newDao() {
@@ -45,5 +32,18 @@ public class SimpleKeyCrudImplTest extends SimpleKeyTestBase<Model, SimpleKeyCru
   @Override
   protected Class getModelClass() {
     return Model.class;
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "TestTable")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBAttribute(attributeName = "Integer1")
+    private Integer integer1;
   }
 }

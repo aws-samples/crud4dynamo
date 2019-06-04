@@ -27,6 +27,19 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.TokenStream;
 
 public class ParserFactory<L extends Lexer, P extends Parser> {
+  private static final BaseErrorListener ERROR_LISTENER =
+      new BaseErrorListener() {
+        @Override
+        public void syntaxError(
+            final Recognizer<?, ?> recognizer,
+            final Object offendingSymbol,
+            final int line,
+            final int charPositionInLine,
+            final String msg,
+            final RecognitionException e) {
+          throw new RuntimeException("Parsing error: " + msg);
+        }
+      };
   private final Class<L> lexerType;
   private final Class<P> parserType;
 
@@ -64,18 +77,4 @@ public class ParserFactory<L extends Lexer, P extends Parser> {
       throw new RuntimeException(e);
     }
   }
-
-  private static final BaseErrorListener ERROR_LISTENER =
-      new BaseErrorListener() {
-        @Override
-        public void syntaxError(
-            final Recognizer<?, ?> recognizer,
-            final Object offendingSymbol,
-            final int line,
-            final int charPositionInLine,
-            final String msg,
-            final RecognitionException e) {
-          throw new RuntimeException("Parsing error: " + msg);
-        }
-      };
 }

@@ -19,6 +19,13 @@ import org.junit.jupiter.api.Test;
 
 class KeyConditionExpressionParserTest {
 
+  private static List<AttributeValue> applyArguments(
+      final ImmutableMap<String, Object> arguments, final AttributeValueMapper valueMapper) {
+    return arguments.keySet().stream()
+        .map(key -> valueMapper.get(key).convert(arguments.get(key)))
+        .collect(Collectors.toList());
+  }
+
   @Data
   @Builder
   @NoArgsConstructor
@@ -30,6 +37,19 @@ class KeyConditionExpressionParserTest {
 
     @DynamoDBRangeKey(attributeName = "RangeKey")
     private Integer rangeKey;
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "TestTable")
+  static class ModelWithStringRangeKey {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private String rangeKey;
   }
 
   @Nested
@@ -143,19 +163,6 @@ class KeyConditionExpressionParserTest {
     }
   }
 
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "TestTable")
-  static class ModelWithStringRangeKey {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private String rangeKey;
-  }
-
   @Nested
   class BeginsWithExpression extends SingleTableDynamoDbTestBase<ModelWithStringRangeKey> {
 
@@ -209,12 +216,5 @@ class KeyConditionExpressionParserTest {
               .toValueMapper(ImmutableMap.of("#HashKey", "HashKey", "#RangeKey", "RangeKey"));
       verify(valueMapper, arguments, expectedValueMapper);
     }
-  }
-
-  private static List<AttributeValue> applyArguments(
-      final ImmutableMap<String, Object> arguments, final AttributeValueMapper valueMapper) {
-    return arguments.keySet().stream()
-        .map(key -> valueMapper.get(key).convert(arguments.get(key)))
-        .collect(Collectors.toList());
   }
 }

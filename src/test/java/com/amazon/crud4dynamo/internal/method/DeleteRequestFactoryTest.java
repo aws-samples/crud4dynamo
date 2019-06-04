@@ -32,61 +32,9 @@ class DeleteRequestFactoryTest extends SingleTableDynamoDbTestBase<DeleteRequest
   private static final String CONDITIONAL_EXPRESSION_1 = "#nonKeyAttribute <> :value";
   private static final String CONDITIONAL_EXPRESSION_2 = "#hashKey <> :hashKey";
 
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = TABLE_NAME)
-  public static class Model {
-    @DynamoDBHashKey(attributeName = HASH_KEY_NAME)
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = RANGE_KEY_NAME)
-    private Integer rangeKey;
-
-    @DynamoDBAttribute(attributeName = STR_ATTRIBUTE_NAME)
-    private String str1;
-  }
-
   @Override
   protected Class<Model> getModelClass() {
     return Model.class;
-  }
-
-  private interface Dao {
-    void methodWithoutDeleteAnnotation();
-
-    @Delete(returnValue = ReturnValue.ALL_OLD, keyExpression = SIMPLE_KEY_EXPRESSION)
-    void methodWithNotNonReturnValue();
-
-    @Delete(keyExpression = SIMPLE_KEY_EXPRESSION)
-    void delete(
-        final @Param(":hashKey") String hashKeyValue,
-        final @Param(":rangeKey") Integer rangeKeyValue);
-
-    @Delete(keyExpression = COMPLEX_KEY_EXPRESSION)
-    void delete(
-        final @Param("#hashKey") String hashKeyName,
-        final @Param("#rangeKey") String rangeKeyName,
-        final @Param(":hashKey") String hashKeyValue,
-        final @Param(":rangeKey") Integer rangeKeyValue);
-
-    @Delete(
-        returnValue = ReturnValue.ALL_OLD,
-        keyExpression = SIMPLE_KEY_EXPRESSION,
-        conditionExpression = CONDITIONAL_EXPRESSION_1)
-    Model conditionalDelete(
-        final @Param(":hashKey") String hashKeyValue,
-        final @Param(":rangeKey") Integer rangeKeyValue,
-        final @Param("#nonKeyAttribute") String nonKeyAttribute,
-        final @Param(":value") String value);
-
-    @Delete(keyExpression = COMPLEX_KEY_EXPRESSION, conditionExpression = CONDITIONAL_EXPRESSION_2)
-    void conditionalDelete(
-        final @Param("#hashKey") String hashKeyName,
-        final @Param("#rangeKey") String rangeKeyName,
-        final @Param(":hashKey") String hashKeyValue,
-        final @Param(":rangeKey") Integer rangeKeyValue);
   }
 
   @Test
@@ -198,5 +146,57 @@ class DeleteRequestFactoryTest extends SingleTableDynamoDbTestBase<DeleteRequest
   private DeleteRequestFactory newFactory(final Method method) {
     return new DeleteRequestFactory(
         Signature.resolve(method, Dao.class), getModelClass(), getDynamoDbMapper());
+  }
+
+  private interface Dao {
+    void methodWithoutDeleteAnnotation();
+
+    @Delete(returnValue = ReturnValue.ALL_OLD, keyExpression = SIMPLE_KEY_EXPRESSION)
+    void methodWithNotNonReturnValue();
+
+    @Delete(keyExpression = SIMPLE_KEY_EXPRESSION)
+    void delete(
+        final @Param(":hashKey") String hashKeyValue,
+        final @Param(":rangeKey") Integer rangeKeyValue);
+
+    @Delete(keyExpression = COMPLEX_KEY_EXPRESSION)
+    void delete(
+        final @Param("#hashKey") String hashKeyName,
+        final @Param("#rangeKey") String rangeKeyName,
+        final @Param(":hashKey") String hashKeyValue,
+        final @Param(":rangeKey") Integer rangeKeyValue);
+
+    @Delete(
+        returnValue = ReturnValue.ALL_OLD,
+        keyExpression = SIMPLE_KEY_EXPRESSION,
+        conditionExpression = CONDITIONAL_EXPRESSION_1)
+    Model conditionalDelete(
+        final @Param(":hashKey") String hashKeyValue,
+        final @Param(":rangeKey") Integer rangeKeyValue,
+        final @Param("#nonKeyAttribute") String nonKeyAttribute,
+        final @Param(":value") String value);
+
+    @Delete(keyExpression = COMPLEX_KEY_EXPRESSION, conditionExpression = CONDITIONAL_EXPRESSION_2)
+    void conditionalDelete(
+        final @Param("#hashKey") String hashKeyName,
+        final @Param("#rangeKey") String rangeKeyName,
+        final @Param(":hashKey") String hashKeyValue,
+        final @Param(":rangeKey") Integer rangeKeyValue);
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = TABLE_NAME)
+  public static class Model {
+    @DynamoDBHashKey(attributeName = HASH_KEY_NAME)
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = RANGE_KEY_NAME)
+    private Integer rangeKey;
+
+    @DynamoDBAttribute(attributeName = STR_ATTRIBUTE_NAME)
+    private String str1;
   }
 }

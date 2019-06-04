@@ -22,36 +22,19 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class UpdateExpressionParserTest extends SingleTableDynamoDbTestBase<Model> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "TestTable")
-  static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
-
-    @DynamoDBAttribute(attributeName = "Int1")
-    private int int1;
-
-    @DynamoDBAttribute(attributeName = "Int2")
-    private int int2;
-
-    @DynamoDBAttribute(attributeName = "Int3")
-    private int int3;
-
-    @DynamoDBAttribute(attributeName = "Set1")
-    private Set<String> set1;
+  private static void verify(
+      final Map<String, Object> arguments,
+      final AttributeValueMapper actualValueMapper,
+      final AttributeValueMapper expectedValueMapper) {
+    assertThat(applyArguments(arguments, actualValueMapper))
+        .isEqualTo(applyArguments(arguments, expectedValueMapper));
   }
 
-  @Data
-  @Builder
-  public static class CustomType {
-    private String name;
-    private Integer age;
+  private static List<AttributeValue> applyArguments(
+      final Map<String, Object> arguments, final AttributeValueMapper valueMapper) {
+    return arguments.keySet().stream()
+        .map(key -> valueMapper.get(key).convert(arguments.get(key)))
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -172,18 +155,35 @@ class UpdateExpressionParserTest extends SingleTableDynamoDbTestBase<Model> {
         expectedValueMapper);
   }
 
-  private static void verify(
-      final Map<String, Object> arguments,
-      final AttributeValueMapper actualValueMapper,
-      final AttributeValueMapper expectedValueMapper) {
-    assertThat(applyArguments(arguments, actualValueMapper))
-        .isEqualTo(applyArguments(arguments, expectedValueMapper));
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "TestTable")
+  static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
+
+    @DynamoDBAttribute(attributeName = "Int1")
+    private int int1;
+
+    @DynamoDBAttribute(attributeName = "Int2")
+    private int int2;
+
+    @DynamoDBAttribute(attributeName = "Int3")
+    private int int3;
+
+    @DynamoDBAttribute(attributeName = "Set1")
+    private Set<String> set1;
   }
 
-  private static List<AttributeValue> applyArguments(
-      final Map<String, Object> arguments, final AttributeValueMapper valueMapper) {
-    return arguments.keySet().stream()
-        .map(key -> valueMapper.get(key).convert(arguments.get(key)))
-        .collect(Collectors.toList());
+  @Data
+  @Builder
+  public static class CustomType {
+    private String name;
+    private Integer age;
   }
 }

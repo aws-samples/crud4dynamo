@@ -27,6 +27,35 @@ import org.junit.jupiter.api.Test;
 
 class BasicCrudMethodFactoryTest {
 
+  private static Context newContext(
+      final Method method,
+      final Class<?> interfaceType,
+      final Class<?> modelType,
+      final DynamoDBMapper mapper) {
+    return Context.builder()
+        .method(method)
+        .mapper(mapper)
+        .modelType(modelType)
+        .interfaceType(interfaceType)
+        .signature(Signature.resolve(method, interfaceType))
+        .build();
+  }
+
+  public interface CustomSimpleKeyCrud extends SimpleKeyCrud<String, SimpleModel> {
+    @Override
+    void save(final SimpleModel simpleModel) throws CrudForDynamoException;
+  }
+
+  public interface CustomCompositeKeyCrud
+      extends CompositeKeyCrud<String, Integer, CompositeModel> {
+    @Override
+    void save(final CompositeModel compositeModel) throws CrudForDynamoException;
+  }
+
+  public interface ExtendedInterface extends SimpleKeyCrud<String, SimpleModel> {
+    void query();
+  }
+
   @Data
   @Builder
   @NoArgsConstructor
@@ -48,11 +77,6 @@ class BasicCrudMethodFactoryTest {
 
     @DynamoDBRangeKey(attributeName = "RangeKey")
     private Integer rangeKey;
-  }
-
-  public interface CustomSimpleKeyCrud extends SimpleKeyCrud<String, SimpleModel> {
-    @Override
-    void save(final SimpleModel simpleModel) throws CrudForDynamoException;
   }
 
   @Nested
@@ -94,12 +118,6 @@ class BasicCrudMethodFactoryTest {
     }
   }
 
-  public interface CustomCompositeKeyCrud
-      extends CompositeKeyCrud<String, Integer, CompositeModel> {
-    @Override
-    void save(final CompositeModel compositeModel) throws CrudForDynamoException;
-  }
-
   @Nested
   class CompositeModelTest extends SingleTableDynamoDbTestBase<CompositeModel> {
     @Override
@@ -137,10 +155,6 @@ class BasicCrudMethodFactoryTest {
       abstractMethod.invoke(model);
       assertThat(getItem(model)).contains(model);
     }
-  }
-
-  public interface ExtendedInterface extends SimpleKeyCrud<String, SimpleModel> {
-    void query();
   }
 
   @Nested
@@ -184,19 +198,5 @@ class BasicCrudMethodFactoryTest {
             newContext(method, CustomCompositeKeyCrud.class, CompositeModel.class, getDbMapper()));
       }
     }
-  }
-
-  private static Context newContext(
-      final Method method,
-      final Class<?> interfaceType,
-      final Class<?> modelType,
-      final DynamoDBMapper mapper) {
-    return Context.builder()
-        .method(method)
-        .mapper(mapper)
-        .modelType(modelType)
-        .interfaceType(interfaceType)
-        .signature(Signature.resolve(method, interfaceType))
-        .build();
   }
 }

@@ -71,6 +71,10 @@ public class TransactionGetMethod implements AbstractMethod {
     return signature;
   }
 
+  private static BiFunction<ItemResponse, ItemResponseConverter, Object> newConvertFunction() {
+    return (itemResponse, itemResponseConverter) -> itemResponseConverter.convert(itemResponse);
+  }
+
   @Override
   public Signature getSignature() {
     return signature;
@@ -106,10 +110,6 @@ public class TransactionGetMethod implements AbstractMethod {
     return Streams.zip(
             result.getResponses().stream(), itemResponseConverters.stream(), newConvertFunction())
         .collect(Collectors.toList());
-  }
-
-  private static BiFunction<ItemResponse, ItemResponseConverter, Object> newConvertFunction() {
-    return (itemResponse, itemResponseConverter) -> itemResponseConverter.convert(itemResponse);
   }
 
   @Override

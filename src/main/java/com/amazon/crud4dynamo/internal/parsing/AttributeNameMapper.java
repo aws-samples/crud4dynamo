@@ -44,16 +44,24 @@ public class AttributeNameMapper {
     innerMap = map;
   }
 
-  public AttributeNameMapper merge(final AttributeNameMapper other) {
-    return merge(this, other);
-  }
-
   public static AttributeNameMapper merge(
       final AttributeNameMapper m1, final AttributeNameMapper m2) {
     final Map<String, List<Function<String, NameAwareConverter>>> map =
         MapHelper.merge(m1.innerMap, m2.innerMap).entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey, flatList()));
     return new AttributeNameMapper(map);
+  }
+
+  private static Function<
+          Map.Entry<String, List<List<Function<String, NameAwareConverter>>>>,
+          List<Function<String, NameAwareConverter>>>
+      flatList() {
+    return entry ->
+        entry.getValue().stream().flatMap(Collection::stream).collect(Collectors.toList());
+  }
+
+  public AttributeNameMapper merge(final AttributeNameMapper other) {
+    return merge(this, other);
   }
 
   public AttributeNameMapper put(
@@ -67,14 +75,6 @@ public class AttributeNameMapper {
 
   public boolean has(final String attrName) {
     return innerMap.containsKey(attrName);
-  }
-
-  private static Function<
-          Map.Entry<String, List<List<Function<String, NameAwareConverter>>>>,
-          List<Function<String, NameAwareConverter>>>
-      flatList() {
-    return entry ->
-        entry.getValue().stream().flatMap(Collection::stream).collect(Collectors.toList());
   }
 
   @VisibleForTesting

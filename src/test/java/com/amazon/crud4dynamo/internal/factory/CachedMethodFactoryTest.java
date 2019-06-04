@@ -22,13 +22,6 @@ class CachedMethodFactoryTest {
   private AbstractMethod delegateMethod;
   private CachedMethodFactory cachedMethodFactory;
 
-  public interface TestInterface {
-    @Cached
-    void cachedMethod();
-
-    void nonCachedMethod();
-  }
-
   @BeforeEach
   void setUp() {
     delegateFactory = mock(AbstractMethodFactory.class);
@@ -60,5 +53,12 @@ class CachedMethodFactoryTest {
 
     assertThat(cachedMethodFactory.create(context)).isEqualTo(delegateMethod);
     verify(delegateFactory).create(context);
+  }
+
+  public interface TestInterface {
+    @Cached
+    void cachedMethod();
+
+    void nonCachedMethod();
   }
 }

@@ -23,47 +23,9 @@ import org.junit.jupiter.api.Test;
 
 class ConditionCheckFactoryTest
     extends SingleTableDynamoDbTestBase<ConditionCheckFactoryTest.Table> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = Table.NAME)
-  public static class Table {
-    private static final String NAME = "TestTable";
-    private static final String HASH_KEY = "HashKey";
-    private static final String STRING_ATTRIBUTE = "StringAttribute";
-
-    @DynamoDBHashKey(attributeName = HASH_KEY)
-    private String hashKey;
-
-    @DynamoDBAttribute(attributeName = STRING_ATTRIBUTE)
-    private String stringAttribute;
-  }
-
   @Override
   protected Class<Table> getModelClass() {
     return Table.class;
-  }
-
-  private interface Dao {
-    String CONDITION_EXPRESSION_1 = "attribute_exists(#attribute)";
-    String CONDITION_EXPRESSION_2 = "StringAttribute > :value";
-
-    @ConditionCheck(
-        tableClass = Table.class,
-        keyExpression = "#key = :hashKey",
-        conditionExpression = CONDITION_EXPRESSION_1)
-    void checkWithoutExpressionAttributeValues(
-        @Param("#key") final String keyName,
-        @Param(":hashKey") final String hashKey,
-        @Param("#attribute") final String attribute);
-
-    @ConditionCheck(
-        tableClass = Table.class,
-        keyExpression = "HashKey = :hashKey",
-        conditionExpression = CONDITION_EXPRESSION_2)
-    void checkWithExpressionAttributeValues(
-        @Param(":hashKey") final String hashKey, @Param(":value") final String value);
   }
 
   /* TODO: clean up. */
@@ -117,5 +79,43 @@ class ConditionCheckFactoryTest
         .containsEntry(":value", new AttributeValue(stringValue));
     assertThat(conditionCheck.getReturnValuesOnConditionCheckFailure())
         .isEqualTo(ReturnValuesOnConditionCheckFailure.NONE.toString());
+  }
+
+  private interface Dao {
+    String CONDITION_EXPRESSION_1 = "attribute_exists(#attribute)";
+    String CONDITION_EXPRESSION_2 = "StringAttribute > :value";
+
+    @ConditionCheck(
+        tableClass = Table.class,
+        keyExpression = "#key = :hashKey",
+        conditionExpression = CONDITION_EXPRESSION_1)
+    void checkWithoutExpressionAttributeValues(
+        @Param("#key") final String keyName,
+        @Param(":hashKey") final String hashKey,
+        @Param("#attribute") final String attribute);
+
+    @ConditionCheck(
+        tableClass = Table.class,
+        keyExpression = "HashKey = :hashKey",
+        conditionExpression = CONDITION_EXPRESSION_2)
+    void checkWithExpressionAttributeValues(
+        @Param(":hashKey") final String hashKey, @Param(":value") final String value);
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = Table.NAME)
+  public static class Table {
+    private static final String NAME = "TestTable";
+    private static final String HASH_KEY = "HashKey";
+    private static final String STRING_ATTRIBUTE = "StringAttribute";
+
+    @DynamoDBHashKey(attributeName = HASH_KEY)
+    private String hashKey;
+
+    @DynamoDBAttribute(attributeName = STRING_ATTRIBUTE)
+    private String stringAttribute;
   }
 }

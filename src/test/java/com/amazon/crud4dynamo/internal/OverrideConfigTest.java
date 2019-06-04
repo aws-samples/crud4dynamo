@@ -14,6 +14,34 @@ import org.junit.jupiter.api.Nested;
 
 class OverrideConfigTest {
 
+  private static class FactoryConfig implements ChainedMethodFactoryConfig<FactoryConfig> {
+    private final ChainedFactoryConstructor constructor;
+
+    private FactoryConfig(final ChainedFactoryConstructor constructor) {
+      this.constructor = constructor;
+    }
+
+    @Override
+    public int getOrder() {
+      return 1;
+    }
+
+    @Override
+    public ChainedFactoryConstructor getChainedFactoryConstructor() {
+      return constructor;
+    }
+  }
+
+  private static class IdentityChainedFactoryConstructor implements ChainedFactoryConstructor {
+    private AbstractMethodFactory factory;
+
+    @Override
+    public AbstractMethodFactory apply(final AbstractMethodFactory abstractMethodFactory) {
+      factory = abstractMethodFactory;
+      return abstractMethodFactory;
+    }
+  }
+
   @Nested
   class WithEmptyConfig extends SimpleKeyCrudTest {
     @Override
@@ -61,34 +89,6 @@ class OverrideConfigTest {
                       new FactoryConfig(identityChainedFactoryConstructor))
                   .build())
           .createSimple(getModelClass());
-    }
-  }
-
-  private static class FactoryConfig implements ChainedMethodFactoryConfig<FactoryConfig> {
-    private final ChainedFactoryConstructor constructor;
-
-    private FactoryConfig(final ChainedFactoryConstructor constructor) {
-      this.constructor = constructor;
-    }
-
-    @Override
-    public int getOrder() {
-      return 1;
-    }
-
-    @Override
-    public ChainedFactoryConstructor getChainedFactoryConstructor() {
-      return constructor;
-    }
-  }
-
-  private static class IdentityChainedFactoryConstructor implements ChainedFactoryConstructor {
-    private AbstractMethodFactory factory;
-
-    @Override
-    public AbstractMethodFactory apply(final AbstractMethodFactory abstractMethodFactory) {
-      factory = abstractMethodFactory;
-      return abstractMethodFactory;
     }
   }
 }

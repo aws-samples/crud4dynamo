@@ -20,36 +20,9 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class GetFactoryTest extends SingleTableDynamoDbTestBase<GetFactoryTest.Table> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = Table.NAME)
-  public static class Table {
-    private static final String NAME = "TestTable";
-    private static final String HASH_KEY = "HashKey";
-    private static final String STRING_ATTRIBUTE = "StringAttribute";
-
-    @DynamoDBHashKey(attributeName = HASH_KEY)
-    private String hashKey;
-
-    @DynamoDBAttribute(attributeName = STRING_ATTRIBUTE)
-    private String stringAttribute;
-  }
-
   @Override
   protected Class<Table> getModelClass() {
     return Table.class;
-  }
-
-  private interface Dao {
-    @Get(
-        tableClass = Table.class,
-        keyExpression = "HashKey = :hashKey",
-        projectionExpression = "#projectAttribute")
-    void get(
-        @Param(":hashKey") final String hashKey,
-        @Param("#projectAttribute") final String projectAttributeName);
   }
 
   @Test
@@ -71,5 +44,32 @@ class GetFactoryTest extends SingleTableDynamoDbTestBase<GetFactoryTest.Table> {
     assertThat(get.getExpressionAttributeNames())
         .containsEntry("#projectAttribute", Table.STRING_ATTRIBUTE)
         .hasSize(1);
+  }
+
+  private interface Dao {
+    @Get(
+        tableClass = Table.class,
+        keyExpression = "HashKey = :hashKey",
+        projectionExpression = "#projectAttribute")
+    void get(
+        @Param(":hashKey") final String hashKey,
+        @Param("#projectAttribute") final String projectAttributeName);
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = Table.NAME)
+  public static class Table {
+    private static final String NAME = "TestTable";
+    private static final String HASH_KEY = "HashKey";
+    private static final String STRING_ATTRIBUTE = "StringAttribute";
+
+    @DynamoDBHashKey(attributeName = HASH_KEY)
+    private String hashKey;
+
+    @DynamoDBAttribute(attributeName = STRING_ATTRIBUTE)
+    private String stringAttribute;
   }
 }

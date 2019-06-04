@@ -38,6 +38,15 @@ public class DefaultMethod implements AbstractMethod {
     this.signature = signature;
   }
 
+  private static MethodHandle toMethodHandle(final Method m) {
+    final Lookup lookup = MethodHandlesHelper.getLookup(m.getDeclaringClass());
+    try {
+      return lookup.unreflectSpecial(m, m.getDeclaringClass());
+    } catch (final IllegalAccessException e) {
+      throw ExceptionHelper.throwAsUnchecked(e);
+    }
+  }
+
   @Override
   public Signature getSignature() {
     return signature;
@@ -58,14 +67,5 @@ public class DefaultMethod implements AbstractMethod {
     methodHandleMap.computeIfAbsent(
         MethodHandle.class, key -> toMethodHandle(method).bindTo(target));
     return this;
-  }
-
-  private static MethodHandle toMethodHandle(final Method m) {
-    final Lookup lookup = MethodHandlesHelper.getLookup(m.getDeclaringClass());
-    try {
-      return lookup.unreflectSpecial(m, m.getDeclaringClass());
-    } catch (final IllegalAccessException e) {
-      throw ExceptionHelper.throwAsUnchecked(e);
-    }
   }
 }

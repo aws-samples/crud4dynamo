@@ -90,16 +90,18 @@ test {
     useJUnitPlatform()
 }
 
-spotless {
-    java {
-        target 'src/main/**/*.java'
-        googleJavaFormat('1.7')
-    }
-
-    format 'misc', {
-        target '**/*.gradle', '**/*.md', '**/.gitignore'
-        trimTrailingWhitespace()
-        indentWithSpaces(4)
-        endWithNewline()
-    }
-}
+// Comment this out for this moment
+// the configuration doesn't compatible with Intellij google-java-format plugin
+//spotless {
+//    java {
+//        target 'src/main/**/*.java'
+//        googleJavaFormat('1.7')
+//    }
+//
+//    format 'misc', {
+//        target '**/*.gradle', '**/*.md', '**/.gitignore'
+//        trimTrailingWhitespace()
+//        indentWithSpaces(4)
+//        endWithNewline()
+//    }
+//}

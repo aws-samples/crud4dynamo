@@ -33,6 +33,23 @@ public class ArgumentTypeBasedConverter implements AttributeValueConverter {
     this.path = path;
   }
 
+  private static boolean isStringSet(final Set<?> aset) {
+    return aset.stream().map(Object::getClass).allMatch(String.class::isAssignableFrom);
+  }
+
+  private static boolean isNumberSet(final Set<?> aset) {
+    return aset.stream().map(Object::getClass).allMatch(Number.class::isAssignableFrom);
+  }
+
+  private static boolean isBinarySet(final Set<?> aset) {
+    return aset.stream()
+        .map(Object::getClass)
+        .allMatch(
+            eleClass ->
+                byte[].class.isAssignableFrom(eleClass)
+                    || ByteBuffer.class.isAssignableFrom(eleClass));
+  }
+
   @Override
   public AttributeValue convert(final Object obj) {
     if (obj instanceof String) {
@@ -100,22 +117,5 @@ public class ArgumentTypeBasedConverter implements AttributeValueConverter {
       throw new CrudForDynamoException(
           String.format("Unsupported type %s for nested attribute %s.", obj.getClass(), path));
     }
-  }
-
-  private static boolean isStringSet(final Set<?> aset) {
-    return aset.stream().map(Object::getClass).allMatch(String.class::isAssignableFrom);
-  }
-
-  private static boolean isNumberSet(final Set<?> aset) {
-    return aset.stream().map(Object::getClass).allMatch(Number.class::isAssignableFrom);
-  }
-
-  private static boolean isBinarySet(final Set<?> aset) {
-    return aset.stream()
-        .map(Object::getClass)
-        .allMatch(
-            eleClass ->
-                byte[].class.isAssignableFrom(eleClass)
-                    || ByteBuffer.class.isAssignableFrom(eleClass));
   }
 }

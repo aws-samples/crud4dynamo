@@ -25,41 +25,6 @@ import org.junit.jupiter.api.Test;
 class PagingMethodTest extends SingleTableDynamoDbTestBase<PagingMethodTest.Model> {
   private static final String GROUP_KEY = "A";
 
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "Model")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
-  }
-
-  @Override
-  protected Class<Model> getModelClass() {
-    return Model.class;
-  }
-
-  private interface Dao extends CompositeKeyCrud<String, Integer, Model> {
-    @Query(keyCondition = "HashKey = :hashKey")
-    PageResult<Model> query(
-        @Param(":hashKey") final String hashKey, final PageRequest<Model> request);
-  }
-
-  @Test
-  void invoke() throws Throwable {
-    final List<Model> testModels = prepareTestModels();
-    final PagingMethod queryMethod = getQueryMethod();
-
-    final List<Model> models =
-        PageResultCollector.newCollector(getInitialRequest(), getRequester(queryMethod)).get();
-
-    assertThat(models).containsAll(testModels);
-  }
-
   private static PageRequest<Model> getInitialRequest() {
     return PageRequest.<Model>builder().exclusiveStartItem(null).limit(3).build();
   }
@@ -74,6 +39,22 @@ class PagingMethodTest extends SingleTableDynamoDbTestBase<PagingMethodTest.Mode
     };
   }
 
+  @Override
+  protected Class<Model> getModelClass() {
+    return Model.class;
+  }
+
+  @Test
+  void invoke() throws Throwable {
+    final List<Model> testModels = prepareTestModels();
+    final PagingMethod queryMethod = getQueryMethod();
+
+    final List<Model> models =
+        PageResultCollector.newCollector(getInitialRequest(), getRequester(queryMethod)).get();
+
+    assertThat(models).containsAll(testModels);
+  }
+
   private PagingMethod getQueryMethod() throws NoSuchMethodException {
     final Method method = Dao.class.getMethod("query", String.class, PageRequest.class);
     return new PagingMethod(
@@ -84,5 +65,24 @@ class PagingMethodTest extends SingleTableDynamoDbTestBase<PagingMethodTest.Mode
     return storeItems(
         IntStream.range(0, 10)
             .mapToObj(i -> Model.builder().hashKey(GROUP_KEY).rangeKey(i).build()));
+  }
+
+  private interface Dao extends CompositeKeyCrud<String, Integer, Model> {
+    @Query(keyCondition = "HashKey = :hashKey")
+    PageResult<Model> query(
+        @Param(":hashKey") final String hashKey, final PageRequest<Model> request);
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
   }
 }

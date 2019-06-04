@@ -24,6 +24,26 @@ class TransactionWriteMethodWithConditionCheckOnlyTest {
   private static final String TABLE_NAME_1 = "TestTable1";
   private static final String TABLE_NAME_2 = "TestTable2";
 
+  private interface TestDao {
+    @ConditionCheck(
+        tableClass = Table1.class,
+        conditionExpression = "attribute_exists(#attribute)",
+        keyExpression = "HashKey = :hashKey")
+    void checkOnTable1(
+        @Param(":hashKey") final String hashKey, @Param("#attribute") final String attribute);
+
+    @ConditionCheck(
+        tableClass = Table1.class,
+        conditionExpression = "attribute_exists(#attribute)",
+        keyExpression = "HashKey = :hashKey")
+    @ConditionCheck(
+        tableClass = Table2.class,
+        conditionExpression = "attribute_exists(#attribute)",
+        keyExpression = "HashKey = :hashKey")
+    void checkOnTable_1_and_2(
+        @Param(":hashKey") final String hashKey, @Param("#attribute") final String attribute);
+  }
+
   @Data
   @Builder
   @DynamoDBTable(tableName = TABLE_NAME_1)
@@ -54,26 +74,6 @@ class TransactionWriteMethodWithConditionCheckOnlyTest {
 
     @DynamoDBAttribute(attributeName = INT_ATTRIBUTE)
     private Integer integerAttribute;
-  }
-
-  private interface TestDao {
-    @ConditionCheck(
-        tableClass = Table1.class,
-        conditionExpression = "attribute_exists(#attribute)",
-        keyExpression = "HashKey = :hashKey")
-    void checkOnTable1(
-        @Param(":hashKey") final String hashKey, @Param("#attribute") final String attribute);
-
-    @ConditionCheck(
-        tableClass = Table1.class,
-        conditionExpression = "attribute_exists(#attribute)",
-        keyExpression = "HashKey = :hashKey")
-    @ConditionCheck(
-        tableClass = Table2.class,
-        conditionExpression = "attribute_exists(#attribute)",
-        keyExpression = "HashKey = :hashKey")
-    void checkOnTable_1_and_2(
-        @Param(":hashKey") final String hashKey, @Param("#attribute") final String attribute);
   }
 
   @Nested

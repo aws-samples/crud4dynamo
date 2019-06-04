@@ -22,25 +22,8 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 class NonPagingMethodTest extends SingleTableDynamoDbTestBase<NonPagingMethodTest.Model> {
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "Model")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
-  }
-
-  public interface Dao extends CompositeKeyCrud<String, Integer, Model> {
-    @Scan(filter = "#rangeKey between :lower and :upper")
-    Iterator<Model> scan(
-        @Param("#rangeKey") String rangeKeyName,
-        @Param(":lower") int lower,
-        @Param(":upper") int upper);
+  private static Stream<Model> prepareData() {
+    return IntStream.range(0, 10).mapToObj(i -> Model.builder().hashKey("A").rangeKey(i).build());
   }
 
   @Override
@@ -66,7 +49,24 @@ class NonPagingMethodTest extends SingleTableDynamoDbTestBase<NonPagingMethodTes
     return new NonPagingMethod(signature, getModelClass(), getDynamoDbMapper(), null);
   }
 
-  private static Stream<Model> prepareData() {
-    return IntStream.range(0, 10).mapToObj(i -> Model.builder().hashKey("A").rangeKey(i).build());
+  public interface Dao extends CompositeKeyCrud<String, Integer, Model> {
+    @Scan(filter = "#rangeKey between :lower and :upper")
+    Iterator<Model> scan(
+        @Param("#rangeKey") String rangeKeyName,
+        @Param(":lower") int lower,
+        @Param(":upper") int upper);
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
   }
 }

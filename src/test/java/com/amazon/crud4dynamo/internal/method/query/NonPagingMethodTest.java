@@ -28,28 +28,9 @@ class NonPagingMethodTest extends SingleTableDynamoDbTestBase<Model> {
 
   private static final String GROUP_KEY = "A";
 
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @DynamoDBTable(tableName = "Model")
-  public static class Model {
-    @DynamoDBHashKey(attributeName = "HashKey")
-    private String hashKey;
-
-    @DynamoDBRangeKey(attributeName = "RangeKey")
-    private Integer rangeKey;
-  }
-
   @Override
   protected Class<Model> getModelClass() {
     return Model.class;
-  }
-
-  private interface Dao extends CompositeKeyCrud<String, Integer, Model> {
-    @Query(keyCondition = KEY_CONDITION_EXPRESSION)
-    Iterable<Model> query(
-        @Param(":hashKey") final String hashKey, @Param(":lower") final int lower);
   }
 
   @Test
@@ -74,5 +55,24 @@ class NonPagingMethodTest extends SingleTableDynamoDbTestBase<Model> {
         Stream.of(
             Model.builder().hashKey(GROUP_KEY).rangeKey(1).build(),
             Model.builder().hashKey(GROUP_KEY).rangeKey(2).build()));
+  }
+
+  private interface Dao extends CompositeKeyCrud<String, Integer, Model> {
+    @Query(keyCondition = KEY_CONDITION_EXPRESSION)
+    Iterable<Model> query(
+        @Param(":hashKey") final String hashKey, @Param(":lower") final int lower);
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @DynamoDBTable(tableName = "Model")
+  public static class Model {
+    @DynamoDBHashKey(attributeName = "HashKey")
+    private String hashKey;
+
+    @DynamoDBRangeKey(attributeName = "RangeKey")
+    private Integer rangeKey;
   }
 }

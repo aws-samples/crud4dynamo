@@ -27,6 +27,10 @@ public class UpdateMethodFactory extends ChainedAbstractMethodFactory {
     super(delegate);
   }
 
+  private static boolean isAnnotatedWithUpdate(final Context context) {
+    return context.signature().invokable().isAnnotationPresent(Update.class);
+  }
+
   @Override
   public AbstractMethod create(final Context context) {
     if (isAnnotatedWithUpdate(context)) {
@@ -38,9 +42,5 @@ public class UpdateMethodFactory extends ChainedAbstractMethodFactory {
           context.mapperConfig());
     }
     return super.create(context);
-  }
-
-  private static boolean isAnnotatedWithUpdate(final Context context) {
-    return context.signature().invokable().isAnnotationPresent(Update.class);
   }
 }
