@@ -26,6 +26,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverted;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverter;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTyped;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBVersionAttribute;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -46,6 +47,8 @@ public class Book {
     public static final String RANGE_KEY = "Id";
     public static final String INTEGER_STORED_AS_STRING = "IntegerStoredAsString";
     public static final String CUSTOM_DATE = "CustomDate";
+    public static final String COVER = "Cover";
+    public static final String VERSION_NUMBER = "Version";
   }
 
   @DynamoDBHashKey(attributeName = Attributes.HASH_KEY)
@@ -61,7 +64,7 @@ public class Book {
   @DynamoDBIgnore
   private String ignored;
 
-  @DynamoDBAttribute(attributeName = "Cover")
+  @DynamoDBAttribute(attributeName = Attributes.COVER)
   private Picture cover;
 
   @DynamoDBTyped(value = DynamoDBAttributeType.S)
@@ -71,6 +74,9 @@ public class Book {
   @DynamoDBTypeConverted(converter = CustomDateConverter.class)
   @DynamoDBAttribute(attributeName = Attributes.CUSTOM_DATE)
   private CustomDate customDate;
+
+  @DynamoDBVersionAttribute(attributeName = Attributes.VERSION_NUMBER)
+  private Long versionNumber;
 
   @Data
   @Builder
