@@ -2,7 +2,12 @@ plugins {
     id 'java-library'
     id 'antlr'
     id 'jacoco'
+    id 'com.jfrog.bintray' version '1.8.4'
+    id 'maven-publish'
 }
+
+group = 'com.amazon'
+version = '1.0'
 
 repositories {
     jcenter()
@@ -102,6 +107,7 @@ jacocoTestReport {
     }
 
     afterEvaluate {
+        // TODO: fix the usage of deprecated API
         classDirectories = files(classDirectories.files.collect {
             fileTree(dir: it, exclude: [
                     "${antlrConfig.package.replace('.', '/')}/**"
@@ -110,3 +116,73 @@ jacocoTestReport {
     }
 }
 
+
+javadoc.failOnError = false
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+bintray {
+    user = System.getProperty('bintray.user')
+    key = System.getProperty('bintray.key')
+    publications = ['mavenPublication']
+
+    pkg {
+        repo = 'crud4dynamo'
+        name = 'crud4dynamo'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/aws-samples/crud4dynamo'
+        version {
+            name = '1.0.0'
+            desc = '1.0.0'
+            released = new Date()
+        }
+    }
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id 'alanzplus'
+            name 'Alan Xuan'
+            email 'jzxuanuni@gmail.com'
+        }
+    }
+
+    scm {
+        url 'https://github.com/aws-samples/crud4dynamo'
+    }
+}
+
+
+publishing {
+    publications {
+        mavenPublication(MavenPublication) {
+            from components.java
+            artifactId 'crud4dynamo'
+            artifact sourcesJar
+            artifact javadocJar
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'A light-weight library built on-top of AWS DynamoDB SDK and provides the interfaces for common access patterns when dealing with DynamoDB.')
+                root.appendNode('name', 'Crud4Dynamo')
+                root.appendNode('url', 'https://github.com/aws-samples/crud4dynamo')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
