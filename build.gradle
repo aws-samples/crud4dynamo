@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'antlr'
-    id "com.diffplug.gradle.spotless" version "3.23.0"
+    id 'jacoco'
 }
 
 repositories {
@@ -89,3 +89,24 @@ generateGrammarSource {
 test {
     useJUnitPlatform()
 }
+
+jacoco {
+    toolVersion = "0.8.3"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "${antlrConfig.package.replace('.', '/')}/**"
+            ])
+        })
+    }
+}
+

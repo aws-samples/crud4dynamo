@@ -1,6 +1,7 @@
 ## Crud4Dynamo
-Crud4Dynamo is a light-weight library built on-top of [AWS DynamoDB SDK](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.html) and provides the interfaces for common access patterns when dealing with DynamoDB.
+[![Build Status](https://travis-ci.org/aws-samples/crud4dynamo.svg?branch=master)](https://travis-ci.org/aws-samples/crud4dynamo)
 
+Crud4Dynamo is a light-weight library built on-top of [AWS DynamoDB SDK](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.html) and provides the interfaces for common access patterns when dealing with DynamoDB.
 
 See [Introduction section](https://github.com/aws-samples/crud4dynamo/wiki/Introduction) in the [wiki](https://github.com/aws-samples/crud4dynamo/wiki) for quick start.
 
